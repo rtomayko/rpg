@@ -56,9 +56,19 @@ pgem_install_dir () {
 log fetch "$1"
 mkdir -p "$PGEMCACHE"
 cd "$PGEMCACHE"
-output=$(gem fetch "$1") || false
+
+output=$(gem fetch "$1")
+test -n "$output" || exit 1
+
 name=${output#Downloaded }
 file="$(pwd)/${name}.gem"
+
+# Install dependencies
+pgem-deps "$file" |
+while read depname args
+do
+    pgem-install "$depname" $args
+done
 
 # Unpack the gem into the packages database
 log unpack "$1"
