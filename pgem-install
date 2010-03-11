@@ -54,14 +54,14 @@ pgem-deps "$gemfile" |
 xargs -n 2 pgem-install
 
 # Unpack the gem into the packages area
-test -d "$PGEMPACKAGES/$gemname" || {
+test -d "$PGEMPACKS/$gemname" || {
     log unpack "$gemfile"
-    mkdir -p "$PGEMPACKAGES"
-    cd "$PGEMPACKAGES"
+    mkdir -p "$PGEMPACKS"
+    cd "$PGEMPACKS"
     gem unpack "$gemfile" >/dev/null
 }
 
-cd "$PGEMPACKAGES/$gemname"
+cd "$PGEMPACKS/$gemname"
 
 # Install all library files.
 if test -d lib

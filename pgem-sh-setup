@@ -41,7 +41,7 @@ pgem_rubybin () {
 : ${PGEMBIN:=$PGEMPATH/bin}
 : ${PGEMMAN:=$PGEMPATH/man}
 : ${PGEMCACHE:=$PGEMPATH/cache}
-: ${PGEMPACKAGES:=$PGEMPATH/packages}
+: ${PGEMPACKS:=$PGEMPATH/packages}
 : ${PGEMDB:=$PGEMPATH/db}
 
 # export all PGEM variables
