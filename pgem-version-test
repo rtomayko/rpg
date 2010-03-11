@@ -1,0 +1,67 @@
+#!/bin/sh
+#/ Usage: pgem-version-test -e <ver> <expr>...
+#/ Test if <ver> matches the version test given in <expr>.
+#/
+set -e
+
+# Shift off the version
+ver="$1" ; shift
+
+# Create a single big expression separated by commas.
+exp=""
+while test $# -gt 0
+do
+    exp="$1,$exp"
+    shift
+done
+exp=$(
+    echo "$exp" |
+    sed '
+        s/ //g
+        s/,$//g
+    ')
+
+# Run one pgem-version-test process per expression.
+if test $(expr "$exp" : '.*,') -gt 0
+then
+    echo "$exp"               |
+      tr ',' '\n'             |
+      xargs -n 1 "$0" "$ver"
+    exit
+fi
+
+. pgem-sh-setup
+
+echo "$exp" |
+sed '
+    s/>/-gt/
+    s/</-lt/
+    s/-gt=/-ge/
+    s/-lt=/-le/
+    s/=/-eq/
+    s/\([0-9]\)/ \1/
+    ' |
+while read op ver2
+do
+    ver1="$ver."
+    ver2="$ver2."
+    log compare "$ver1 $op $ver2"
+    while test -n "$ver1" -o -n "$ver2"
+    do
+        left=${ver1%%.*}
+        right=${ver2%%.*}
+        left=${left:-0}
+        right=${right:-0}
+        ver1=${ver1#*.}
+        ver2=${ver2#*.}
+        printf "test $left $op $right\n"
+        if test $left $op $right
+        then
+            test $left -eq $right || exit 0
+        else
+            test $left -eq $right
+        fi
+    done
+
+    test 0 $op 0
+done

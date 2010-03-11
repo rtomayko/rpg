@@ -1,5 +1,17 @@
 #!/bin/sh
 
+# Write a warning to stderr. The message is prefixed with the
+# program's basename.
+warn () {
+    echo "$(basename $0):" "$@" 1>&2
+}
+
+# Write an informationational message stderr under verbose mode.
+log () {
+    local t="$1:" ; shift
+    printf "%-10s%s\n" "$t" "$*" 1>&2
+}
+
 # rubygems gemdir path
 pgem_gemdir () {
     if test -z "$GEM_HOME"; then
@@ -26,10 +38,11 @@ pgem_rubybin () {
 # pgem configuration
 : ${PGEMPATH:=/var/lib/pgem}
 : ${PGEMLIB:=$PGEMPATH/lib}
-: ${PGEMCACHE:=$PGEMPATH/cache}
-: ${PGEMPACKAGES:=$PGEMPATH/packages}
 : ${PGEMBIN:=$PGEMPATH/bin}
 : ${PGEMMAN:=$PGEMPATH/man}
+: ${PGEMCACHE:=$PGEMPATH/cache}
+: ${PGEMPACKAGES:=$PGEMPATH/packages}
+: ${PGEMDB:=$PGEMPATH/db}
 
 # export all PGEM variables
 export PGEMPATH PGEMLIB PGEMCACHE PGEMPACKAGES PGEMBIN PGEMMAN
