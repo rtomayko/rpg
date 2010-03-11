@@ -25,7 +25,7 @@ pgem_ln () {
 # Recursive file hierarchy copy routine. Attempts to hardlink files
 # and falls back to normal copies.
 pgem_install_dir () {
-    local src="$1" dest="$2"
+    local src="$1" dest="$2" manifest="$3"
     mkdir -p "$dest"
     for file in "$1"/*
     do
@@ -33,10 +33,11 @@ pgem_install_dir () {
         then
             # link dest to source
             pgem_ln "$file" "$dest/$(basename $file)"
+            echo "$dest/$(basename $file)" >> "$manifest"
         elif test -d "$file"
         then
             # recurse into directories
-            pgem_install_dir "$file" "$dest/$(basename $file)"
+            pgem_install_dir "$file" "$dest/$(basename $file)" "$manifest"
         else
             warn "unknown file type: $file"
             return 1
@@ -48,6 +49,7 @@ pgem_install_dir () {
 # Fetch the gem into PGEM_CACHE
 gemfile=$(pgem-fetch $name $vers) || exit 1
 gemname=$(basename ${gemfile%.gem})
+gemvers=${gemname##*-}
 
 # Install all dependencies
 pgem-deps "$gemfile" |
@@ -61,13 +63,21 @@ test -d "$PGEMPACKS/$gemname" || {
     gem unpack "$gemfile" >/dev/null
 }
 
+# Get the manifest file going and create an installing symlink.
+dbdir="$PGEMDB/$name"
+manifest="$dbdir/$gemvers"
+mkdir -p "$dbdir"
+echo "# $(date)" > "$manifest"
+ln -s "$gemvers" "$dbdir/installing"
+
+# Go into the unpackaged package dir to make installing a bit easier.
 cd "$PGEMPACKS/$gemname"
 
 # Install all library files.
 if test -d lib
 then
     mkdir -p "$PGEMLIB"
-    pgem_install_dir lib "$PGEMLIB"
+    pgem_install_dir lib "$PGEMLIB" "$manifest"
 fi
 
 # Install executables
@@ -82,6 +92,7 @@ then
             < "$file" \
             > "$dest"
         chmod 0755 "$dest"
+        echo "$dest" >> "$manifest"
     done
 fi
 
@@ -96,6 +107,11 @@ then
             dest="$PGEMMAN/man$section/$(basename $file)"
             mkdir -p "$PGEMMAN/man$section"
             pgem_ln "$file" "$dest"
+            echo "$dest" >> "$manifest"
         fi
     done
 fi
+
+# Mark this package as active
+ln -s "$gemvers" "$dbdir/active"
+unlink "$dbdir/installing"
