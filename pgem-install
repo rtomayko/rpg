@@ -5,6 +5,11 @@ set -e
 
 . pgem-sh-setup
 
+name="$1"
+vers="${2:->=0}"
+
+log install $name $vers
+
 # Usage: pgem_ln <source> <dest>
 # Attempt to hard link <dest> to <source> but fall back to cp(1) if
 # you're crossing file systems or the ln fails otherwise.
@@ -41,29 +46,22 @@ pgem_install_dir () {
 }
 
 # Fetch the gem into PGEM_CACHE
-log fetch "$1"
-mkdir -p "$PGEMCACHE"
-cd "$PGEMCACHE"
+gemfile=$(pgem-fetch $name $vers) || exit 1
+gemname=$(basename ${gemfile%.gem})
 
-output=$(gem fetch "$1")
-test -n "$output" || exit 1
+# Install all dependencies
+pgem-deps "$gemfile" |
+xargs -n 2 pgem-install
 
-name=${output#Downloaded }
-file="$(pwd)/${name}.gem"
+# Unpack the gem into the packages area
+test -d "$PGEMPACKAGES/$gemname" || {
+    log unpack "$gemfile"
+    mkdir -p "$PGEMPACKAGES"
+    cd "$PGEMPACKAGES"
+    gem unpack "$gemfile" >/dev/null
+}
 
-# Install dependencies
-pgem-deps "$file" |
-while read depname args
-do
-    pgem-install "$depname" $args
-done
-
-# Unpack the gem into the packages database
-log unpack "$1"
-mkdir -p "$PGEMPACKAGES"
-cd "$PGEMPACKAGES"
-gem unpack "$file" >/dev/null
-cd "$name"
+cd "$PGEMPACKAGES/$gemname"
 
 # Install all library files.
 if test -d lib

@@ -42,8 +42,8 @@ gem spec --ruby "$@"                                       |
 grep -e 'add_\(runtime\|development\)_dependency'          |
 grep $pattern                                              |
 sed '
-    s/^.*(%q<\([A-Za-z0-9_-]\{1,\}\)>, \["\(.*\)"\])/\1 \2/
+    s/^.*(%q<\([A-Za-z0-9_-]\{1,\}\)>, \["\(.*\)"\])/\1::\2/
     s/", "/, /
-    s/ / --version "/
-    s/$/"/
+    s/ //
+    s/::/ /
     '

@@ -32,6 +32,8 @@ fi
 
 . pgem-sh-setup
 
+# log compare "$ver $exp"
+
 echo "$exp" |
 sed '
     s/>/-gt/
@@ -45,7 +47,6 @@ while read op ver2
 do
     ver1="$ver."
     ver2="$ver2."
-    log compare "$ver1 $op $ver2"
     while test -n "$ver1" -o -n "$ver2"
     do
         left=${ver1%%.*}
@@ -54,7 +55,6 @@ do
         right=${right:-0}
         ver1=${ver1#*.}
         ver2=${ver2#*.}
-        printf "test $left $op $right\n"
         if test $left $op $right
         then
             test $left -eq $right || exit 0
