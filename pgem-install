@@ -113,5 +113,5 @@ then
 fi
 
 # Mark this package as active
-ln -s "$gemvers" "$dbdir/active"
 unlink "$dbdir/installing"
+ln -s "$gemvers" "$dbdir/active"
