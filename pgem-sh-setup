@@ -1,0 +1,46 @@
+#!/bin/sh
+
+
+# rubygems gemdir path
+pgem_gemdir () {
+    if test -z "$GEM_HOME"; then
+        GEM_HOME=$(gem environment gemdir)
+        export GEM_HOME
+    fi
+    echo "$GEM_HOME"
+}
+
+# ruby sitelibdir path.
+pgem_sitelibdir () {
+    if test -z "$RUBYSITE"; then
+        RUBYSITE=$(ruby -rrbconfig -e "puts RbConfig::CONFIG['sitelibdir']")
+        export RUBYSITE
+    fi
+    echo "$RUBYSITE"
+}
+
+# full path to ruby binary
+pgem_rubybin () {
+    command -v ruby
+}
+
+# pgem configuration
+: ${PGEMPATH:=/var/lib/pgem}
+: ${PGEMLIB:=$PGEMPATH/lib}
+: ${PGEMCACHE:=$PGEMPATH/cache}
+: ${PGEMPACKAGES:=$PGEMPATH/packages}
+: ${PGEMBIN:=$PGEMPATH/bin}
+: ${PGEMMAN:=$PGEMPATH/man}
+
+# export all PGEM variables
+export PGEMPATH PGEMLIB PGEMCACHE PGEMPACKAGES PGEMBIN PGEMMAN
+
+# source system pgemrc file
+if test -f /etc/pgemrc; then
+    . /etc/pgemrc
+fi
+
+# source user pgemrc file
+if test -f ~/.pgemrc; then
+    . ~/.pgemrc
+fi

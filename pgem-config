@@ -1,0 +1,8 @@
+#!/bin/sh
+#/ Usage: pgem config
+#/ Show pgem configuration information.
+
+. pgem-sh-setup
+
+# pgem configuration
+env | grep ^PGEM

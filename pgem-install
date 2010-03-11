@@ -1,0 +1,104 @@
+#!/bin/sh
+#/ Usage: pgem-install <name>...
+#/ Install package <name>
+set -e
+
+. pgem-sh-setup
+
+# Write a warning to stderr. The message is prefixed with the
+# program's basename.
+warn () {
+    echo "$(basename $0):" "$@" 1>&2
+}
+
+# Write an informationational message stderr under verbose mode.
+log () {
+    echo "$@" 1>&2
+}
+
+# Usage: pgem_ln <source> <dest>
+# Attempt to hard link <dest> to <source> but fall back to cp(1) if
+# you're crossing file systems or the ln fails otherwise.
+pgem_ln () {
+    if ln -f "$1" "$2"; then
+        log "install: $2 [ln]"
+    else
+        log "install: $2 [cp]"
+        cp "$1" "$2"
+    fi
+}
+
+# Recursive file hierarchy copy routine. Attempts to hardlink files
+# and falls back to normal copies.
+pgem_install_dir () {
+    local src="$1" dest="$2"
+    mkdir -p "$dest"
+    for file in "$1"/*
+    do
+        if test -f "$file"
+        then
+            # link dest to source
+            pgem_ln "$file" "$dest/$(basename $file)"
+        elif test -d "$file"
+        then
+            # recurse into directories
+            pgem_install_dir "$file" "$dest/$(basename $file)"
+        else
+            warn "unknown file type: $file"
+            return 1
+        fi
+    done
+    return 0
+}
+
+# Fetch the gem into PGEM_CACHE
+log "fetching: $1"
+mkdir -p "$PGEMCACHE"
+cd "$PGEMCACHE"
+output=$(gem fetch "$1") || false
+name=${output#Downloaded }
+file="$(pwd)/${name}.gem"
+
+# Unpack the gem into the packages database
+log "unpacking: $1"
+mkdir -p "$PGEMPACKAGES"
+cd "$PGEMPACKAGES"
+gem unpack "$file" >/dev/null
+cd "$name"
+
+# Install lib files
+if test -d lib
+then
+    mkdir -p "$PGEMLIB"
+    pgem_install_dir lib "$PGEMLIB"
+fi
+
+# Install executables
+if test -d bin
+then
+    mkdir -p "$PGEMBIN"
+    for file in bin/*
+    do
+        dest="$PGEMBIN/$(basename $file)"
+        log "install: $dest [+x]"
+        sed "s@^#!.*ruby.*@#!$(pgem_rubybin)@" \
+            < "$file" \
+            > "$dest"
+        chmod 0755 "$dest"
+    done
+fi
+
+# Install manpages
+if test -d man
+then
+    for file in man/*
+    do
+        if test -f "$file" -a $(expr "$file" : '.*\.[0-9]') -gt 0
+        then
+            section=${file##*\.}
+            dest="$PGEMMAN/man$section/$(basename $file)"
+            mkdir -p "$PGEMMAN/man$section"
+            pgem_ln "$file" "$dest"
+        fi
+    done
+fi
