@@ -13,7 +13,8 @@ warn () {
 
 # Write an informationational message stderr under verbose mode.
 log () {
-    echo "$@" 1>&2
+    local t="$1:" ; shift
+    printf "%-10s%s\n" "$t" "$*" 1>&2
 }
 
 # Usage: pgem_ln <source> <dest>
@@ -21,9 +22,9 @@ log () {
 # you're crossing file systems or the ln fails otherwise.
 pgem_ln () {
     if ln -f "$1" "$2"; then
-        log "install: $2 [ln]"
+        log install "$2 [ln]"
     else
-        log "install: $2 [cp]"
+        log install "$2 [cp]"
         cp "$1" "$2"
     fi
 }
@@ -52,7 +53,7 @@ pgem_install_dir () {
 }
 
 # Fetch the gem into PGEM_CACHE
-log "fetching: $1"
+log fetch "$1"
 mkdir -p "$PGEMCACHE"
 cd "$PGEMCACHE"
 output=$(gem fetch "$1") || false
@@ -60,13 +61,13 @@ name=${output#Downloaded }
 file="$(pwd)/${name}.gem"
 
 # Unpack the gem into the packages database
-log "unpacking: $1"
+log unpack "$1"
 mkdir -p "$PGEMPACKAGES"
 cd "$PGEMPACKAGES"
 gem unpack "$file" >/dev/null
 cd "$name"
 
-# Install lib files
+# Install all library files.
 if test -d lib
 then
     mkdir -p "$PGEMLIB"
@@ -80,7 +81,7 @@ then
     for file in bin/*
     do
         dest="$PGEMBIN/$(basename $file)"
-        log "install: $dest [+x]"
+        log install "$dest [+x]"
         sed "s@^#!.*ruby.*@#!$(pgem_rubybin)@" \
             < "$file" \
             > "$dest"

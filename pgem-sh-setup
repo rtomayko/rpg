@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 # rubygems gemdir path
 pgem_gemdir () {
     if test -z "$GEM_HOME"; then
