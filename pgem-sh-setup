@@ -3,8 +3,8 @@
 : ${__SHC__:=false}
 
 # Guard against sourcing this file multiple times
-test $__pgem_sh_setup && return
-__pgem_sh_setup=true
+test $__pgem_sh_setup_included && return
+__pgem_sh_setup_included=true
 
 # pgem configuration
 : ${PGEMPATH:=/var/lib/pgem}

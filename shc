@@ -44,7 +44,7 @@ do
 
     # functions may not contain the - character
     expr $name : '.*-' >/dev/null &&
-    funcname="__$(echo $funcname | tr - _)"
+    funcname="$(echo $funcname | tr - _)"
 
     echo "# $src"
     echo "$funcname () {"
@@ -54,7 +54,8 @@ do
 
     test $name != $funcname &&
     echo "alias $name=$funcname"
-    echo "alias $name.sh=$funcname"
+
+    # echo "alias $name.sh=$funcname"
     printf "# /$name\n\n\n"
 done |
 

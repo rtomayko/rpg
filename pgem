@@ -15,9 +15,11 @@ if $PGEMTRACE
 then log trace "$command" "$@" 1>&2
 fi
 
-if expr "$0" : '.*\.sh$' >/dev/null
+if   $__SHC__
 then
-    exec "pgem-${command}.sh" "$@"
-else
-    exec "pgem-${command}" "$@"
+    command="pgem-${command}"
+    $command "$@"
+elif expr "$0" : '.*\.sh$' >/dev/null
+then exec "pgem-${command}.sh" "$@"
+else exec "pgem-${command}" "$@"
 fi
