@@ -23,8 +23,8 @@ INSTALLMETHOD = install-standalone
 
 all:: build
 
-SOURCES = pgem \
-		  pgem-sh-setup \
+SOURCES = pgem-sh-setup \
+		  pgem \
 		  pgem-config \
 		  pgem-deps \
 		  pgem-fetch \
@@ -33,7 +33,9 @@ SOURCES = pgem \
 		  pgem-version-test \
 		  pgem-uninstall \
 		  pgem-build \
-		  pgem-env
+		  pgem-env \
+		  pgem-update \
+		  pgem-resolve
 
 STANDALONE = $(NAME)-sa
 
@@ -82,5 +84,7 @@ uninstall:
 
 clean:
 	rm -f $(CLEAN)
+
+.PHONY: clean install install-standalone install-multi
 
 FORCE:
