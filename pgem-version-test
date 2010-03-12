@@ -31,13 +31,21 @@ compare "$exp" : '.*,' && {
     echo "$exp"               |
       tr ',' '\n'             |
       xargs -n 1 pgem version-test "$ver"
-    exit
+    exit 0
 }
 
 . pgem-sh-setup
 
 op=${exp%%[!><=~]*}
-ver2=${ver2##*[><=~]}
+ver2=${exp##*[><=~]}
+
+# handle squiggly guy
+test "$op" = "~>" && {
+    gte="$ver2"
+    lt="${ver2%.*}.999999" # gross
+    pgem version-test "$ver" "<$lt,>=$gte"
+    exit 0
+}
 
 ver1="$ver."
 ver2="$ver2."
@@ -53,7 +61,7 @@ do
     then
         compare $left = $right || exit 0
     else
-        compare $left -eq $right
+        compare $left = $right
     fi
 done
 
