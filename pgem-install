@@ -72,9 +72,23 @@ test -d "$PGEMPACKS/$gemname" || {
     gem unpack "$gemfile" >/dev/null
 }
 
-# Get the manifest file going and create an installing symlink.
+# Get the manifest file going.
 dbdir="$PGEMDB/$name"
 manifest="$dbdir/$gemvers"
+
+# Check if the package already has an installed version
+test -e "$dbdir/active" && {
+    curvers=$(readlink $dbdir/active)
+    if pgem version-test "$curvers" "$vers"
+    then
+        log uptodate "$name $curvers is installed"
+        exit 0
+    else
+        log conflict "$name $curvers installed but you want $gemvers"
+        unlink "$dbdir/active"
+    fi
+}
+
 mkdir -p "$dbdir"
 echo "# $(date)" > "$manifest"
 ln -sf "$gemvers" "$dbdir/installing"
