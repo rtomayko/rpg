@@ -1,0 +1,83 @@
+#!/bin/sh
+#/ Usage: shc -m <main> <file>...
+#/ Combine multiple shell scripts and write to stdout.
+
+main=
+while getopts m: opt
+do
+    case $opt in
+    m)   main="$OPTARG";;
+    ?)   echo "Usage: $(basename $0): -m <main> <file>..."
+         exit 2;;
+    esac
+done
+
+# Bail out if the main argument was not provided.
+test -z "$main" && {
+    echo "$(basename $0): main program not specified" 1>&2
+    exit 2
+}
+
+# Fast forward past option arguments
+shift $(($OPTIND - 1))
+
+# Shebang
+cat <<BANNER
+#!/bin/sh
+# ==================================================================
+# This file was generated from these source files using the shc
+# shell combiner:
+#
+$(echo "$@" | tr ' ' '\n' | sed 's/^/#    * /')
+#
+# ==================================================================
+
+
+BANNER
+
+# Run over each source file and create a function with its contents.
+for src in "$@"
+do
+    name="$(basename $src)"
+    name=${name#.sh}
+    funcname=$name
+
+    # functions may not contain the - character
+    expr $name : '.*-' >/dev/null &&
+    funcname=$(echo $funcname | tr - _)
+
+    echo "# $src"
+    echo "$funcname () {"
+    echo ":"
+    cat "$src" | grep -v '^ *#'
+    echo "}"
+
+    test $name != $funcname &&
+    echo "alias $name=$funcname"
+    printf "# /$name\n\n\n"
+done |
+
+# Replace source operators on any of the provided files with normal function
+# calls.
+sed "$(
+    echo "$@"             |
+    tr ' ' '\n'           |
+    sed 's@.*/@@'         |
+    sed 's@^@s/^ *\\. \\(@' |
+    sed 's@$@\\)/\\1/@'
+)" |
+
+# Replace exec calls with function calls + immediate returns
+sed "$(
+    echo "$@"             |
+    tr ' ' '\n'           |
+    sed 's@.*/@@'         |
+    sed 's@^@s/^ *\\exec \\(@' |
+    sed 's@$@\\)/\\1;return $?/@'
+)" |
+
+# Replace exit with return
+sed 's/^\( *\)exit\( *\)/\1return\1/'
+
+# Call the main script
+echo "$main \"\$@\""
