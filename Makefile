@@ -30,7 +30,10 @@ SOURCES = pgem \
 		  pgem-fetch \
 		  pgem-install \
 		  pgem-list \
-		  pgem-version-test
+		  pgem-version-test \
+		  pgem-uninstall \
+		  pgem-build \
+		  pgem-env
 
 STANDALONE = $(NAME)-sa
 
