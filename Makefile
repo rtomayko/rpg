@@ -15,9 +15,11 @@ datadir     = ${datarootdir}
 mandir      = ${datarootdir}/man
 docdir      = $(datadir)/doc/$(TARNAME)
 
-# Change this to `install-multi' if you want separate pgem-XXX commands. By
-# default, all pgem- programs are combined into a single command.
-INSTALLMETHOD = install-standalone
+# Change this to `install-standalone' if you want a single pgem command. By
+# default, all pgem- commands are installed.
+#
+# NOTE: the standalone stuff doesn't work yet.
+INSTALLMETHOD = install-multi
 
 # ---- END OF CONFIGURATION ----
 
@@ -71,13 +73,13 @@ install-multi:
 	@mkdir -p $(bindir)
 	@for f in $(SOURCES); do \
 		echo "installing: $$f"; \
-		cp $f "$(bindir)/$$f" && \
+		cp $$f "$(bindir)/$$f" && \
 		chmod 0755 "$(bindir)/$$f"; \
 	done
 
 uninstall:
 	@for f in $(SOURCES); do \
-		test -e "$(bindir)/$$f" && continue; \
+		test -e "$(bindir)/$$f" || continue; \
 		echo "uninstalling: $$f"; \
 		rm -f "$(bindir)/$$f"; \
 	done
