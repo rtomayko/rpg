@@ -1,5 +1,7 @@
 #!/bin/sh
 
+: ${__SHC__:=false}
+
 # Guard against sourcing this file multiple times
 test $__pgem_sh_setup && return
 __pgem_sh_setup=true
@@ -48,6 +50,8 @@ pgem_rubybin () {
 : ${PGEMCACHE:=$PGEMPATH/cache}
 : ${PGEMPACKS:=$PGEMPATH/packages}
 : ${PGEMDB:=$PGEMPATH/db}
+
+: ${PGEMTRACE:=false}
 
 # export all PGEM variables
 export PGEMPATH PGEMLIB PGEMCACHE PGEMPACKAGES PGEMBIN PGEMMAN

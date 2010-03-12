@@ -30,7 +30,7 @@ exp=$(
 compare "$exp" : '.*,' && {
     echo "$exp"               |
       tr ',' '\n'             |
-      xargs -n 1 "$0" "$ver"
+      xargs -n 1 pgem version-test "$ver"
     exit
 }
 

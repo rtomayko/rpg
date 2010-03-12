@@ -20,7 +20,7 @@ then
         sed 's/^.*-\([0-9].*\)\.gem/\1/' |
         sort -rn)
     do
-        if pgem-version-test "$havever" "$vers"
+        if pgem version-test "$havever" "$vers"
         then
             log fetch "$name $vers [cached]"
             echo "$PGEMCACHE/$name-${havever}.gem"
@@ -30,8 +30,11 @@ then
 fi
 
 log fetch "$name" "$vers"
-output=$(gem fetch -v "$vers" "$name") || exit 1
+output=$(gem fetch -v "$vers" "$name") ||
+exit 1
+
 output=${output#Downloaded }
-test -n "$output" || exit 1
+test -n "$output" ||
+exit 1
 
 echo "$PGEMCACHE/$output.gem"

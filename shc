@@ -32,7 +32,7 @@ $(echo "$@" | tr ' ' '\n' | sed 's/^/#    * /')
 #
 # ==================================================================
 
-
+__SHC__=true
 BANNER
 
 # Run over each source file and create a function with its contents.
@@ -54,6 +54,7 @@ do
 
     test $name != $funcname &&
     echo "alias $name=$funcname"
+    echo "alias $name.sh=$funcname"
     printf "# /$name\n\n\n"
 done |
 
