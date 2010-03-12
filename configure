@@ -1,0 +1,164 @@
+#!/bin/sh
+
+looking () {
+    printf "looking $(echo $@)"
+}
+
+ok () {
+    printf " OK\n"
+}
+
+missing () {
+    printf " (missing)\n"
+}
+
+found () {
+    printf " (${1:-found})"
+    test -n "$2" && printf " $2"
+    printf "\n"
+}
+
+have () {
+    for f in "$@"
+    do
+        path=$(command -v "$1") || continue
+        echo "$path"
+        return 0
+    done
+    return 1
+}
+
+UNAME=$(uname)
+HOST=$(hostname)
+TIME=$(date)
+echo "building for $UNAME on $HOST at $TIME"
+
+looking "for /bin/sh"
+SH=$(have /bin/sh) && {
+    if sh --version 2>/dev/null | grep -q bash
+    then
+        found '' "oh ick, it looks like bash"
+    else
+        found
+    fi
+} || missing
+
+looking "for dash"
+DASH=$(have /bin/dash /usr/bin/dash dash) &&
+found "$DASH" || missing
+
+looking "for ln"
+LN=$(have /bin/ln ln gln)
+found "$LN" || missing
+
+looking "for sed"
+SED=$(have /usr/bin/sed sed gsed) &&
+found "$SED" || missing
+
+looking "for sort"
+SORT=$(have /usr/bin/sort sort gsort)
+found "$SORT" || missing
+
+looking "for tr"
+TR=$(have /usr/bin/tr tr gtr)
+found "$TR" || missing
+
+looking "for cut"
+CUT=$(have /usr/bin/cut cut gcut)
+found "$CUT" || missing
+
+looking "for perl"
+PERL=$(have perl)
+found "$PERL" || missing
+
+looking "for readlink"
+READLINK=$(have readlink greadlink)
+found "$READLINK" || missing
+
+looking "for install"
+INSTALL=$(have install ginstall)
+found "$INSTALL" || missing
+
+looking "for diff"
+DIFF=$(have diff)
+found "$DIFF" || missing
+
+looking "for patch"
+PATCH=$(have patch)
+found "$PATCH" || missing
+
+looking "for schocco"
+SHOCCO=$(have shocco) &&
+found "$SHOCCO" || missing
+
+looking "for ronn"
+RONN=$(have ronn) &&
+found "$RONN" || missing
+
+looking "for curl"
+CURL=$(have curl)
+found "$CURL" || missing
+
+looking "for ruby"
+RUBY=$(have ruby) &&
+found "$RUBY" || missing
+
+looking "for gem"
+GEM=$(have gem) &&
+found "$GEM" || missing
+
+set -e
+
+echo writing config.mk...
+cat <<EOF > config.mk
+SHELL    = $SH
+DASH     = $DASH
+LN       = $LN
+INSTALL  = $INSTALL
+SED      = $SED
+SORT     = $SORT
+TR       = $TR
+CUT      = $CUT
+PERL     = $PERL
+READLINK = $READLINK
+DIFF     = $DIFF
+PATCH    = $PATCH
+SHOCCO   = $SHOCCO
+RONN     = $RONN
+CURL     = $CURL
+RUBY     = $RUBY
+GEM      = $GEM
+EOF
+
+echo writing config.sh...
+cat <<EOF > config.sh
+SH='$SH'
+DASH='$DASH'
+LN='$LN'
+SED='$SED'
+SORT='$SORT'
+TR='$TR'
+CUT='$CUT'
+PERL='$PERL'
+READLINK='$READLINK'
+DIFF='$DIFF'
+PATCH='$PATCH'
+CURL='$CURL'
+RUBY='$RUBY'
+GEM='$GEM'
+
+alias ln="$LN"
+alias sed="$SED"
+alias sort="$SORT"
+alias tr="$TR"
+alias cut="$CUT"
+alias perl="$PERL"
+alias readlink="$READLINK"
+alias diff="$DIFF"
+alias patch="$PATCH"
+alias curl="$CURL"
+alias ruby="$RUBY"
+alias gem="$GEM"
+EOF
+
+echo "done. run \`make' to build and \`make install' to install."
