@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# Guard against sourcing this file multiple times
+test $__pgem_sh_setup && return
+__pgem_sh_setup=true
+
+
 # Write a warning to stderr. The message is prefixed with the
 # program's basename.
 warn () {
