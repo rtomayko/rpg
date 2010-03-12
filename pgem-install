@@ -46,6 +46,13 @@ pgem_install_dir () {
     return 0
 }
 
+command -v readlink >/dev/null ||
+readlink () {
+    local p=$(ls -l "$1")
+    expr "$p" : ".* -> " >/dev/null
+    echo ${p##* -> }
+}
+
 # Fetch the gem into PGEM_CACHE
 gemfile=$(pgem-fetch $name $vers) || exit 1
 gemname=$(basename ${gemfile%.gem})
@@ -68,7 +75,7 @@ dbdir="$PGEMDB/$name"
 manifest="$dbdir/$gemvers"
 mkdir -p "$dbdir"
 echo "# $(date)" > "$manifest"
-ln -s "$gemvers" "$dbdir/installing"
+ln -sf "$gemvers" "$dbdir/installing"
 
 # Go into the unpackaged package dir to make installing a bit easier.
 cd "$PGEMPACKS/$gemname"
