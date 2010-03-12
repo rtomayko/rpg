@@ -6,6 +6,21 @@
 test $__pgem_sh_setup && return
 __pgem_sh_setup=true
 
+# pgem configuration
+: ${PGEMPATH:=/var/lib/pgem}
+: ${PGEMLIB:=$PGEMPATH/lib}
+: ${PGEMBIN:=$PGEMPATH/bin}
+: ${PGEMMAN:=$PGEMPATH/man}
+: ${PGEMCACHE:=$PGEMPATH/cache}
+: ${PGEMPACKS:=$PGEMPATH/packages}
+: ${PGEMDB:=$PGEMPATH/db}
+
+: ${PGEMTRACE:=false}
+: ${PGEMSHOWBUILD:=false}
+
+# export all PGEM variables
+export PGEMPATH PGEMLIB PGEMCACHE PGEMPACKAGES PGEMBIN PGEMMAN
+export PGEMTRACE
 
 # Write a warning to stderr. The message is prefixed with the
 # program's basename.
@@ -33,10 +48,15 @@ pgem_gemdir () {
     echo "$GEM_HOME"
 }
 
+# Retrieve a rbconfig value.
+pgem_rbconfig () {
+    ruby -rrbconfig -e "puts RbConfig::CONFIG['$1']"
+}
+
 # ruby sitelibdir path.
 pgem_sitelibdir () {
     test -z "$RUBYSITE" && {
-        RUBYSITE=$(ruby -rrbconfig -e "puts RbConfig::CONFIG['sitelibdir']")
+        RUBYSITE=$(pgem_rbconfig sitelibdir)
         export RUBYSITE
     }
     echo "$RUBYSITE"
@@ -45,6 +65,15 @@ pgem_sitelibdir () {
 # full path to ruby binary
 pgem_rubybin () {
     command -v ruby
+}
+
+# Query rbconfig for the the dynamic library file extension.
+pgem_ruby_dlext() {
+    test -z "$RUBYDLEXT" && {
+        RUBYDLEXT=$(pgem_rbconfig DLEXT)
+        export RUBYDLEXT
+    }
+    echo "$RUBYDLEXT"
 }
 
 # readlink(1) for systems that don't have it
@@ -56,20 +85,6 @@ readlink () {
         echo ${_p##* -> }
     }
 }
-
-# pgem configuration
-: ${PGEMPATH:=/var/lib/pgem}
-: ${PGEMLIB:=$PGEMPATH/lib}
-: ${PGEMBIN:=$PGEMPATH/bin}
-: ${PGEMMAN:=$PGEMPATH/man}
-: ${PGEMCACHE:=$PGEMPATH/cache}
-: ${PGEMPACKS:=$PGEMPATH/packages}
-: ${PGEMDB:=$PGEMPATH/db}
-
-: ${PGEMTRACE:=false}
-
-# export all PGEM variables
-export PGEMPATH PGEMLIB PGEMCACHE PGEMPACKAGES PGEMBIN PGEMMAN
 
 # source system pgemrc file
 test -f /etc/pgemrc &&

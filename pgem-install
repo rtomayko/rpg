@@ -45,7 +45,8 @@ pgem_install_dir () {
 }
 
 # Fetch the gem into the cache.
-gemfile=$(pgem fetch $name $vers) || exit 1
+gemfile=$(pgem fetch $name $vers) ||
+exit 1
 gemname=$(basename ${gemfile%.gem})
 gemvers=${gemname##*-}
 
@@ -86,6 +87,25 @@ ln -sf "$gemvers" "$dbdir/installing"
 
 # Go into the unpackaged package dir to make installing a bit easier.
 cd "$PGEMPACKS/$gemname"
+
+# Build extension libraries if they exist
+exts="$(pgem build "$(pwd)")" || abort "extension failed to build"
+
+test -n "$exts" && {
+    mkdir -p "$PGEMLIB"
+    echo "$exts" |
+    while read dl
+    do
+        # make install sitearchdir=#{manager.dir}/lib
+        prefix=$(
+            grep '^target_prefix.=' "$(dirname $dl)/Makefile" |
+            sed 's/^target_prefix *= *//'
+        )
+        dest="${PGEMLIB}${prefix}/$(basename $dl)"
+        pgem_ln "$dl" "$dest"
+        echo "$dest" >> "$manifest"
+    done
+}
 
 # Install all library files.
 test -d lib && {
