@@ -1,3 +1,6 @@
+# pgem makefile
+.POSIX:
+
 # Default make target
 all::
 
@@ -25,38 +28,49 @@ INSTALLMETHOD = install-multi
 
 all:: build
 
-SOURCES = pgem-sh-setup \
-		  pgem \
-		  pgem-config \
-		  pgem-deps \
-		  pgem-fetch \
-		  pgem-install \
-		  pgem-list \
-		  pgem-version-test \
-		  pgem-uninstall \
-		  pgem-build \
-		  pgem-env \
-		  pgem-update \
-		  pgem-resolve
+SOURCES = pgem-sh-setup.sh \
+		  pgem.sh \
+		  pgem-config.sh \
+		  pgem-deps.sh \
+		  pgem-fetch.sh \
+		  pgem-install.sh \
+		  pgem-list.sh \
+		  pgem-version-test.sh \
+		  pgem-uninstall.sh \
+		  pgem-build.sh \
+		  pgem-env.sh \
+		  pgem-update.sh \
+		  pgem-resolve.sh
 
-STANDALONE = $(NAME)-sa
+PROGRAMS = pgem-sh-setup \
+		   pgem \
+		   pgem-config \
+		   pgem-deps \
+		   pgem-fetch \
+		   pgem-install \
+		   pgem-list \
+		   pgem-version-test \
+		   pgem-uninstall \
+		   pgem-build \
+		   pgem-env \
+		   pgem-update \
+		   pgem-resolve
+
+STANDALONE = $(NAME)
 
 CLEAN = $(STANDALONE) syntax
 
-build: syntax $(STANDALONE)
-	@echo "  DONE  $(NAME) built successfully. Ready to \`make install'."
+.sh:
+	$(SHELL) -n $<
+	cp $< $@
+	chmod +x $@
 
-syntax: $(SOURCES)
-	@for f in $(SOURCES); do \
-		$(SHELL) -n $$f && \
-		printf "SYNTAX  %-30s OK\n" "$$f"  || \
-		printf "SYNTAX  %-30s BAD\n" "$$f"; \
-	done
-	@touch syntax
+build: $(PROGRAMS) $(STANDALONE)
+	echo "  DONE  $(NAME) built successfully. Ready to \`make install'."
 
 pgem-sa:
-	@echo " BUILD  $(STANDALONE)"
-	@$(SHELL) shc -m pgem $(SOURCES) > $(STANDALONE) || { \
+	echo " BUILD  $(STANDALONE)"
+	$(SHELL) shc -m pgem $(SOURCES) > $(STANDALONE) || { \
 		rm -f $(STANDALONE); \
 		false; \
 	}; \
@@ -70,15 +84,15 @@ install-standalone:
 	chmod 0755 $(bindir)/pgem
 
 install-multi:
-	@mkdir -p $(bindir)
-	@for f in $(SOURCES); do \
+	mkdir -p $(bindir)
+	for f in $(SOURCES); do \
 		echo "installing: $$f"; \
 		cp $$f "$(bindir)/$$f" && \
 		chmod 0755 "$(bindir)/$$f"; \
 	done
 
 uninstall:
-	@for f in $(SOURCES); do \
+	for f in $(SOURCES); do \
 		test -e "$(bindir)/$$f" || continue; \
 		echo "uninstalling: $$f"; \
 		rm -f "$(bindir)/$$f"; \
@@ -87,6 +101,6 @@ uninstall:
 clean:
 	rm -f $(CLEAN)
 
-.PHONY: clean install install-standalone install-multi
+.SILENT:
 
-FORCE:
+.SUFFIXES: .sh
