@@ -56,20 +56,39 @@ PROGRAMS = pgem-sh-setup \
 		   pgem-update \
 		   pgem-resolve
 
+DOCHTML = pgem-sh-setup.html \
+		  pgem.html \
+		  pgem-config.html \
+		  pgem-deps.html \
+		  pgem-fetch.html \
+		  pgem-install.html \
+		  pgem-list.html \
+		  pgem-version-test.html \
+		  pgem-uninstall.html \
+		  pgem-build.html \
+		  pgem-env.html \
+		  pgem-update.html \
+		  pgem-resolve
+
 STANDALONE = $(NAME)
 
-CLEAN = $(STANDALONE) syntax
-
 .sh:
+	echo "    SH  $@"
 	$(SHELL) -n $<
 	cp $< $@
 	chmod +x $@
 
+.sh.html:
+	echo " SHOCCO $@"
+	shocco $< > $@
+
 build: $(PROGRAMS) $(STANDALONE)
 	echo "  DONE  $(NAME) built successfully. Ready to \`make install'."
 
+doc: $(DOCHTML)
+
 pgem-sa:
-	echo " BUILD  $(STANDALONE)"
+	echo "   SHC  $(STANDALONE)"
 	$(SHELL) shc -m pgem $(SOURCES) > $(STANDALONE) || { \
 		rm -f $(STANDALONE); \
 		false; \
@@ -85,22 +104,22 @@ install-standalone:
 
 install-multi:
 	mkdir -p $(bindir)
-	for f in $(SOURCES); do \
+	for f in $(PROGRAMS); do \
 		echo "installing: $$f"; \
 		cp $$f "$(bindir)/$$f" && \
 		chmod 0755 "$(bindir)/$$f"; \
 	done
 
 uninstall:
-	for f in $(SOURCES); do \
+	for f in $(PROGRAMS); do \
 		test -e "$(bindir)/$$f" || continue; \
 		echo "uninstalling: $$f"; \
 		rm -f "$(bindir)/$$f"; \
 	done
 
 clean:
-	rm -f $(CLEAN)
+	echo $(STANDALONE) $(PROGRAMS) $(DOCHTML) | xargs -tn 1 rm -f
 
 .SILENT:
 
-.SUFFIXES: .sh
+.SUFFIXES: .sh .html
