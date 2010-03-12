@@ -8,8 +8,6 @@ set -e
 name="$1"
 vers="${2:->=0}"
 
-log install $name $vers
-
 # Usage: pgem_ln <source> <dest>
 # Attempt to hard link <dest> to <source> but fall back to cp(1) if
 # you're crossing file systems or the ln fails otherwise.
@@ -46,15 +44,6 @@ pgem_install_dir () {
     return 0
 }
 
-# readlink(1) for systems that don't have it
-# command -v readlink >/dev/null ||
-readlink () {
-    local _p
-    _p=$(ls -l "$1")
-    expr "$_p" : ".* -> " >/dev/null
-    echo ${_p##* -> }
-}
-
 # Fetch the gem into the cache.
 gemfile=$(pgem fetch $name $vers) || exit 1
 gemname=$(basename ${gemfile%.gem})
@@ -88,6 +77,8 @@ test -e "$dbdir/active" && {
         unlink "$dbdir/active"
     fi
 }
+
+log install $name $vers
 
 mkdir -p "$dbdir"
 echo "# $(date)" > "$manifest"

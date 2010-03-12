@@ -16,7 +16,12 @@ warn () {
 # Write an informationational message stderr under verbose mode.
 log () {
     local t="$1:" ; shift
-    printf "%-10s%s\n" "$t" "$*" 1>&2
+    printf "%12s %s\n" "$t" "$*" 1>&2
+}
+
+abort () {
+    test $# -gt 0 && warn "$@"
+    exit 1
 }
 
 # rubygems gemdir path
@@ -40,6 +45,16 @@ pgem_sitelibdir () {
 # full path to ruby binary
 pgem_rubybin () {
     command -v ruby
+}
+
+# readlink(1) for systems that don't have it
+readlink () {
+    local _p
+    test -L "$1"
+    command readlink "$1" || {
+        _p=$(ls -l "$1")
+        echo ${_p##* -> }
+    }
 }
 
 # pgem configuration

@@ -44,7 +44,7 @@ do
 
     # functions may not contain the - character
     expr $name : '.*-' >/dev/null &&
-    funcname=$(echo $funcname | tr - _)
+    funcname="__$(echo $funcname | tr - _)"
 
     echo "# $src"
     echo "$funcname () {"
