@@ -30,7 +30,7 @@ then
 fi
 
 log fetch "$name" "$vers"
-output=$(gem fetch -v "$vers" "$name")
+output=$(gem fetch -v "$vers" "$name") || exit 1
 output=${output#Downloaded }
 test -n "$output" || exit 1
 

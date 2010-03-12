@@ -74,15 +74,13 @@ ln -s "$gemvers" "$dbdir/installing"
 cd "$PGEMPACKS/$gemname"
 
 # Install all library files.
-if test -d lib
-then
+test -d lib && {
     mkdir -p "$PGEMLIB"
     pgem_install_dir lib "$PGEMLIB" "$manifest"
-fi
+}
 
 # Install executables
-if test -d bin
-then
+test -d bin && {
     mkdir -p "$PGEMBIN"
     for file in bin/*
     do
@@ -94,14 +92,13 @@ then
         chmod 0755 "$dest"
         echo "$dest" >> "$manifest"
     done
-fi
+}
 
 # Install manpages
-if test -d man
-then
+test -d man && {
     for file in man/*
     do
-        if test -f "$file" -a $(expr "$file" : '.*\.[0-9]') -gt 0
+        if test -f "$file" && expr "$file" : '.*\.[0-9]' >/dev/null
         then
             section=${file##*\.}
             dest="$PGEMMAN/man$section/$(basename $file)"
@@ -110,8 +107,8 @@ then
             echo "$dest" >> "$manifest"
         fi
     done
-fi
+}
 
 # Mark this package as active
 unlink "$dbdir/installing"
-ln -s "$gemvers" "$dbdir/active"
+ln -sf "$gemvers" "$dbdir/active"
