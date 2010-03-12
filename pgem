@@ -1,0 +1,12 @@
+#!/bin/sh
+#/ Usage: pgem <options> command
+#/
+
+# Bring in pgem config
+. pgem-sh-setup
+
+# Shift off the first argument to determine the real command:
+command="pgem-$1"
+shift
+
+exec $command "$@"
