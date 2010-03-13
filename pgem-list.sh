@@ -38,7 +38,7 @@ do
 
     # Write a line of output for the failed glob with `-x`.
     if $shownonmatch && ! $matched
-    then printf "%-30s %s\n" "$glob" "X"
+    then printf "%-30s %s\n" "$glob" "-"
     fi
 done |
 
