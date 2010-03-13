@@ -1,40 +1,38 @@
 #!/bin/sh
-#/ Usage: pgem-fetch <name> [<version>]
-#/ Fetch a gem to the cache and write the gems name and version.
-#/ If a gem matching the name and version already exists, no network
-#/ operations need be performed.
 set -e
+usage="Usage: pgem-fetch <package> [<version>]
+Fetch <package> to the cache and write the package files name and version.
+
+No network operations are performed when a package exists in the cache
+that satisfies the version spec."
+[ -z "$*" -o "$1" = "--help" ] && echo "$usage" && exit 2
 
 . pgem-sh-setup
 
-name="$1"
-vers="${2:->=0}"
+package="$1"
+version="${2:->=0}"
 
-mkdir -p "$PGEMCACHE"
-cd "$PGEMCACHE"
+# Find the best (most recent) version of the package matching the
+# supplied version spec. Bail out with a failure status if nothing is
+# found satisfying the requested version.
+bestver=$(pgem-resolve -n 1 "$package" "$version") || {
+    warn "$package $version not found."
+    exit 1
+}
 
-if test -n "$vers"
-then
-    for havever in $(
-        ls -1 $name-[0-9]*.gem 2>/dev/null |
-        sed 's/^.*-\([0-9].*\)\.gem/\1/' |
-        sort -rn)
-    do
-        if pgem-version-test "$havever" "$vers"
-        then
-            log fetch "$name $vers [cached]"
-            echo "$PGEMCACHE/$name-${havever}.gem"
-            exit
-        fi
-    done
+gemfile="${package}-${bestver}.gem"
+if test -f "$PGEMCACHE/$gemfile"
+then log fetch "$package $version [cached: $bestver]"
+else
+    # We're going to need to pull the gem off the server.
+    mkdir -p "$PGEMCACHE"
+    cd "$PGEMCACHE"
+    log fetch "$package $version [fetching: $bestver]"
+
+    # Grab the gem with curl(1) and write to a temporary file just
+    # in case something goes wrong during transfer.
+    curl -# -L "http://rubygems.org/downloads/${gemfile}" > "${gemfile}+"
+    mv "${gemfile}+" "$gemfile"
 fi
 
-log fetch "$name" "$vers"
-output=$(gem fetch -v "$vers" "$name") ||
-exit 1
-
-output=${output#Downloaded }
-test -n "$output" ||
-exit 1
-
-echo "$PGEMCACHE/$output.gem"
+echo "$PGEMCACHE/$gemfile"
