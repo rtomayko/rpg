@@ -38,8 +38,7 @@ BANNER
 # Run over each source file and create a function with its contents.
 for src in "$@"
 do
-    name="$(basename $src)"
-    name=${name#.sh}
+    name="$(basename $src .sh)"
     funcname=$name
 
     # functions may not contain the - character
@@ -79,7 +78,7 @@ sed "$(
 )" |
 
 # Replace exit with return
-sed 's/^\( *\)exit\( *\)/\1return\1/'
+sed 's/^\( *\)exit\( *\)/\1return\2/'
 
 # Call the main script
 echo "$main \"\$@\""

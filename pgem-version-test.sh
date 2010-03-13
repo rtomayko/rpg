@@ -2,8 +2,8 @@
 #/ Usage: pgem-version-test -e <ver> <expr>...
 #/ Test if <ver> matches the version test given in <expr>.
 #/
+local ver exp op ver1 ver2 gte lt left right compver
 set -e
-
 
 compare () {
     expr "$1" "$2" "$3" >/dev/null
@@ -30,7 +30,10 @@ exp=$(
 compare "$exp" : '.*,' && {
     echo "$exp"               |
       tr ',' '\n'             |
-      xargs -n 1 pgem version-test "$ver"
+      while read compver
+      do
+          pgem version-test "$ver" "$compver"
+      done
     exit 0
 }
 

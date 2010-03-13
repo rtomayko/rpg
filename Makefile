@@ -70,7 +70,7 @@ DOCHTML = pgem-sh-setup.html \
 		  pgem-update.html \
 		  pgem-resolve
 
-STANDALONE = $(NAME)
+STANDALONE = $(NAME)-sa
 
 .sh:
 	echo "    SH  $@"
@@ -87,7 +87,7 @@ build: $(PROGRAMS) $(STANDALONE)
 
 doc: $(DOCHTML)
 
-pgem-sa:
+$(STANDALONE): $(SOURCES) shc
 	echo "   SHC  $(STANDALONE)"
 	$(SHELL) shc -m pgem $(SOURCES) > $(STANDALONE) || { \
 		rm -f $(STANDALONE); \

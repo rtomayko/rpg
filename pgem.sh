@@ -15,11 +15,23 @@ if $PGEMTRACE
 then log trace "$command" "$@" 1>&2
 fi
 
-if   $__SHC__
+if $__SHC__
 then
-    command="pgem-${command}"
-    $command "$@"
-elif expr "$0" : '.*\.sh$' >/dev/null
-then exec "pgem-${command}.sh" "$@"
-else exec "pgem-${command}" "$@"
+    case $command in
+    build)         pgem_build "$@";;
+    config)        pgem_config "$@";;
+    deps)          pgem_deps "$@";;
+    env)           pgem_env "$@";;
+    fetch)         pgem_fetch "$@";;
+    install)       pgem_install "$@";;
+    list)          pgem_list "$@";;
+    resolve)       pgem_resolve "$@";;
+    sh-setup)      true ;;
+    uninstall)     pgem_uninstall "$@";;
+    update)        pgem_update "$@";;
+    version-test)  pgem_version_test "$@";;
+    *)             exec pgem-$command "$@";;
+    esac
+else
+    exec "pgem-${command}" "$@"
 fi

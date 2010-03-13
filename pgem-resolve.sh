@@ -29,7 +29,7 @@ grep -e "^$name " < "$index" |
 cut -d ' ' -f 2 |
 while read v
 do
-    if pgem-version-test "$v" "$vers"
+    if pgem version-test "$v" "$vers"
     then echo "$v"
          count=$(($count + 1))
          test $count -eq $max && break
