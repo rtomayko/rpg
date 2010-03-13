@@ -34,6 +34,16 @@ shift $(($OPTIND - 1))
 # Bail out with usage if we have more args.
 [ "$*" ] && warn "invalid argument: $*" && exit 2
 
+# The Release Index
+# -----------------
+#
+# The `release` file includes all versions of all packages. One line per
+# `<package> <version>` pair.
+
+# Here's where the file is kept. There's also `release-recent` and
+# `release-diff` files, which we'll see in a second.
+release="$PGEMINDEX/release"
+
 # Maybe bail out if a stale time was given. `PGEMSTALETIME` values can be
 # stuff like `10 days` or `10d`, `30 minutes` or `30m`. A number with no
 # time designator is considered in days. When the value is `never`,
@@ -42,7 +52,7 @@ shift $(($OPTIND - 1))
 if test "$staletime"
 then
     case "$staletime" in
-    never|none) log update "database is in never update mode"
+    never|none) log update "index is in never auto update mode"
                 exit 0;;
     [0-9]*m*)   fargs="-mmin -${staletime%%[!0-9]*}";;
     [0-9]*)     fargs="-mtime -${staletime%%[!0-9]*}";;
@@ -50,20 +60,14 @@ then
                 warn "bad PGSTALETIME value: '$staletime'. ignoring.";;
     esac
 
-    if test -z "$(find "$index" -maxdepth 0 $fargs 2>/dev/null)"
-    then log update "database is missing or stale [> $staletime old]"
-    else log update "database is fresh [< $staletime old]"
+    if test -z "$(find "$release" -maxdepth 0 $fargs 2>/dev/null)"
+    then log update "release index is missing or stale [> $staletime old]"
+    else log update "release index is fresh [< $staletime old]"
          exit 0
     fi
 else
     log update "index rebuild forced"
 fi
-
-# The Release Index
-# -----------------
-#
-# The `release` file includes all versions of all packages. One line per
-# `<package> <version>` pair.
 
 # First thing we do, we create the `PGEMINDEX` directory if it doesn't exist.
 test -d "$PGEMINDEX" || {
@@ -71,9 +75,6 @@ test -d "$PGEMINDEX" || {
     mkdir -p "$PGEMINDEX"
 }
 
-# Here's where the file is kept. There's also `release-recent` and
-# `release-diff` files, which we'll see in a second.
-release="$PGEMINDEX/release"
 log update "building release file [$release+]"
 
 # The `gem list --all` output looks like this:
