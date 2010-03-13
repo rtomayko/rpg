@@ -12,8 +12,59 @@ __pgem_sh_setup_included=true
 : ${PGEMBIN:=$PGEMPATH/bin}
 : ${PGEMMAN:=$PGEMPATH/man}
 : ${PGEMCACHE:=$PGEMPATH/cache}
-: ${PGEMPACKS:=$PGEMPATH/packages}
+: ${PGEMPACKS:=$PGEMPATH/packs}
+
+# `PGEMDB` is where our local package database is kept. It's a
+# filesystem hierarchy. It looks like this:
+#
+#     $PGEMDB/
+#     |-- ronn
+#     |   |-- 0.4
+#     |   |-- 0.4.1
+#     |   `-- active -> 0.4.1
+#     |-- sinatra
+#     |   |-- 0.9.4
+#     |   |-- 0.9.6
+#     |   `-- active -> 0.9.6
+#     |-- stemmer
+#     |   |-- 1.0.1
+#     |   `-- active -> 1.0.1
+#     |-- syntax
+#     |   |-- 1.0.0
+#     |   `-- active -> 1.0.0
+#     `-- turn
+#         |-- 0.7.0
+#         `-- active -> 0.10.0
+#
+# The database is meant to be "stable". That is, you can write programs
+# that rely on this structure. Maybe it should be documented first.
 : ${PGEMDB:=$PGEMPATH/db}
+
+# `PGEMINDEX` is where the index of available gems is kept. It's a
+# directory. The `pgem-update(1)` program manages the files under it.
+#
+#   * `release`:
+#     All available packages and all versions of all packages. Each line is a
+#     `<package> <version>` pair, separated by whitespace. The file is sorted
+#     alphabetically by package  name, reverse by version number, such that the
+#     first line for a package is the most recent version.
+#
+#   * `release-recent`:
+#     The most recent versions of all packages. The format is otherwise
+#     identical to the `release` file. This mostly exists so that
+#     `join(1)` can be used on it. Otherwise, we'd just build it from
+#     `release` when we needed it.
+#
+#   * `prerelease`:
+#     **NOT YET IMPLEMENTED.**
+#     This is the same as `release` but includes only prelease packages.
+#
+#   * `prerelease-recent`:
+#     **NOT YET IMPLEMENTED.**
+#     This is the same as `release-recent` but includes only prelease
+#     packages.
+#
+: ${PGEMINDEX:=$PGEMPATH/index}
 
 # Enable the shell's trace facility (`set -x`) in all pgem programs.
 : ${PGEMTRACE:=false}
@@ -29,7 +80,7 @@ __pgem_sh_setup_included=true
 : ${PGEMSTALETIME:=1 day}
 
 # export all PGEM variables
-export PGEMPATH PGEMLIB PGEMCACHE PGEMPACKAGES PGEMBIN PGEMMAN
+export PGEMPATH PGEMLIB PGEMBIN PGEMMAN PGEMCACHE PGEMPACKS PGEMDB PGEMINDEX
 export PGEMTRACE PGEMSHOWBUILD PGEMSTALETIME
 
 # Logging and Output
