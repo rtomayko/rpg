@@ -75,14 +75,15 @@ STANDALONE = $(NAME)-sa
 .sh:
 	echo "    SH  $@"
 	$(SHELL) -n $<
+	rm -f $@
 	cp $< $@
-	chmod +x $@
+	chmod a-w+x $@
 
 .sh.html:
 	echo " SHOCCO $@"
 	shocco $< > $@
 
-build: $(PROGRAMS) $(STANDALONE)
+build: $(PROGRAMS)
 
 auto:
 	while true; do $(MAKE) ; sleep 1; done
