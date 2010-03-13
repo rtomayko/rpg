@@ -2,7 +2,8 @@
 set -e
 . pgem-sh-setup
 
-usage="Usage: pgem-update [-v] [-m <mins>|-d <days>|-s]
+ARGV="$@"
+USAGE '${PROGNAME} [-v] [-m <mins>|-d <days>|-s]
 Create or update the remote package index. Maybe.
 
 Options
@@ -13,26 +14,25 @@ Options
 
 The -s option is used by various pgem commands when an update may be
 neccassary. Its default stale time can be configured by setting the
-PGEMSTALETIME option in ~/.pgemrc or /etc/pgemrc."
-[ "$1" = '--help' ] && echo "$usage" && exit 2
+PGEMSTALETIME option in ~/.pgemrc or /etc/pgemrc.'
 
 verbose=false
 staletime=
-while getopts vsm:d: opt
+while getopts m:d:vs opt
 do
     case $opt in
     v)   verbose=true;;
     m)   staletime="$OPTARG min";;
     d)   staletime="$OPTARG day";;
     s)   staletime="$PGEMSTALETIME";;
-    ?)   echo "$usage"
-         exit 2;;
+    ?)   helpthem;;
     esac
 done
 shift $(($OPTIND - 1))
 
-# Bail out with usage if we have more args.
-[ "$*" ] && warn "invalid argument: $*" && exit 2
+# Bail out if we have more args.
+[ "$*" ] &&
+{ warn "invalid argument: $*"; exit 2; }
 
 # The Release Index
 # -----------------
@@ -52,7 +52,7 @@ release="$PGEMINDEX/release"
 if test "$staletime"
 then
     case "$staletime" in
-    never|none) log update "index is in never auto update mode"
+    never|none) notice "index is in never auto update mode"
                 exit 0;;
     [0-9]*m*)   fargs="-mmin -${staletime%%[!0-9]*}";;
     [0-9]*)     fargs="-mtime -${staletime%%[!0-9]*}";;
@@ -61,21 +61,21 @@ then
     esac
 
     if test -z "$(find "$release" -maxdepth 0 $fargs 2>/dev/null)"
-    then log update "release index is missing or stale [> $staletime old]"
-    else log update "release index is fresh [< $staletime old]"
+    then notice "release index is missing or stale [> $staletime old]"
+    else notice "release index is fresh [< $staletime old]"
          exit 0
     fi
 else
-    log update "index rebuild forced"
+    notice "index rebuild forced"
 fi
 
 # First thing we do, we create the `PGEMINDEX` directory if it doesn't exist.
 test -d "$PGEMINDEX" || {
-    log update "creating index directory: $PGEMINDEX"
+    notice "creating index directory: $PGEMINDEX"
     mkdir -p "$PGEMINDEX"
 }
 
-log update "building release file [$release+]"
+notice "building release file [$release+]"
 
 # The `gem list --all` output looks like this:
 #
@@ -142,7 +142,7 @@ done > "$release+"
 #
 # We also don't care that much if this doesn't work due to, e.g.
 # `diff(1)` not being availble.
-log update "building release diff [$release-diff+]"
+notice "building release diff [$release-diff+]"
 
 (diff -u "$release" "$release+" 2>&1 && true) \
 > "$release-diff+"
@@ -160,7 +160,7 @@ $verbose && {
 
 # The recent release index contains only the most recent versions of
 # release packages but otherwise identical to the `release` file.
-log update "building recent release index [$release-recent+]"
+notice "building recent release index [$release-recent+]"
 
 # Since the big release index comes down from the server with versions
 # in reverse order (most recent first), we can push it through `sort(1)`
@@ -174,11 +174,11 @@ sort -u -b -k 1,1 < "$release+" > "$release-recent+"
 # ------
 
 # Move the new index files into place.
-log update "committing new release index files..."
+notice "committing new release index files..."
 for file in "$release-diff" "$release-recent" "$release"
 do  mv "$file+" "$file"
 done
-log update "index rebuild complete"
+notice "index rebuild complete"
 
 # Careful now.
 :

@@ -1,9 +1,10 @@
 #!/bin/sh
 set -e
-usage="Usage: pgem-fsck
-Verify integrity of the package database and release index."
-
 . pgem-sh-setup
+
+ARGV="$@"
+USAGE '${PROGNAME}
+Verify integrity of the package db and release index.'
 
 checking () {
     printf "checking %-35s" "$* ..."

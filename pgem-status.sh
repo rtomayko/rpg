@@ -1,17 +1,17 @@
 #!/bin/sh
 set -e
-usage="Usage: pgem-status [-u] [-p] [<glob>...]
+. pgem-sh-setup
+
+ARGV="$@"
+USAGE '${PROGNAME} [-u] [-p] [<glob>...]
 Show status of installed packages vs available packages.
 
 Options
-  -a                    Include all packages, not just installed, packages
-  -u                    Update the available package index before running
-  -p                    Generate more parseable output
+  -a               Include all packages, not just installed, packages
+  -u               Update the available package index before running
+  -p               Generate more parseable output
 
-Passing one or more <glob>s filters the list to matching packages."
-expr "$*" : '.*--help' >/dev/null && { echo "$usage"; exit 2; }
-
-. pgem-sh-setup
+Passing one or more <glob>s filters the list to matching packages.'
 
 # Argument parsing.
 update=false
@@ -72,7 +72,7 @@ else remotefilter="grep"
      done
 fi
 
-log "status" "remote filter: $remotefilter"
+notice "remote filter: $remotefilter"
 
 # Kick off a pipeline by listing installed packages. The output from
 # `pgem list` looks something like this:

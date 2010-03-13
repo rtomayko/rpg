@@ -1,26 +1,26 @@
 #!/bin/sh
 set -e
-usage="Usage: pgem-version-test [-q] <version> <expression>...
-Package version testing utility.
+. pgem-sh-setup
+
+[ "$*" ] || set -- '--help'; ARGV="$@"
+USAGE '${PROGNAME} [-q] <version> <expression>...
+Test package version against dependency expression.
 
 Test that <version> matches the version tests given in <expression>. If
-<version> is '-', read multiple versions from stdin. <expression> may
+<version> is -, read multiple versions from stdin. <expression> may
 include commas to separate multiple tests.
 
-<expression> is comprised of a comparison operator: '=', '>', '<', '>=',
-'<=', or '~>', followed by a version number. When no operator is specified,
-'=' is assumed.
+<expression> is comprised of a comparison operator: =, >, <, >=,
+<=, or ~>, followed by a version number. When no operator is specified,
+= is assumed.
 
-Exits zero when all tests compare truthfully; non-zero when any tests fail."
-[ $# -eq 0 -o "$1" = "--help" ] && echo "$usage" && exit 2
-
-. pgem-sh-setup
+Exits zero when all tests compare truthfully; non-zero when any tests fail.'
 
 # Don't write matching version to stdout with -q
 quiet=false
 test "$1" = '-q' && {
-    shift
     quiet=true
+    shift
 }
 
 # Like expr(1) but ignore stdout.
@@ -44,19 +44,15 @@ version_compare () {
 
         # check if v1 satisfies operator w/ v2.
         if compare $left $op $right
-        then
-            compare $left = $right ||
-            return 0
-        else
-            compare $left = $right ||
-            return 1
+        then compare $left = $right || return 0
+        else compare $left = $right || return 1
         fi
     done
     compare 0 $op 0
 }
 
 # Shift off the version
-vers="$1" ; shift
+vers="$1"; shift
 
 # Read versions from stdin if - was given.
 test "$vers" = '-' &&
@@ -66,9 +62,8 @@ vers="$(cat -)"
 # each version test separated by commas.
 exps=""
 while test $# -gt 0
-do
-    exps="$1,$exp"
-    shift
+do exps="$1,$exp"
+   shift
 done
 
 # Get rid of the commas and condense each version spec so we get
@@ -77,42 +72,40 @@ exps=$(echo "$exps" | sed -e 's/ //g' -e 's/,$//' -e 's/,/ /g')
 allmatch=true
 
 for ver in $vers
-do
-    satisfied=true
-    for exp in $exps
-    do
-        # extract operator part or default to '='
-        operator=${exp%%[!><=~]*}
-        operator=${operator:-=}
+do satisfied=true
+   for exp in $exps
+   do # extract operator part or default to '='
+      operator=${exp%%[!><=~]*}
+      operator=${operator:-=}
 
-        # extract version part
-        ver2=${exp##*[><=~]}
+      # extract version part
+      ver2=${exp##*[><=~]}
 
-        case "$operator" in
-        =)   # fast path equality
-             test "$ver" = "$ver2" || {
-                satisfied=false
-                break
-             };;
-        ~\>) # handle squiggly guy
-             lt="${ver2%.*}.999999" # gross
-             version_compare "$ver" "<" "$lt" &&
-             version_compare "$ver" ">=" "$ver2" || {
-                satisfied=false
-                break
-             };;
-        *)   # normal comparison
-             version_compare "$ver" "$operator" "$ver2" || {
-                satisfied=false
-                break
-             };;
-        esac
-    done
+      case "$operator" in
+      =)   # fast path equality
+           test "$ver" = "$ver2" || {
+              satisfied=false
+              break
+           };;
+      ~\>) # handle squiggly guy
+           lt="${ver2%.*}.999999" # gross
+           version_compare "$ver" "<" "$lt" &&
+           version_compare "$ver" ">=" "$ver2" || {
+              satisfied=false
+              break
+           };;
+      *)   # normal comparison
+           version_compare "$ver" "$operator" "$ver2" || {
+              satisfied=false
+              break
+           };;
+      esac
+   done
 
-    if $satisfied
-    then $quiet || echo "$ver"
-    else allmatch=false
-    fi
+   if $satisfied
+   then $quiet || echo "$ver"
+   else allmatch=false
+   fi
 done
 
 $allmatch

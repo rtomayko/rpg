@@ -1,24 +1,23 @@
 #!/bin/sh
 set -e
-usage="Usage: pgem-install <package> [<version>]...
-Fetch and install <package> matching <version>."
-[ -z "$*" ] || expr "$*" : '.*--help' >/dev/null &&
-{ echo "$usage"; exit 2; }
-
 . pgem-sh-setup
+
+[ "$*" ] || set -- '--help'; ARGV="$@"
+USAGE '${PROGNAME} <package> [<version>...]
+Install package into pgem environment.'
 
 name="$1"
 vers="${2:->=0}"
 
-[ "$name" ] || { echo "$usage"; exit 2; }
+[ "$name" ] || helpthem
 
 # Usage: pgem_ln <source> <dest>
 # Attempt to hard link <dest> to <source> but fall back to cp(1) if
 # you're crossing file systems or the ln fails otherwise.
 pgem_ln () {
     if ln -f "$1" "$2"
-    then log install "$2 [ln]"
-    else log install "$2 [cp]"
+    then notice "$2 [ln]"
+    else notice "$2 [cp]"
          cp "$1" "$2"
     fi
 }
@@ -46,6 +45,8 @@ pgem_install_dir () {
     return 0
 }
 
+notice "$name $vers installation commencing ..."
+
 # Fetch the gem into the cache.
 gemfile=$(pgem-fetch $name $vers)
 gemname=$(basename $gemfile .gem)
@@ -57,7 +58,7 @@ xargs -n 2 pgem install
 
 # Unpack the gem into the packages area if its not already there
 test -d "$PGEMPACKS/$gemname" || {
-    log unpack "$gemfile"
+    notice "unpacking $gemfile into $PGEMPACKS"
     mkdir -p "$PGEMPACKS"
     cd "$PGEMPACKS"
     gem unpack "$gemfile" >/dev/null
@@ -71,16 +72,12 @@ manifest="$dbdir/$gemvers"
 test -e "$dbdir/active" && {
     curvers=$(readlink $dbdir/active)
     if pgem-version-test -q "$curvers" "$vers"
-    then
-        log uptodate "$name $curvers is installed"
-        exit 0
-    else
-        log conflict "$name $curvers installed but you want $gemvers"
-        unlink "$dbdir/active"
+    then notice "$name $curvers is installed and current"
+         exit 0
+    else notice "$name $curvers is installed but $gemvers requested"
+         unlink "$dbdir/active"
     fi
 }
-
-log install $name $vers
 
 mkdir -p "$dbdir"
 echo "# $(date)" > "$manifest"
@@ -134,9 +131,8 @@ test -d lib && {
 test -d bin && {
     mkdir -p "$PGEMBIN"
     for file in bin/*
-    do
-        dest="$PGEMBIN/$(basename $file)"
-        log install "$dest [+x]"
+    do  dest="$PGEMBIN/$(basename $file)"
+        notice "$dest [!]"
         sed "s@^#!.*ruby.*@#!$(ruby_command)@" \
             < "$file" \
             > "$dest"

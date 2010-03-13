@@ -91,6 +91,9 @@ __pgem_sh_setup_included=true
 #
 : ${PGEMINDEX:=$PGEMPATH/index}
 
+# Enable verbose logging to stderr.
+: ${PGEMVERBOSE:=false}
+
 # Enable the shell's trace facility (`set -x`) in all pgem programs.
 : ${PGEMTRACE:=false}
 
@@ -116,20 +119,82 @@ GEMNAME_PATTERN='[0-9A-Za-z_.-]\{1,\}'
 GEMVERS_PATTERN='[0-9.]\{1,\}'
 GEMPRES_PATTERN='[0-9A-Za-z.]\{1,\}'
 
-# Logging and Output
-# ------------------
+# Usage Messages, Logging, and Stuff Like That
+# --------------------------------------------
+
+# The program name used in usage messages, log output, and other places
+# probably. You can set this before sourcing pgem-sh-setup to override
+# the default `$(basename $0)` value but it's probably what you want.
+: ${PROGNAME:=$(basename $0)}
+
+# The progam's usage message. See the documentation for the `USAGE`
+# function for information on setting this and how it plays with the
+# other usage related functions.
+: ${__USAGE__:='${PROGNAME} <args>'}
+
+# This is the main usage setting thingy. Scripts should start as
+# follows to take advantage of it:
+#
+#     set -e           # always
+#     . pgem-sh-setup  # bring in support lib
+#
+#     ARGV="$@"
+#     USAGE '${PROGNAME} <options> ...
+#     A short, preferably < 50 char description of the script.
+#
+#     Options:
+#       -b               Booooyaaahhh.'
+#
+# That will automatically trigger option parsing for a `--help`
+# argument and whatnot.
+#
+# Note that the string passed in is single-quote escape. The string will
+# evaluated at help time so you can do wild/expensive interpolations if
+# that's your thing.
+#
+# One more quick usage tip. Some scripts want to show usage when `$@` is
+# empty and others don't. These `USAGE` routines default to *not*
+# showing the usage message when no arguments were passed. If you want
+# to show usage when no arguments are passed, put this immediately
+# before setting the `ARGV` variable:
+#
+#     [ "$*" ] || set -- --help
+#     ARGV="$@"
+#     USAGE ...
+#
+# That'll cause empty arg invocations to show the help message.
+USAGE () {
+    USAGE="${1:-$(cat)}"
+    case "$ARGV" in
+    *--h|*--he|*--hel|*--help|*-h|*-\?)
+        helpthem 0
+        exit 0;;  # just in case
+    esac
+}
+
+# Show usage message defined in USAGE environment variable. The usage message
+# is first evaluated as a string so interpolations can be performed if
+# necessary.
+helpthem () {
+    : ${REAL_USAGE:=$(eval "echo \"$USAGE\"")}
+    echo "Usage: $REAL_USAGE"
+    exit ${1:-2}
+}
+
 
 # Write a warning to stderr. The message is prefixed with the
 # program's basename.
-warn () { echo "$(basename $0):" "$@" 1>&2; }
+warn () { echo "$PROGNAME:" "$@" 1>&2; }
 
-# Write an informationational message stderr under verbose mode.
-log () {
-    _t="$1:" ; shift
-    printf "%12s %s\n" "$_t" "$*" 1>&2
+# Write an informationational message to stderr prefixed with the name
+# of the current script. Don't use this, use `notice`.
+heed () {
+    printf "%12s %s\n" "$PROGNAME" "$*" 1>&2
 }
 
-abort () { test "$*" && warn "$@"; exit 1; }
+# We rewite the `notice` function to `head` if `PGEMVERBOSE` is enabled
+# after sourcing config files.
+notice () { true; }
 
 # Ruby Related Utility Functions
 # ------------------------------
@@ -199,6 +264,10 @@ test -f ~/.pgemrc &&
 # Turn on the shell's built in tracing facilities
 # if PGEMTRACE is enabled.
 eval "${PGEMTRACE:-false}" && set -x
+
+eval "${PGEMVERBOSE:-false}" && {
+    notice () { heed "$@"; }
+}
 
 # make sure we don't accidentally exit with a non-zero status
 :

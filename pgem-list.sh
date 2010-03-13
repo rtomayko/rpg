@@ -1,14 +1,16 @@
 #!/bin/sh
 set -e
-usage="Usage: pgem-list [-x] [<glob>...]
-List installed packages matching <glob>s or all packages with no <glob>s.
+. pgem-sh-setup
+
+ARGV="$@"
+USAGE '${PROGNAME} [-x] [<glob>...]
+List pgem installed packages.
 
 Options
-  -x                    Include non-matching globs in output."
-expr "$*" : '.*--help' >/dev/null &&
-echo "$usage" && exit 2
+  -x               Include non-matching globs in output.
 
-. pgem-sh-setup
+Only list packages matching <glob> when provided. With multiple <glob>s,
+list packages matching any one of them.'
 
 shownonmatch=false
 test "$1" = '-x' && {

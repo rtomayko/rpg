@@ -1,13 +1,16 @@
 #!/bin/sh
-#/ Usage: pgem-env [name=value ...] [<command> [<arguments> ...]]
-#/ Executes <command> after modifying the environment with pgem values.
-#/ The pgem shared lib path is placed on RUBYLIB and the pgem bin path
-#/ is added to PATH.
-#/
-#/ If no <command> is specified, pgem-env writes the name and values
-#/ of variables in the environment stdout with one <name>=<value> per line.
-
+set -e
 . pgem-sh-setup
+
+ARGV="$@"
+USAGE '${PROGNAME} [name=value ...] [<command> [<arguments> ...]]
+Execute command under pgem environment.
+
+The PGEMLIB dir is placed on RUBYLIB and exported, and PGEMBIN is add to
+added PATH before executing command.
+
+If no <command> is specified, ${PROGNAME} writes the name and values
+of variables in the environment to stdout with one <name>=<value> per line.'
 
 # Setup RUBYLIB and PATH.
 RUBYLIB="$PGEMLIB:$RUBYLIB"

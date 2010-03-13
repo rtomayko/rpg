@@ -1,38 +1,32 @@
 #!/bin/sh
-#/ Usage: pgem-deps [-d|-r] <gem>
-#/ List dependencies for a specific <gem> by name or gem file.
-#/
-#/ Options:
-#/   -d, --development       List development dependencies
-#/   -r, --runtime           List runtime dependencies
-#/
-#/ Only runtime dependencies are listed by default. If the --development
-#/ option is given, only development dependencies are listed, unless the
-#/ --runtime option is also given.
+set -e
+. pgem-sh-setup
 
-# NOTE: This is very similar to `gem dependency --pipe` but takes a
-# filename or specific gem name instead of a search pattern.
+[ "$*" ] || set -- "--help"; ARGV="$@"
+USAGE '${PROGNAME} [-d] [-r] <package>
+List dependencies for a package or gem file.
+
+Options:
+  -d               List development dependencies
+  -r               List runtime dependencies
+
+Only runtime dependencies are listed by default. If the -d option is given,
+only development dependencies are listed, unless the -r option is also
+given.'
+
+# This is very similar to `gem dependency --pipe` but takes a filename or
+# specific gem name instead of a search pattern.
 
 pattern=
 
 while test $# -gt 0
 do
     case "$1" in
-        --dev*|-d)
-            pattern="$pattern -e \.add_development"
-            shift
-            ;;
-        --run*|-r)
-            pattern="$pattern -e \.add_runtime"
-            shift
-            ;;
-        --help)
-            cat "$0" | grep '^#/' | cut -c4-
-            exit
-            ;;
-        *)
-            break
-            ;;
+    --dev*|-d)  pattern="$pattern -e \.add_development"
+                shift;;
+    --run*|-r)  pattern="$pattern -e \.add_runtime"
+                shift;;
+            *)  break;;
     esac
 done
 

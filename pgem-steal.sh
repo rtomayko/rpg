@@ -1,16 +1,12 @@
 #!/bin/sh
 set -e
-usage="Usage: pgem-steal [-n]
+. pgem-sh-setup
+
+ARGV="$@"
+USAGE '${PROGNAME} [-n]
 Take everything currently installed in Rubygems and install in pgems.
 
-With the -n option, show what would be installed but don't.
-"
-expr "$*" : ".*--help" >/dev/null && {
-    echo "$usage"
-    exit 2
-}
-
-. pgem-sh-setup
+With the -n option, show what would be installed but do not.'
 
 if test "$1" = '-n'
 then  tampon="echo"

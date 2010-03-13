@@ -1,9 +1,9 @@
 #!/bin/sh
-#/ Usage: pgem config
-#/ Show pgem configuration information.
 set -e
-
 . pgem-sh-setup
 
-# pgem configuration
+ARGV="$@"
+USAGE '${PROGNAME}
+Write pgem configuration values to standard output.'
+
 env | grep ^PGEM
