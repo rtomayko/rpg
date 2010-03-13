@@ -17,11 +17,20 @@ __pgem_sh_setup_included=true
 
 # Enable the shell's trace facility (`set -x`) in all pgem programs.
 : ${PGEMTRACE:=false}
+
+# Show extconf.rb and make output when building extensions.
 : ${PGEMSHOWBUILD:=false}
+
+# Default stale time for use with `pgem-update -s`. Values can be stuff
+# like `10 days` or `10d`, `30 minutes` or `30m`. A number with no time
+# designator is considered in days. This value can also be `never`, in
+# which case the database will never be automatically updated in the
+# course of running other programs.
+: ${PGEMSTALETIME:=1 day}
 
 # export all PGEM variables
 export PGEMPATH PGEMLIB PGEMCACHE PGEMPACKAGES PGEMBIN PGEMMAN
-export PGEMTRACE
+export PGEMTRACE PGEMSHOWBUILD PGEMSTALETIME
 
 # Write a warning to stderr. The message is prefixed with the
 # program's basename.

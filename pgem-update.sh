@@ -1,12 +1,63 @@
 #!/bin/sh
-#/ Usage: pgem-update
-#/ Rebuild the package database.
 set -e
-
 . pgem-sh-setup
 
-mkdir -p "$PGEMDB"
+usage="Usage: pgem-update [-v] [-m <mins>|-d <days>|-s]
+Create or update the remote package database if stale.
+
+Options
+  -d <days>             Do nothing if db is less than <days> days old
+  -m <mins>             Do nothing if db is less than <mins> minutes old
+  -s                    Do nothing if db is less than $PGEMSTALETIME old
+  -v                    Write newly available packages to stdout after updating
+
+The -s option is used by various pgem commands when an update may be
+neccassary. Its default stale time can be configured by setting the
+PGEMSTALETIME option in ~/.pgemrc or /etc/pgemrc."
+[ "$1" = '--help' ] && echo "$usage" && exit 2
+
+verbose=false
+staletime=
+while getopts vsm:d: opt
+do
+    case $opt in
+    v)   verbose=true;;
+    m)   staletime="$OPTARG min";;
+    d)   staletime="$OPTARG day";;
+    s)   staletime="$PGEMSTALETIME";;
+    ?)   echo "$usage"
+         exit 2;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+# Bail out with usage if we have more args.
+[ "$*" ] && warn "invalid argument: $*" && exit 2
+
 index="$PGEMDB/gemdb"
+test -d "$PGEMDB" || mkdir -p "$PGEMDB"
+
+# Maybe bail out if a stale time was given. `PGEMSTALETIME` values can be
+# stuff like `10 days` or `10d`, `30 minutes` or `30m`. A number with no
+# time designator is considered in days. When the value is `never`,
+# don't update the database due to staleness in the course of running
+# other programs.
+test -n "$staletime" && {
+    case "$staletime" in
+    never|none) log update "database is in never update mode"
+                exit 0;;
+    [0-9]*m*)   fargs="-mmin -${staletime%%[!0-9]*}";;
+    [0-9]*)     fargs="-mtime -${staletime%%[!0-9]*}";;
+    *)          fargs=""
+                warn "bad PGSTALETIME value: '$staletime'. ignoring.";;
+    esac
+
+    if test -z "$(find "$index" -maxdepth 0 $fargs 2>/dev/null)"
+    then log update "database is missing or stale [> $staletime old]"
+    else log update "database is fresh [< $staletime old]"
+         exit 0
+    fi
+}
 
 # The `gem list --all` output looks like this:
 #
@@ -59,8 +110,18 @@ done > "${index}+"
 # We wrote the new index to separate file so we can take a quick diff. We can
 # show the diff directly, which is awesome, but this could also be used to roll
 # back and update (`patch -R`) if something goes wrong.
-(diff -u "${index}" "${index}+" && true) > "$PGEMDB/diff"
-cat "$PGEMDB/diff"
+(diff -u "${index}" "${index}+" 2>&1 && true) > "$PGEMDB/diff"
 
 # Move the new index into place
 mv "${index}+" "${index}"
+
+# Write a list of new packages to stdout if the verbose flag was given.
+$verbose && {
+    echo "# New packages:"
+    grep '^+' < "$PGEMDB/diff" |
+    grep -v '^++'              |
+    cut -c2-
+}
+
+# Careful now.
+:

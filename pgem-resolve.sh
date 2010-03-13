@@ -1,12 +1,11 @@
 #!/bin/sh
 set -e
-
 usage="Usage: pgem-resolve [-n <max>] <package> <expression>...
 Write available package versions matching version <expression>s."
+[ -z "$*" -o "$1" = '--help' ] && echo "$usage" && exit 2
 
 . pgem-sh-setup
 
-# Parse options.
 max=100
 while getopts 1n: opt
 do
@@ -17,25 +16,25 @@ do
          exit 2;;
     esac
 done
-
-# Fast forward past option arguments.
 shift $(($OPTIND - 1))
 
-name="$1"; shift
+package="$1"; shift
 test "$*" || {
     echo "$usage"
     exit 2
 }
+
 index="$PGEMDB/gemdb"
+pgem-update -s
 
 versions=$(
-    grep "^$name " < "$index"    |
+    grep "^$package " < "$index"    |
     cut -d ' ' -f 2              |
-    head -$max                   |
-    pgem-version-test - "$@"
+    pgem-version-test - "$@"     |
+    head -$max
 ) || true
 
-# exit with success if we found at least one version, failure otherwise.
+# Exit with success if we found at least one version, failure otherwise.
 if test -n "$versions"
 then echo "$versions"
 else exit 1
