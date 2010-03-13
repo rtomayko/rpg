@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-usage="Usage: pgem-version-test <version> <expression>...
+usage="Usage: pgem-version-test [-q] <version> <expression>...
 Package version testing utility.
 
 Test that <version> matches the version tests given in <expression>. If
@@ -15,6 +15,13 @@ Exits zero when all tests compare truthfully; non-zero when any tests fail."
 [ $# -eq 0 -o "$1" = "--help" ] && echo "$usage" && exit 2
 
 . pgem-sh-setup
+
+# Don't write matching version to stdout with -q
+quiet=false
+test "$1" = '-q' && {
+    shift
+    quiet=true
+}
 
 # Like expr(1) but ignore stdout.
 compare () { expr "$1" "$2" "$3" >/dev/null; }
@@ -103,7 +110,7 @@ do
     done
 
     if $satisfied
-    then echo "$ver"
+    then $quiet || echo "$ver"
     else allmatch=false
     fi
 done
