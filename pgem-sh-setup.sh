@@ -189,7 +189,7 @@ warn () { echo "$PROGNAME:" "$@" 1>&2; }
 # Write an informationational message to stderr prefixed with the name
 # of the current script. Don't use this, use `notice`.
 heed () {
-    printf "%12s %s\n" "$PROGNAME" "$*" 1>&2
+    printf "%13s %s\n" "${PROGNAME#pgem-}:" "$*" 1>&2
 }
 
 # We rewite the `notice` function to `head` if `PGEMVERBOSE` is enabled
