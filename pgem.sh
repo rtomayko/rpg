@@ -10,11 +10,6 @@ set -e
 command="$1"
 shift
 
-# Set PHEMV
-if $PGEMTRACE
-then log trace "$command" "$@" 1>&2
-fi
-
 if $__SHC__
 then
     case $command in

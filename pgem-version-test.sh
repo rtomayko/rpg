@@ -1,71 +1,111 @@
 #!/bin/sh
-#/ Usage: pgem-version-test -e <ver> <expr>...
-#/ Test if <ver> matches the version test given in <expr>.
-#/
-local ver exp op ver1 ver2 gte lt left right compver
 set -e
+usage="Usage: pgem-version-test <version> <expression>...
+Package version testing utility.
 
-compare () {
-    expr "$1" "$2" "$3" >/dev/null
-}
+Test that <version> matches the version tests given in <expression>. If
+<version> is '-', read multiple versions from stdin. <expression> may
+include commas to separate multiple tests.
 
-# Shift off the version
-ver="$1" ; shift
+<expression> is comprised of a comparison operator: '=', '>', '<', '>=',
+'<=', or '~>', followed by a version number. When no operator is specified,
+'=' is assumed.
 
-# Create a single big expression separated by commas.
-exp=""
-while test $# -gt 0
-do
-    exp="$1,$exp"
-    shift
-done
-exp=$(
-    echo "$exp" |
-    sed '
-        s/ //g
-        s/,$//g
-    ')
-
-# Run one pgem-version-test process per expression.
-compare "$exp" : '.*,' && {
-    echo "$exp"               |
-      tr ',' '\n'             |
-      while read compver
-      do
-          pgem version-test "$ver" "$compver"
-      done
-    exit 0
-}
+Exits zero when all tests compare truthfully; non-zero when any tests fail."
+[ $# -eq 0 -o "$1" = "--help" ] && echo "$usage" && exit 2
 
 . pgem-sh-setup
 
-op=${exp%%[!><=~]*}
-ver2=${exp##*[><=~]}
+# Like expr(1) but ignore stdout.
+compare () { expr "$1" "$2" "$3" >/dev/null; }
 
-# handle squiggly guy
-test "$op" = "~>" && {
-    gte="$ver2"
-    lt="${ver2%.*}.999999" # gross
-    pgem version-test "$ver" "<$lt,>=$gte"
-    exit 0
+# Usage: pgem_version_eval <ver1> <op> <ver2>
+# Compare <ver1> with <ver2> using operator <op>.
+# Return zero if <ver1> matches <ver2>, non-zero otherwise.
+version_compare () {
+    v1="$1."; op="$2"; v2="$3."
+    while test -n "$v1" -o -n "$v2"
+    do
+        # take left-most item from v1 and v2
+        left=${v1%%.*}; right=${v2%%.*}
+
+        # remove left-most item from v1 and v2
+        v1=${v1#*.}; v2=${v2#*.}
+
+        # use 0 if we've eaten through either side
+        left=${left:-0}; right=${right:-0}
+
+        # check if v1 satisfies operator w/ v2.
+        if compare $left $op $right
+        then
+            compare $left = $right ||
+            return 0
+        else
+            compare $left = $right ||
+            return 1
+        fi
+    done
+    compare 0 $op 0
 }
 
-ver1="$ver."
-ver2="$ver2."
-while test -n "$ver1" -o -n "$ver2"
+# Shift off the version
+vers="$1" ; shift
+
+# Read versions from stdin if - was given.
+test "$vers" = '-' &&
+vers="$(cat -)"
+
+# Combine the rest of the arguments into one big list of expression with
+# each version test separated by commas.
+exps=""
+while test $# -gt 0
 do
-    left=${ver1%%.*}
-    right=${ver2%%.*}
-    left=${left:-0}
-    right=${right:-0}
-    ver1=${ver1#*.}
-    ver2=${ver2#*.}
-    if compare $left $op $right
-    then
-        compare $left = $right || exit 0
-    else
-        compare $left = $right
+    exps="$1,$exp"
+    shift
+done
+
+# Get rid of the commas and condense each version spec so we get
+# something like: "0.3.4 =0.5.7 >=0.9 10.2"
+exps=$(echo "$exps" | sed -e 's/ //g' -e 's/,$//' -e 's/,/ /g')
+allmatch=true
+
+for ver in $vers
+do
+    satisfied=true
+    for exp in $exps
+    do
+        # extract operator part or default to '='
+        operator=${exp%%[!><=~]*}
+        operator=${operator:-=}
+
+        # extract version part
+        ver2=${exp##*[><=~]}
+
+        case "$operator" in
+        =)   # fast path equality
+             test "$ver" = "$ver2" || {
+                satisfied=false
+                break
+             };;
+        ~\>) # handle squiggly guy
+             lt="${ver2%.*}.999999" # gross
+             version_compare "$ver" "<" "$lt" &&
+             version_compare "$ver" ">=" "$ver2" || {
+                satisfied=false
+                break
+             };;
+        *)   # normal comparison
+             version_compare "$ver" "$operator" "$ver2" || {
+                satisfied=false
+                break
+             };;
+        esac
+    done
+
+    if $satisfied
+    then echo "$ver"
+    else allmatch=false
     fi
 done
 
-compare 0 $op 0
+$allmatch
