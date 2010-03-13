@@ -91,12 +91,16 @@ log update "building release file [$release+]"
 #     cmdrkeene-foursquare (0.0.4)
 #
 # It includes all gems and all versions of all gems.
-gem list --no-installed --remote --all                      |
+gem list --no-installed --remote --all                       |
 
 # Now turn it into something that's easy to use with stream tools like
 # `grep(1)`, `sed(1)`, `cut(1)`, `join(1)`, etc.
-sed -e "s/^\($GEMNAME_PATTERN\) (\(.*\))$/GEM \1 \2/"       \
-    -e 's/,//g'                                             |
+sed -e "s/^\($GEMNAME_PATTERN\) (\(.*\))$/GEM \1 \2/"        \
+    -e 's/,//g'                                              |
+
+# Make sure the file is sorted on package names in `sort -b` order. This is
+# important for `join(1)` and `uniq(1)`.
+sort -b -k 1,1 -k2,2rn                                       |
 
 # It looks like this when we're done with it:
 #
@@ -158,23 +162,13 @@ $verbose && {
 # release packages but otherwise identical to the `release` file.
 log update "building recent release index [$release-recent+]"
 
-# Start out by flipping the `<package> <vers>` fields around so that
-# `<version>` is the leader. This lets us use `uniq(1)`'s ignore option.
-sed 's@^\([! ]*\) \(.*\)@\2 \1@' < "$release+" |
-
-# Okay we can feed this directly to uniq(1) because the big index is
-# reverse sorted by version (most recent first). Only the first line
-# for each package is output, which is great because that's the most
-# recent version
-uniq -f 1                                      |
-
-# Flip `<package>` and `<version>` back the way they came.
-#
-# Seem crazy to do all this? Doesn't matter. It's fast as shit. 95% of the time
-# is spent pulling the index file off the network.
-sed 's@^\([! ]*\) \(.*\)@\2 \1@'               \
-> "$release-recent+"
-
+# Since the big release index comes down from the server with versions
+# in reverse order (most recent first), we can push it through `sort(1)`
+# using the `<package>` field as the key (only) and have it uniq the list
+# down for us. `sort -u` uses the first line with a distinct `<package>`
+# name and discards adjacent matches, leaving us with a sorted list of
+# the most recent versions.
+sort -u -b -k 1,1 < "$release+" > "$release-recent+"
 
 # Commit
 # ------
