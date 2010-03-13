@@ -44,7 +44,8 @@ SOURCES = pgem-sh-setup.sh \
 		  pgem-upgrade.sh \
 		  pgem-steal.sh \
 		  pgem-fsck.sh \
-		  pgem-status.sh
+		  pgem-status.sh \
+		  pgem-outdated.sh
 
 PROGRAMS = pgem-sh-setup \
 		   pgem \
@@ -62,7 +63,8 @@ PROGRAMS = pgem-sh-setup \
 		   pgem-upgrade \
 		   pgem-steal \
 		   pgem-fsck \
-		   pgem-status
+		   pgem-status \
+		   pgem-outdated
 
 DOCHTML = pgem-sh-setup.html \
 		  pgem.html \
@@ -80,7 +82,8 @@ DOCHTML = pgem-sh-setup.html \
 		  pgem-upgrade.html \
 		  pgem-steal.html \
 		  pgem-fsck.html \
-		  pgem-status.html
+		  pgem-status.html \
+		  pgem-outdated.html
 
 STANDALONE = $(NAME)-sa
 
