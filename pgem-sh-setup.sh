@@ -32,6 +32,9 @@ __pgem_sh_setup_included=true
 export PGEMPATH PGEMLIB PGEMCACHE PGEMPACKAGES PGEMBIN PGEMMAN
 export PGEMTRACE PGEMSHOWBUILD PGEMSTALETIME
 
+# Logging and Output
+# ------------------
+
 # Write a warning to stderr. The message is prefixed with the
 # program's basename.
 warn () { echo "$(basename $0):" "$@" 1>&2; }
@@ -43,6 +46,10 @@ log () {
 }
 
 abort () { test "$*" && warn "$@"; exit 1; }
+
+
+# Misc Utility Functions
+# ----------------------
 
 # rubygems gemdir path
 pgem_gemdir () {
@@ -96,6 +103,17 @@ yes () { true; }
 no () { false; }
 alias 1=true
 alias 0=false
+
+# Constants
+# ---------
+
+# Useful BRE patterns for matching various gem stuffs.
+GEMNAME_PATTERN='[0-9A-Za-z_.-]\{1,\}'
+GEMVERS_PATTERN='[0-9.]\{1,\}'
+GEMPRES_PATTERN='[0-9A-Za-z.]\{1,\}'
+
+# Config Files
+# ------------
 
 # source system pgemrc file
 test -f /etc/pgemrc &&

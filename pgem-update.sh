@@ -77,10 +77,10 @@ gem list --no-installed --remote --all |
 
 # Now turn it into something that's easy to use with stream tools
 # like grep(1), sed(1), cut(1), join(1), etc.
-sed '
-    s/^\([0-9A-Za-z_.-]\{1,\}\) (\(.*\))$/GEM \1 \2/
+sed "
+    s/^\($GEMNAME_PATTERN\) (\(.*\))$/GEM \1 \2/
     s/,//g
-    '                                  |
+    "                                  |
 
 # It looks like this when we're done with it:
 #
@@ -102,9 +102,14 @@ sed '
 # fairly easily with sed(1) or awk(1) but I'm not familiar with any approaches.
 while read leader name versions
 do
-    for ver in $versions
-    do echo "$name $ver"
-    done
+    if test "$leader" = "GEM"
+    then
+        for ver in $versions
+        do echo "$name $ver"
+        done
+    else
+        warn "malformed input from \`gem list': $leader $name $versions"
+    fi
 done > "${index}+"
 
 # We wrote the new index to separate file so we can take a quick diff. We can
