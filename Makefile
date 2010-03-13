@@ -83,7 +83,9 @@ STANDALONE = $(NAME)-sa
 	shocco $< > $@
 
 build: $(PROGRAMS) $(STANDALONE)
-	echo "  DONE  $(NAME) built successfully. Ready to \`make install'."
+
+auto:
+	while true; do $(MAKE) ; sleep 1; done
 
 doc: $(DOCHTML)
 
