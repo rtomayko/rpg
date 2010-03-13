@@ -40,7 +40,11 @@ SOURCES = pgem-sh-setup.sh \
 		  pgem-build.sh \
 		  pgem-env.sh \
 		  pgem-update.sh \
-		  pgem-resolve.sh
+		  pgem-resolve.sh \
+		  pgem-upgrade.sh \
+		  pgem-steal.sh \
+		  pgem-fsck.sh \
+		  pgem-status.sh
 
 PROGRAMS = pgem-sh-setup \
 		   pgem \
@@ -54,7 +58,11 @@ PROGRAMS = pgem-sh-setup \
 		   pgem-build \
 		   pgem-env \
 		   pgem-update \
-		   pgem-resolve
+		   pgem-resolve \
+		   pgem-upgrade \
+		   pgem-steal \
+		   pgem-fsck \
+		   pgem-status
 
 DOCHTML = pgem-sh-setup.html \
 		  pgem.html \
@@ -68,7 +76,11 @@ DOCHTML = pgem-sh-setup.html \
 		  pgem-build.html \
 		  pgem-env.html \
 		  pgem-update.html \
-		  pgem-resolve
+		  pgem-resolve.html \
+		  pgem-upgrade.html \
+		  pgem-steal.html \
+		  pgem-fsck.html \
+		  pgem-status.html
 
 STANDALONE = $(NAME)-sa
 
