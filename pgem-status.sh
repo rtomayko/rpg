@@ -124,9 +124,9 @@ pgem list -x "$@" |
 # line and, because both files are sorted, knows immediately whether the
 # lines intersect or are unpairable.
 #
-# `join(1)` has additional options (`-a` and `-e`) that let you do "outer
-# joins" and "full joins". Those could be useful for, amongst other
-# things, writing commands that show all packages you *don't* have installed.
+# Additional, we selectively enable some of `join(1)`'s other options (`-a`
+# and `-e`) for achieving "outer joins" and "full joins" when querying
+# against all remote packages.
 join -a 1 $joiner -o 1.1,1.2,2.2,2.1 -e '-' - "$PGEMINDEX/release-recent" |
 
 # Grep out remote packages based on our globs. See the *Glob Filter* section
