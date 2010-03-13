@@ -45,13 +45,13 @@ pgem_install_dir () {
 }
 
 # Fetch the gem into the cache.
-gemfile=$(pgem fetch $name $vers) ||
+gemfile=$(pgem-fetch $name $vers) ||
 exit 1
 gemname=$(basename ${gemfile%.gem})
 gemvers=${gemname##*-}
 
 # Install all dependencies
-pgem deps "$gemfile" |
+pgem-deps "$gemfile" |
 xargs -n 2 pgem install
 
 # Unpack the gem into the packages area if its not already there
@@ -69,7 +69,7 @@ manifest="$dbdir/$gemvers"
 # Check if the package already has an installed version
 test -e "$dbdir/active" && {
     curvers=$(readlink $dbdir/active)
-    if pgem version-test "$curvers" "$vers"
+    if pgem-version-test "$curvers" "$vers"
     then
         log uptodate "$name $curvers is installed"
         exit 0
@@ -89,7 +89,7 @@ ln -sf "$gemvers" "$dbdir/installing"
 cd "$PGEMPACKS/$gemname"
 
 # Build extension libraries if they exist
-exts="$(pgem build "$(pwd)")" || abort "extension failed to build"
+exts="$(pgem-build "$(pwd)")" || abort "extension failed to build"
 
 test -n "$exts" && {
     mkdir -p "$PGEMLIB"

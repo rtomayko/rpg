@@ -20,7 +20,7 @@ then
         sed 's/^.*-\([0-9].*\)\.gem/\1/' |
         sort -rn)
     do
-        if pgem version-test "$havever" "$vers"
+        if pgem-version-test "$havever" "$vers"
         then
             log fetch "$name $vers [cached]"
             echo "$PGEMCACHE/$name-${havever}.gem"
