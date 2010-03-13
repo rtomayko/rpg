@@ -6,12 +6,37 @@
 test $__pgem_sh_setup_included && return
 __pgem_sh_setup_included=true
 
-# pgem configuration
+# Install Paths
+# -------------
+
+# This is the psuedo root directory where `pgem` keeps all its stuff. The
+# default locations of all other pgem paths use this as a base.
+# *HOWEVER*, no pgem utility targets this directory -- every significant
+# location must have a separate path variable so that things stay
+# flexible in configuration.
 : ${PGEMPATH:=/var/lib/pgem}
+
+# `PGEMLIB` is the shared Ruby `lib` directory where library files are
+# installed. You can set this to the current Ruby's site packages with:
+#
+#     PGEMLIB=$(ruby_sitelibdir)
 : ${PGEMLIB:=$PGEMPATH/lib}
+
+# `PGEMBIN` is where executable scripts included in packages are installed.
 : ${PGEMBIN:=$PGEMPATH/bin}
+
+# `PGEMMAN` is where manpages included with packages are installed. This
+# is basically the whole reason `pgem` was written in the first place.
 : ${PGEMMAN:=$PGEMPATH/man}
+
+
+
+# `PGEMCACHE` is where `pgem-fetch(1)` looks for and stores gem files.
+# Set this to your Rubygems `cache` directory to share the gem cache.
 : ${PGEMCACHE:=$PGEMPATH/cache}
+
+# `PGEMPACKS` is where `pgem-install(1)` unpacks gems before installing. The
+# package directories are not used after package installation is complete.
 : ${PGEMPACKS:=$PGEMPATH/packs}
 
 # `PGEMDB` is where our local package database is kept. It's a
@@ -83,6 +108,14 @@ __pgem_sh_setup_included=true
 export PGEMPATH PGEMLIB PGEMBIN PGEMMAN PGEMCACHE PGEMPACKS PGEMDB PGEMINDEX
 export PGEMTRACE PGEMSHOWBUILD PGEMSTALETIME
 
+# Constants
+# ---------
+
+# Useful BRE patterns for matching various gem stuffs.
+GEMNAME_PATTERN='[0-9A-Za-z_.-]\{1,\}'
+GEMVERS_PATTERN='[0-9.]\{1,\}'
+GEMPRES_PATTERN='[0-9A-Za-z.]\{1,\}'
+
 # Logging and Output
 # ------------------
 
@@ -98,48 +131,44 @@ log () {
 
 abort () { test "$*" && warn "$@"; exit 1; }
 
+# Ruby Related Utility Functions
+# ------------------------------
 
-# Misc Utility Functions
-# ----------------------
-
-# rubygems gemdir path
-pgem_gemdir () {
-    test "$GEM_HOME" || {
-        GEM_HOME=$(gem environment gemdir)
-        export GEM_HOME
-    }
-    echo "$GEM_HOME"
+# The command that should be executed to run `ruby`. This is used to
+# rewrite shebang lines.
+ruby_command () {
+    command -v ruby 2>/dev/null ||
+    echo "/usr/bin/env ruby"
 }
 
 # Retrieve a rbconfig value.
-pgem_rbconfig () {
+ruby_config () {
     ruby -rrbconfig -e "puts RbConfig::CONFIG['$1']"
 }
 
-# ruby sitelibdir path.
-pgem_sitelibdir () {
-    test "$RUBYSITE" || {
-        RUBYSITE=$(pgem_rbconfig sitelibdir)
-        export RUBYSITE
+# Ruby's `site_ruby` directory.
+ruby_sitelibdir () {
+    test "$RUBYSITEDIR" || {
+        RUBYSITEDIR=$(ruby_config sitelibdir)
+        export RUBYSITEDIR
     }
-    echo "$RUBYSITE"
+    echo "$RUBYSITEDIR"
 }
 
-# full path to ruby binary
-pgem_rubybin () {
-    command -v ruby
-}
-
-# Query rbconfig for the the dynamic library file extension.
-pgem_ruby_dlext() {
+# The file extension for dynamic libraries on this operating system.
+# e.g., `so` on Linux, `dylib` on MacOS.
+ruby_dlext() {
     test "$RUBYDLEXT" || {
-        RUBYDLEXT=$(pgem_rbconfig DLEXT)
+        RUBYDLEXT=$(ruby_config DLEXT)
         export RUBYDLEXT
     }
     echo "$RUBYDLEXT"
 }
 
-# readlink(1) for systems that don't have it
+# Misc Utility Functions
+# ----------------------
+
+# readlink(1) for systems that don't have it.
 readlink () {
     test -L "$1"
     command readlink "$1" 2>/dev/null || {
@@ -155,13 +184,6 @@ no () { false; }
 alias 1=true
 alias 0=false
 
-# Constants
-# ---------
-
-# Useful BRE patterns for matching various gem stuffs.
-GEMNAME_PATTERN='[0-9A-Za-z_.-]\{1,\}'
-GEMVERS_PATTERN='[0-9.]\{1,\}'
-GEMPRES_PATTERN='[0-9A-Za-z.]\{1,\}'
 
 # Config Files
 # ------------
