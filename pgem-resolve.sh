@@ -2,7 +2,8 @@
 set -e
 usage="Usage: pgem-resolve [-n <max>] <package> <expression>...
 Write available package versions matching version <expression>s."
-[ -z "$*" -o "$1" = '--help' ] && echo "$usage" && exit 2
+[ -z "$*" -o "$1" = '--help' ] &&
+{ echo "$usage"; exit 2; }
 
 . pgem-sh-setup
 
@@ -16,7 +17,7 @@ do
          exit 2;;
     esac
 done
-shift $(($OPTIND - 1))
+shift $(( $OPTIND - 1 ))
 
 package="$1"; shift
 test "$*" || {
@@ -24,7 +25,7 @@ test "$*" || {
     exit 2
 }
 
-index="$PGEMDB/gemdb"
+index="$PGEMINDEX/release"
 pgem-update -s
 
 versions=$(
