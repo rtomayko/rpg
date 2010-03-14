@@ -18,11 +18,10 @@ Options
 
 # Run ourself and then `sort | uniq` the output down to the best
 # match if the `-u` option was given.
+maxvers=
 [ "$1" = '-u' ] && {
     shift
-    "$0" "$@" |
-    sort -u -b -k1,1
-    exit
+    maxvers='-n 1'
 }
 
 # Done parsing args.
@@ -37,7 +36,7 @@ failedpacks=
 resolve () {
     if test -n "$current"
     then
-        rpg-resolve -p "$current" "$expression" || {
+        rpg-resolve -p $maxvers "$current" "$expression" || {
             failed=$(( $failed + 1 ))
             echo "$current != *"
             notice "failed to resolve $current $expression"

@@ -27,7 +27,7 @@ package="$1"; shift
 [ "$*" ] || helpthem
 
 index="$RPGINDEX/release"
-rpg-update -s
+test -f "$index" || rpg-update -s
 
 versions=$(
     grep "^$package " < "$index"    |

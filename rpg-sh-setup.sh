@@ -221,7 +221,7 @@ warn () { echo "$PROGNAME:" "$@" 1>&2; }
 # Write an informationational message to stderr prefixed with the name
 # of the current script. Don't use this, use `notice`.
 heed () {
-    printf "%18s %s\n" "${PROGNAME#rpg-}:" "$*" 1>&2
+    printf "%20s %s\n" "${PROGNAME#rpg-}:" "$*" 1>&2
 }
 
 # We rewite the `notice` function to `head` if `RPGVERBOSE` is enabled

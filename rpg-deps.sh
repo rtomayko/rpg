@@ -3,7 +3,7 @@ set -e
 . rpg-sh-setup
 
 [ "$*" ] || set -- "--help"; ARGV="$@"
-USAGE '${PROGNAME} [-d] [-r] <package>
+USAGE '${PROGNAME} [-d] [-r] <package> [<version>]
 List dependencies for a package or gem file.
 
 Options:

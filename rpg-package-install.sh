@@ -71,8 +71,9 @@ rpg_install_dir () {
 # Establish our directories in the package database. These should
 # have already been created by `rpg-package-register`. If not, bail
 # out now since something isn't right.
-package="$1"
-version="$2"
+package="$1";shift
+version="$1";shift
+test "$version" = '=' && version="$1";shift
 packagedir="$RPGDB/$package"
 
 test -d "$packagedir/$version" || {

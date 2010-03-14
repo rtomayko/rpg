@@ -14,8 +14,8 @@ then  tampon="echo"
 else  tampon="rpg-install"
 fi
 
-gem list --local                                                     |
-sed "s|^\(${GEMNAME_PATTERN}\) *(\([$GEMVERS_PATTERN\).*|GEM \1 \2|" |
-grep '^GEM '                                                         |
-sed 's/^GEM //'                                                      |
+gem list --local                                             |
+sed "s|^\(${GEMNAME_BRE}\) *(\([$GEMVERS_BRE\).*|GEM \1 \2|" |
+grep '^GEM '                                                 |
+sed 's/^GEM //'                                              |
 xargs -n 2 "$tampon"

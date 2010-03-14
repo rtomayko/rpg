@@ -46,6 +46,7 @@ do
         if $force
         then notice "$package $version already registered: proceeding due to -f"
         else notice "$package $version already registered: bypassing"
+             echo "$packagedir"
              exit 0
         fi
     else

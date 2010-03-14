@@ -35,7 +35,7 @@ cd "$RPGDB" || exit 0
 for glob in "$@"
 do
     matched=false
-    for path in $(ls -1 $glob/active 2>/dev/null)
+    for path in $(ls -1d $glob/active 2>/dev/null)
     do
         matched=true
         package=${path%/active}
