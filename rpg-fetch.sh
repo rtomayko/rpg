@@ -31,7 +31,7 @@ else
 
     # Grab the gem with curl(1) and write to a temporary file just
     # in case something goes wrong during transfer.
-    curl -L "http://rubygems.org/downloads/${gemfile}" > "${gemfile}+"
+    curl -s -L "http://rubygems.org/downloads/${gemfile}" > "${gemfile}+"
     mv "${gemfile}+" "$gemfile"
 fi
 
