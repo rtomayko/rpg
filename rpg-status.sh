@@ -31,7 +31,7 @@ do
     a)   joiner="-a2";;
     u)   update=true;;
     p)   parsey=true;;
-    ?)   echo "$usage"
+    ?)   helpthem;
          exit 2;;
     esac
 done

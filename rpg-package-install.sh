@@ -90,7 +90,7 @@ then notice "sources already exist. bypassing fetch and unpack."
 else gemfile=$(rpg-fetch "$package" "$version")
      notice "unpacking $gemfile into $RPGPACKS"
      mkdir -p "$RPGPACKS"
-     (cd "$RPGPACKS" && gem unpack "$gemfile" >/dev/null)
+     rpg-unpack -p "$RPGPACKS" "$gemfile"
 fi
 
 # If the package already has an active/installed version, check if its
@@ -203,7 +203,6 @@ test -d man && {
         fi
     done
 }
-
 
 # Mark this package as active
 unlink "$packagedir/installing"

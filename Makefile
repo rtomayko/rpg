@@ -33,14 +33,14 @@ SOURCES = \
 	rpg-install.sh rpg-list.sh rpg-version-test.sh rpg-uninstall.sh \
 	rpg-build.sh rpg-env.sh rpg-update.sh rpg-resolve.sh rpg-upgrade.sh \
 	rpg-steal.sh rpg-fsck.sh rpg-status.sh rpg-outdated.sh \
-	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh
+	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh
 
 PROGRAMS = \
 	rpg-sh-setup rpg rpg-config rpg-deps rpg-fetch \
 	rpg-install rpg-list rpg-version-test rpg-uninstall \
 	rpg-build rpg-env rpg-update rpg-resolve rpg-upgrade \
 	rpg-steal rpg-fsck rpg-status rpg-outdated rpg-parse-package-list \
-	rpg-package-register rpg-package-install rpg-solve
+	rpg-package-register rpg-package-install rpg-solve rpg-unpack
 
 DOCHTML = \
 	rpg-sh-setup.html rpg.html rpg-config.html rpg-deps.html rpg-fetch.html \
