@@ -32,20 +32,22 @@ SOURCES = \
 	rpg-sh-setup.sh rpg.sh rpg-config.sh rpg-deps.sh rpg-fetch.sh \
 	rpg-install.sh rpg-list.sh rpg-version-test.sh rpg-uninstall.sh \
 	rpg-build.sh rpg-env.sh rpg-update.sh rpg-resolve.sh rpg-upgrade.sh \
-	rpg-steal.sh rpg-fsck.sh rpg-status.sh rpg-outdated.sh
+	rpg-steal.sh rpg-fsck.sh rpg-status.sh rpg-outdated.sh \
+	rpg-package-register.sh rpg-package-install.sh
 
 PROGRAMS = \
 	rpg-sh-setup rpg rpg-config rpg-deps rpg-fetch \
 	rpg-install rpg-list rpg-version-test rpg-uninstall \
 	rpg-build rpg-env rpg-update rpg-resolve rpg-upgrade \
-	rpg-steal rpg-fsck rpg-status rpg-outdated rpg-parse-package-list
+	rpg-steal rpg-fsck rpg-status rpg-outdated rpg-parse-package-list \
+	rpg-package-register rpg-package-install
 
 DOCHTML = \
 	rpg-sh-setup.html rpg.html rpg-config.html rpg-deps.html rpg-fetch.html \
 	rpg-install.html rpg-list.html rpg-version-test.html rpg-uninstall.html \
 	rpg-build.html rpg-env.html rpg-update.html rpg-resolve.html \
 	rpg-upgrade.html rpg-steal.html rpg-fsck.html rpg-status.html \
-	rpg-outdated.html
+	rpg-outdated.html rpg-package-register.html rpg-package-install.html
 
 STANDALONE = $(NAME)-sa
 
