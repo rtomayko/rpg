@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-. pgem-sh-setup
+. rpg-sh-setup
 
 [ "$*" ] || set -- '--help'
 ARGV="$@"
@@ -24,7 +24,7 @@ do
         make clean &&
         make) 1> build.log 2>&1
     then
-        $PGEMSHOWBUILD && cat build.log 1>&2
+        $RPGSHOWBUILD && cat build.log 1>&2
         find "$(pwd)" -name "*.$(ruby_dlext)"
     else
         cat build.log 1>&2

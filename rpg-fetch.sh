@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-. pgem-sh-setup
+. rpg-sh-setup
 
 [ "$*" ] || set -- "--help"; ARGV="$@"
 USAGE '${PROGNAME} <package> [<version>]
@@ -15,18 +15,18 @@ version="${2:->=0}"
 # Find the best (most recent) version of the package matching the
 # supplied version spec. Bail out with a failure status if nothing is
 # found satisfying the requested version.
-bestver=$(pgem-resolve -n 1 "$package" "$version") || {
+bestver=$(rpg-resolve -n 1 "$package" "$version") || {
     warn "$package $version not found."
     exit 1
 }
 
 gemfile="${package}-${bestver}.gem"
-if test -f "$PGEMCACHE/$gemfile"
+if test -f "$RPGCACHE/$gemfile"
 then notice "$package $version [cached: $bestver]"
 else
     # We're going to need to pull the gem off the server.
-    mkdir -p "$PGEMCACHE"
-    cd "$PGEMCACHE"
+    mkdir -p "$RPGCACHE"
+    cd "$RPGCACHE"
     notice "$package $version [fetching: $bestver]"
 
     # Grab the gem with curl(1) and write to a temporary file just
@@ -35,4 +35,4 @@ else
     mv "${gemfile}+" "$gemfile"
 fi
 
-echo "$PGEMCACHE/$gemfile"
+echo "$RPGCACHE/$gemfile"

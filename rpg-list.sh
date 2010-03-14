@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
-. pgem-sh-setup
+. rpg-sh-setup
 
 ARGV="$@"
 USAGE '${PROGNAME} [-x] [<glob>...]
-List pgem installed packages.
+List rpg installed packages.
 
 Options
   -x               Include non-matching globs in output.
@@ -22,8 +22,8 @@ test "$1" = '-x' && {
 [ "$*" ] || set -- '*'
 
 # Switch into package database dir or bail out if it doesn't exist.
-test -d "$PGEMDB" &&
-cd "$PGEMDB" || exit 0
+test -d "$RPGDB" &&
+cd "$RPGDB" || exit 0
 
 # Run over globs gives on the command line and locate matching
 # installed packages.

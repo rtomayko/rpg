@@ -1,17 +1,17 @@
 #!/bin/sh
 set -e
-. pgem-sh-setup
+. rpg-sh-setup
 
 ARGV="$@"
 USAGE '${PROGNAME} [-n]
-Take everything currently installed in Rubygems and install in pgems.
+Transplant packages from Rubygems to rpg.
 
 With the -n option, show what would be installed but do not.'
 
 if test "$1" = '-n'
 then  tampon="echo"
       shift
-else  tampon="pgem-install"
+else  tampon="rpg-install"
 fi
 
 gem list --local                                                     |

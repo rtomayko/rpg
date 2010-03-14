@@ -1,21 +1,21 @@
 #!/bin/sh
 set -e
-. pgem-sh-setup
+. rpg-sh-setup
 
 ARGV="$@"
 USAGE '${PROGNAME} <name>
-Uninstall package from pgem environment.'
+Uninstall package from rpg environment.'
 
 test $# -gt 1 && {
     echo "$@" |
-    xargs -n 1 pgem uninstall
+    xargs -n 1 rpg uninstall
     exit
 }
 
 name="$1"
 
 # Get the manifest file going.
-dbdir="$PGEMDB/$name"
+dbdir="$RPGDB/$name"
 manifest="$dbdir/active"
 
 # Bail out if the db doesn't have this package or the package

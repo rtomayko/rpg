@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-. pgem-sh-setup
+. rpg-sh-setup
 
 ARGV="$@"
 USAGE '${PROGNAME}
@@ -29,29 +29,29 @@ ok () {
 fail () { printf " FAIL\n[%s]\n" "$*"; }
 
 checking "recent index readability"
-diagnose test -r "$PGEMINDEX/release-recent"
+diagnose test -r "$RPGINDEX/release-recent"
 
 checking "index readability"
-diagnose test -r "$PGEMINDEX/release"
+diagnose test -r "$RPGINDEX/release"
 
 checking "recent index joinability"
-diagnose sort -c -b -k 1,1 "$PGEMINDEX/release-recent"
+diagnose sort -c -b -k 1,1 "$RPGINDEX/release-recent"
 
 checking "index joinability"
 diagnose sh -c "
-    cut -f 1 -d ' ' < '$PGEMINDEX/release' |
+    cut -f 1 -d ' ' < '$RPGINDEX/release' |
     sort -c -b -k 1,1
     "
 
 checking "recent index data"
-if lines=$(wc -l "$PGEMINDEX/release-recent" | sed 's/[^0-9]//g') &&
+if lines=$(wc -l "$RPGINDEX/release-recent" | sed 's/[^0-9]//g') &&
    test "$lines" -gt 0
 then ok "$lines packages"
 else fail "${lines:-no} packages"
 fi
 
 checking "index data"
-if lines=$(wc -l "$PGEMINDEX/release" | sed 's/[^0-9]//g') &&
+if lines=$(wc -l "$RPGINDEX/release" | sed 's/[^0-9]//g') &&
    test "$lines" -gt 0
 then ok "$lines package versions"
 else fail "${lines:-no} packages"

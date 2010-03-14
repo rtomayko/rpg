@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-. pgem-sh-setup
+. rpg-sh-setup
 
 ARGV="$@"
 USAGE '${PROGNAME} [-v] [-m <mins>|-d <days>|-s]
@@ -9,12 +9,12 @@ Create or update the remote package index. Maybe.
 Options
   -d <days>             Do nothing if db is less than <days> days old
   -m <mins>             Do nothing if db is less than <mins> minutes old
-  -s                    Do nothing if db is less than $PGEMSTALETIME old
+  -s                    Do nothing if db is less than $RPGSTALETIME old
   -v                    Write newly available packages to stdout after updating
 
-The -s option is used by various pgem commands when an update may be
+The -s option is used by various rpg commands when an update may be
 neccassary. Its default stale time can be configured by setting the
-PGEMSTALETIME option in ~/.pgemrc or /etc/pgemrc.'
+RPGSTALETIME option in ~/.rpgrc or /etc/rpgrc.'
 
 verbose=false
 staletime=
@@ -24,7 +24,7 @@ do
     v)   verbose=true;;
     m)   staletime="$OPTARG min";;
     d)   staletime="$OPTARG day";;
-    s)   staletime="$PGEMSTALETIME";;
+    s)   staletime="$RPGSTALETIME";;
     ?)   helpthem;;
     esac
 done
@@ -42,9 +42,9 @@ shift $(($OPTIND - 1))
 
 # Here's where the file is kept. There's also `release-recent` and
 # `release-diff` files, which we'll see in a second.
-release="$PGEMINDEX/release"
+release="$RPGINDEX/release"
 
-# Maybe bail out if a stale time was given. `PGEMSTALETIME` values can be
+# Maybe bail out if a stale time was given. `RPGSTALETIME` values can be
 # stuff like `10 days` or `10d`, `30 minutes` or `30m`. A number with no
 # time designator is considered in days. When the value is `never`,
 # don't update the index due to staleness in the course of running
@@ -69,10 +69,10 @@ else
     notice "index rebuild forced"
 fi
 
-# First thing we do, we create the `PGEMINDEX` directory if it doesn't exist.
-test -d "$PGEMINDEX" || {
-    notice "creating index directory: $PGEMINDEX"
-    mkdir -p "$PGEMINDEX"
+# First thing we do, we create the `RPGINDEX` directory if it doesn't exist.
+test -d "$RPGINDEX" || {
+    notice "creating index directory: $RPGINDEX"
+    mkdir -p "$RPGINDEX"
 }
 
 notice "building release file [$release+]"

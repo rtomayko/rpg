@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-. pgem-sh-setup
+. rpg-sh-setup
 
 [ "$*" ] || set -- "--help"; ARGV="$@"
 USAGE '${PROGNAME} [-n <max>] <package> <expression>...
@@ -19,13 +19,13 @@ shift $(( $OPTIND - 1 ))
 package="$1"; shift
 [ "$*" ] || helpthem
 
-index="$PGEMINDEX/release"
-pgem-update -s
+index="$RPGINDEX/release"
+rpg-update -s
 
 versions=$(
     grep "^$package " < "$index"    |
     cut -d ' ' -f 2                 |
-    pgem-version-test - "$@"        |
+    rpg-version-test - "$@"        |
     head -$max
 ) || true
 

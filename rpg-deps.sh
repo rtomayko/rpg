@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-. pgem-sh-setup
+. rpg-sh-setup
 
 [ "$*" ] || set -- "--help"; ARGV="$@"
 USAGE '${PROGNAME} [-d] [-r] <package>

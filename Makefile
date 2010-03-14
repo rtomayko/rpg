@@ -1,10 +1,10 @@
-# pgem makefile
+# rpg makefile
 .POSIX:
 
 # Default make target
 all::
 
-NAME = pgem
+NAME = rpg
 TARNAME = $(NAME)
 SHELL = /bin/sh
 
@@ -18,8 +18,8 @@ datadir     = ${datarootdir}
 mandir      = ${datarootdir}/man
 docdir      = $(datadir)/doc/$(TARNAME)
 
-# Change this to `install-standalone' if you want a single pgem command. By
-# default, all pgem- commands are installed.
+# Change this to `install-standalone' if you want a single rpg command. By
+# default, all rpg- commands are installed.
 #
 # NOTE: the standalone stuff doesn't work yet.
 INSTALLMETHOD = install-multi
@@ -28,62 +28,24 @@ INSTALLMETHOD = install-multi
 
 all:: build
 
-SOURCES = pgem-sh-setup.sh \
-		  pgem.sh \
-		  pgem-config.sh \
-		  pgem-deps.sh \
-		  pgem-fetch.sh \
-		  pgem-install.sh \
-		  pgem-list.sh \
-		  pgem-version-test.sh \
-		  pgem-uninstall.sh \
-		  pgem-build.sh \
-		  pgem-env.sh \
-		  pgem-update.sh \
-		  pgem-resolve.sh \
-		  pgem-upgrade.sh \
-		  pgem-steal.sh \
-		  pgem-fsck.sh \
-		  pgem-status.sh \
-		  pgem-outdated.sh
+SOURCES = \
+	rpg-sh-setup.sh rpg.sh rpg-config.sh rpg-deps.sh rpg-fetch.sh \
+	rpg-install.sh rpg-list.sh rpg-version-test.sh rpg-uninstall.sh \
+	rpg-build.sh rpg-env.sh rpg-update.sh rpg-resolve.sh rpg-upgrade.sh \
+	rpg-steal.sh rpg-fsck.sh rpg-status.sh rpg-outdated.sh
 
-PROGRAMS = pgem-sh-setup \
-		   pgem \
-		   pgem-config \
-		   pgem-deps \
-		   pgem-fetch \
-		   pgem-install \
-		   pgem-list \
-		   pgem-version-test \
-		   pgem-uninstall \
-		   pgem-build \
-		   pgem-env \
-		   pgem-update \
-		   pgem-resolve \
-		   pgem-upgrade \
-		   pgem-steal \
-		   pgem-fsck \
-		   pgem-status \
-		   pgem-outdated
+PROGRAMS = \
+	rpg-sh-setup rpg rpg-config rpg-deps rpg-fetch \
+	rpg-install rpg-list rpg-version-test rpg-uninstall \
+	rpg-build rpg-env rpg-update rpg-resolve rpg-upgrade \
+	rpg-steal rpg-fsck rpg-status rpg-outdated
 
-DOCHTML = pgem-sh-setup.html \
-		  pgem.html \
-		  pgem-config.html \
-		  pgem-deps.html \
-		  pgem-fetch.html \
-		  pgem-install.html \
-		  pgem-list.html \
-		  pgem-version-test.html \
-		  pgem-uninstall.html \
-		  pgem-build.html \
-		  pgem-env.html \
-		  pgem-update.html \
-		  pgem-resolve.html \
-		  pgem-upgrade.html \
-		  pgem-steal.html \
-		  pgem-fsck.html \
-		  pgem-status.html \
-		  pgem-outdated.html
+DOCHTML = \
+	rpg-sh-setup.html rpg.html rpg-config.html rpg-deps.html rpg-fetch.html \
+	rpg-install.html rpg-list.html rpg-version-test.html rpg-uninstall.html \
+	rpg-build.html rpg-env.html rpg-update.html rpg-resolve.html \
+	rpg-upgrade.html rpg-steal.html rpg-fsck.html rpg-status.html \
+	rpg-outdated.html
 
 STANDALONE = $(NAME)-sa
 
@@ -107,7 +69,7 @@ doc: $(DOCHTML)
 
 $(STANDALONE): $(SOURCES) shc
 	echo "   SHC  $(STANDALONE)"
-	$(SHELL) shc -m pgem $(SOURCES) > $(STANDALONE) || { \
+	$(SHELL) shc -m rpg $(SOURCES) > $(STANDALONE) || { \
 		rm -f $(STANDALONE); \
 		false; \
 	}; \
@@ -117,8 +79,8 @@ install: $(INSTALLMETHOD)
 
 install-standalone:
 	mkdir -p $(bindir)
-	cp pgem-sa $(bindir)/pgem
-	chmod 0755 $(bindir)/pgem
+	cp rpg-sa $(bindir)/rpg
+	chmod 0755 $(bindir)/rpg
 
 install-multi:
 	mkdir -p $(bindir)

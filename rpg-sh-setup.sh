@@ -3,46 +3,46 @@
 : ${__SHC__:=false}
 
 # Guard against sourcing this file multiple times
-test $__pgem_sh_setup_included && return
-__pgem_sh_setup_included=true
+test $__rpg_sh_setup_included && return
+__rpg_sh_setup_included=true
 
 # Install Paths
 # -------------
 
-# This is the psuedo root directory where `pgem` keeps all its stuff. The
-# default locations of all other pgem paths use this as a base.
-# *HOWEVER*, no pgem utility targets this directory -- every significant
+# This is the psuedo root directory where `rpg` keeps all its stuff. The
+# default locations of all other rpg paths use this as a base.
+# *HOWEVER*, no rpg utility targets this directory -- every significant
 # location must have a separate path variable so that things stay
 # flexible in configuration.
-: ${PGEMPATH:=/var/lib/pgem}
+: ${RPGPATH:=/var/lib/rpg}
 
-# `PGEMLIB` is the shared Ruby `lib` directory where library files are
+# `RPGLIB` is the shared Ruby `lib` directory where library files are
 # installed. You can set this to the current Ruby's site packages with:
 #
-#     PGEMLIB=$(ruby_sitelibdir)
-: ${PGEMLIB:=$PGEMPATH/lib}
+#     RPGLIB=$(ruby_sitelibdir)
+: ${RPGLIB:=$RPGPATH/lib}
 
-# `PGEMBIN` is where executable scripts included in packages are installed.
-: ${PGEMBIN:=$PGEMPATH/bin}
+# `RPGBIN` is where executable scripts included in packages are installed.
+: ${RPGBIN:=$RPGPATH/bin}
 
-# `PGEMMAN` is where manpages included with packages are installed. This
-# is basically the whole reason `pgem` was written in the first place.
-: ${PGEMMAN:=$PGEMPATH/man}
+# `RPGMAN` is where manpages included with packages are installed. This
+# is basically the whole reason `rpg` was written in the first place.
+: ${RPGMAN:=$RPGPATH/man}
 
 
 
-# `PGEMCACHE` is where `pgem-fetch(1)` looks for and stores gem files.
+# `RPGCACHE` is where `rpg-fetch(1)` looks for and stores gem files.
 # Set this to your Rubygems `cache` directory to share the gem cache.
-: ${PGEMCACHE:=$PGEMPATH/cache}
+: ${RPGCACHE:=$RPGPATH/cache}
 
-# `PGEMPACKS` is where `pgem-install(1)` unpacks gems before installing. The
+# `RPGPACKS` is where `rpg-install(1)` unpacks gems before installing. The
 # package directories are not used after package installation is complete.
-: ${PGEMPACKS:=$PGEMPATH/packs}
+: ${RPGPACKS:=$RPGPATH/packs}
 
-# `PGEMDB` is where our local package database is kept. It's a
+# `RPGDB` is where our local package database is kept. It's a
 # filesystem hierarchy. It looks like this:
 #
-#     $PGEMDB/
+#     $RPGDB/
 #     |-- ronn
 #     |   |-- 0.4
 #     |   |-- 0.4.1
@@ -63,10 +63,10 @@ __pgem_sh_setup_included=true
 #
 # The database is meant to be "stable". That is, you can write programs
 # that rely on this structure. Maybe it should be documented first.
-: ${PGEMDB:=$PGEMPATH/db}
+: ${RPGDB:=$RPGPATH/db}
 
-# `PGEMINDEX` is where the index of available gems is kept. It's a
-# directory. The `pgem-update(1)` program manages the files under it.
+# `RPGINDEX` is where the index of available gems is kept. It's a
+# directory. The `rpg-update(1)` program manages the files under it.
 #
 #   * `release`:
 #     All available packages and all versions of all packages. Each line is a
@@ -89,27 +89,27 @@ __pgem_sh_setup_included=true
 #     This is the same as `release-recent` but includes only prelease
 #     packages.
 #
-: ${PGEMINDEX:=$PGEMPATH/index}
+: ${RPGINDEX:=$RPGPATH/index}
 
 # Enable verbose logging to stderr.
-: ${PGEMVERBOSE:=false}
+: ${RPGVERBOSE:=false}
 
-# Enable the shell's trace facility (`set -x`) in all pgem programs.
-: ${PGEMTRACE:=false}
+# Enable the shell's trace facility (`set -x`) in all rpg programs.
+: ${RPGTRACE:=false}
 
 # Show extconf.rb and make output when building extensions.
-: ${PGEMSHOWBUILD:=false}
+: ${RPGSHOWBUILD:=false}
 
-# Default stale time for use with `pgem-update -s`. Values can be stuff
+# Default stale time for use with `rpg-update -s`. Values can be stuff
 # like `10 days` or `10d`, `30 minutes` or `30m`. A number with no time
 # designator is considered in days. This value can also be `never`, in
 # which case the database will never be automatically updated in the
 # course of running other programs.
-: ${PGEMSTALETIME:=1 day}
+: ${RPGSTALETIME:=1 day}
 
-# export all PGEM variables
-export PGEMPATH PGEMLIB PGEMBIN PGEMMAN PGEMCACHE PGEMPACKS PGEMDB PGEMINDEX
-export PGEMTRACE PGEMSHOWBUILD PGEMSTALETIME
+# export all RPG variables
+export RPGPATH RPGLIB RPGBIN RPGMAN RPGCACHE RPGPACKS RPGDB RPGINDEX
+export RPGTRACE RPGSHOWBUILD RPGSTALETIME
 
 # Constants
 # ---------
@@ -123,7 +123,7 @@ GEMPRES_PATTERN='[0-9A-Za-z.]\{1,\}'
 # --------------------------------------------
 
 # The program name used in usage messages, log output, and other places
-# probably. You can set this before sourcing pgem-sh-setup to override
+# probably. You can set this before sourcing rpg-sh-setup to override
 # the default `$(basename $0)` value but it's probably what you want.
 : ${PROGNAME:=$(basename $0)}
 
@@ -136,7 +136,7 @@ GEMPRES_PATTERN='[0-9A-Za-z.]\{1,\}'
 # follows to take advantage of it:
 #
 #     set -e           # always
-#     . pgem-sh-setup  # bring in support lib
+#     . rpg-sh-setup  # bring in support lib
 #
 #     ARGV="$@"
 #     USAGE '${PROGNAME} <options> ...
@@ -189,10 +189,10 @@ warn () { echo "$PROGNAME:" "$@" 1>&2; }
 # Write an informationational message to stderr prefixed with the name
 # of the current script. Don't use this, use `notice`.
 heed () {
-    printf "%13s %s\n" "${PROGNAME#pgem-}:" "$*" 1>&2
+    printf "%13s %s\n" "${PROGNAME#rpg-}:" "$*" 1>&2
 }
 
-# We rewite the `notice` function to `head` if `PGEMVERBOSE` is enabled
+# We rewite the `notice` function to `head` if `RPGVERBOSE` is enabled
 # after sourcing config files.
 notice () { true; }
 
@@ -253,19 +253,19 @@ alias 0=false
 # Config Files
 # ------------
 
-# source system pgemrc file
-test -f /etc/pgemrc &&
-. /etc/pgemrc
+# source system rpgrc file
+test -f /etc/rpgrc &&
+. /etc/rpgrc
 
-# source user pgemrc file
-test -f ~/.pgemrc &&
-. ~/.pgemrc
+# source user rpgrc file
+test -f ~/.rpgrc &&
+. ~/.rpgrc
 
 # Turn on the shell's built in tracing facilities
-# if PGEMTRACE is enabled.
-eval "${PGEMTRACE:-false}" && set -x
+# if RPGTRACE is enabled.
+eval "${RPGTRACE:-false}" && set -x
 
-eval "${PGEMVERBOSE:-false}" && {
+eval "${RPGVERBOSE:-false}" && {
     notice () { heed "$@"; }
 }
 

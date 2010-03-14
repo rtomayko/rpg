@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-. pgem-sh-setup
+. rpg-sh-setup
 
 ARGV="$@"
 USAGE '${PROGNAME} [-u] [-p] [<glob>...]
@@ -33,9 +33,9 @@ shift $(( $OPTIND - 1 ))
 # the `-u` arg; otherwise, maybe update it based on the configured stale
 # time.
 if $update
-then  pgem-update
+then  rpg-update
       shift
-else  pgem-update -s
+else  rpg-update -s
 fi
 
 if $parsey
@@ -54,7 +54,7 @@ fi
 [ "$*" ] || set -- '*'
 
 # Build glob BREs for filtering the remote package list. The local package
-# list is filtered by `pgem-list` so we don't need to worry about that
+# list is filtered by `rpg-list` so we don't need to worry about that
 # side.
 #
 # If there's only one glob and it's "*", don't do any `grep` nonsense,
@@ -75,7 +75,7 @@ fi
 notice "remote filter: $remotefilter"
 
 # Kick off a pipeline by listing installed packages. The output from
-# `pgem list` looks something like this:
+# `rpg list` looks something like this:
 #
 #
 #     RedCloth                       4.2.3
@@ -93,7 +93,7 @@ notice "remote filter: $remotefilter"
 #
 # So we have the "<package> <version>" pairs separated by whitespace,
 # basically.
-pgem list -x "$@" |
+rpg list -x "$@" |
 
 # Okay ...
 #
@@ -127,7 +127,7 @@ pgem list -x "$@" |
 # Additional, we selectively enable some of `join(1)`'s other options (`-a`
 # and `-e`) for achieving "outer joins" and "full joins" when querying
 # against all remote packages.
-join -a 1 $joiner -o 1.1,1.2,2.2,2.1 -e '-' - "$PGEMINDEX/release-recent" |
+join -a 1 $joiner -o 1.1,1.2,2.2,2.1 -e '-' - "$RPGINDEX/release-recent" |
 
 # Grep out remote packages based on our globs. See the *Glob Filter* section
 # above for more information.

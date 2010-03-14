@@ -1,9 +1,9 @@
 #!/bin/sh
 set -e
-. pgem-sh-setup
+. rpg-sh-setup
 
 ARGV="$@"
 USAGE '${PROGNAME}
-Write pgem configuration values to standard output.'
+Write rpg configuration values to standard output.'
 
-env | grep ^PGEM
+env | grep ^RPG
