@@ -33,3 +33,7 @@
 /pgem-fsck
 /pgem-outdated
 /pgem-status
+/pgem-fsck.html
+/pgem-outdated.html
+/pgem-resolve.html
+/pgem-status.html
