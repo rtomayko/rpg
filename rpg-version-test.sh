@@ -67,7 +67,7 @@ do exps="$1,$exp"
 done
 
 # Get rid of the commas and condense each version spec so we get
-# something like: "0.3.4 =0.5.7 >=0.9 10.2"
+# something like: `0.3.4 =0.5.7 >=0.9 10.2`
 exps=$(echo "$exps" | sed -e 's/ //g' -e 's/,$//' -e 's/,/ /g')
 allmatch=true
 
