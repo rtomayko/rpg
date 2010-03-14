@@ -21,11 +21,37 @@ found () {
 have () {
     for f in "$@"
     do
-        path=$(command -v "$1") || continue
-        echo "$path"
+        _havepath=$(command -v "$f") || { continue; }
+        echo "$_havepath"
         return 0
     done
     return 1
+}
+
+# Usage: stdutil <name> <variable> <path>...
+stdutil () {
+    looking "for $1"; shift
+    _varname="$1";    shift
+    if _path=$(have "$@")
+    then found "$_path"
+         recordconfig $_varname "$_path"
+    else missing
+         recordconfig $_varname ""
+    fi
+    return 0
+}
+
+# Build up lists of config stuff to write to config.sh and config.mk
+SHCONFIG=
+SHALIAS=
+MAKECONFIG=
+recordconfig () {
+    SHCONFIG="$SHCONFIG
+$1='$2'"
+    SHALIAS="$SHALIAS
+alias $1='$2'"
+    MAKECONFIG="$MAKECONFIG
+$1 = $2"
 }
 
 UNAME=$(uname)
@@ -35,130 +61,48 @@ echo "building for $UNAME on $HOST at $TIME"
 
 looking "for /bin/sh"
 SH=$(have /bin/sh) && {
-    if sh --version 2>/dev/null | grep -q bash
+    if expr "$("$SH" --version 2>/dev/null)" : '.*bash' >/dev/null
     then
         found '' "oh ick, it looks like bash"
     else
         found
     fi
 } || missing
+recordconfig SHELL "$SH"
 
-looking "for dash"
-DASH=$(have /bin/dash /usr/bin/dash dash) &&
-found "$DASH" || missing
-
-looking "for ln"
-LN=$(have /bin/ln ln gln)
-found "$LN" || missing
-
-looking "for sed"
-SED=$(have /usr/bin/sed sed gsed) &&
-found "$SED" || missing
-
-looking "for sort"
-SORT=$(have /usr/bin/sort sort gsort)
-found "$SORT" || missing
-
-looking "for tr"
-TR=$(have /usr/bin/tr tr gtr)
-found "$TR" || missing
-
-looking "for cut"
-CUT=$(have /usr/bin/cut cut gcut)
-found "$CUT" || missing
-
-looking "for perl"
-PERL=$(have perl)
-found "$PERL" || missing
-
-looking "for readlink"
-READLINK=$(have readlink greadlink)
-found "$READLINK" || missing
-
-looking "for install"
-INSTALL=$(have install ginstall)
-found "$INSTALL" || missing
-
-looking "for diff"
-DIFF=$(have diff)
-found "$DIFF" || missing
-
-looking "for patch"
-PATCH=$(have patch)
-found "$PATCH" || missing
-
-looking "for schocco"
-SHOCCO=$(have shocco) &&
-found "$SHOCCO" || missing
-
-looking "for ronn"
-RONN=$(have ronn) &&
-found "$RONN" || missing
-
-looking "for curl"
-CURL=$(have curl)
-found "$CURL" || missing
-
-looking "for ruby"
-RUBY=$(have ruby) &&
-found "$RUBY" || missing
-
-looking "for gem"
-GEM=$(have gem) &&
-found "$GEM" || missing
+stdutil bash      DASH       /bin/bash /usr/bin/bash bash
+stdutil dash      DASH       /bin/dash /usr/bin/dash dash
+stdutil ln        LN         /bin/ln ln gln
+stdutil sed       SED        /bin/sed /usr/bin/sed sed gsed
+stdutil sort      SORT       /bin/sort /usr/bin/sort sort gsort
+stdutil tr        TR         /usr/bin/tr tr gtr
+stdutil cut       CUT        /usr/bin/cut cut gcut
+stdutil mktemp    MKTEMP     /bin/mktemp mktemp gmktemp
+stdutil perl      PERL       perl
+stdutil readlink  READLINK   /bin/readlink readlink greadlink
+stdutil install   INSTALL    /usr/bin/install install ginstall
+stdutil diff      DIFF       diff
+stdutil patch     PATCH      patch
+stdutil curl      CURL       curl
+stdutil ruby      RUBY       ruby
+stdutil gem       GEM        gem
+stdutil schocco   SHOCCO     shocco
+stdutil ronn      RONN       ronn
 
 set -e
 
 echo writing config.mk...
 cat <<EOF > config.mk
-SHELL    = $SH
-DASH     = $DASH
-LN       = $LN
-INSTALL  = $INSTALL
-SED      = $SED
-SORT     = $SORT
-TR       = $TR
-CUT      = $CUT
-PERL     = $PERL
-READLINK = $READLINK
-DIFF     = $DIFF
-PATCH    = $PATCH
-SHOCCO   = $SHOCCO
-RONN     = $RONN
-CURL     = $CURL
-RUBY     = $RUBY
-GEM      = $GEM
+$MAKECONFIG
 EOF
 
 echo writing config.sh...
 cat <<EOF > config.sh
-SH='$SH'
-DASH='$DASH'
-LN='$LN'
-SED='$SED'
-SORT='$SORT'
-TR='$TR'
-CUT='$CUT'
-PERL='$PERL'
-READLINK='$READLINK'
-DIFF='$DIFF'
-PATCH='$PATCH'
-CURL='$CURL'
-RUBY='$RUBY'
-GEM='$GEM'
+# utility locations
+$SHCONFIG
 
-alias ln="$LN"
-alias sed="$SED"
-alias sort="$SORT"
-alias tr="$TR"
-alias cut="$CUT"
-alias perl="$PERL"
-alias readlink="$READLINK"
-alias diff="$DIFF"
-alias patch="$PATCH"
-alias curl="$CURL"
-alias ruby="$RUBY"
-alias gem="$GEM"
+# big aliases
+$SHALIAS
 EOF
 
 echo "done. run \`make' to build and \`make install' to install."
