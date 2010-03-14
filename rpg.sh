@@ -17,6 +17,7 @@ The most commonly used rpg commands are:
 Options
   -c <path>        Read rcfile at <path> instead of standard rpgrc locations
   -v               Enable verbose logging to stderr
+  -q               Disable verbose logging to stderr (when enabled in config)
   -x               Enable shell tracing to stderr (extremely verbose)
 
 See \`${PROGNAME} help <command>' for more information on a specific command."
@@ -30,26 +31,14 @@ do
     esac
 done
 
-
-# Install Plumbing
-#   rpg-build
-#   rpg-deps
-#   rpg-env
-#   rpg-fetch
-#   rpg-list
-#   rpg-fsck
-#
-# Version Resolution and Dependency Solving
-#   rpg-resolve
-#   rpg-version-test
-
 # Argument parsing.
-while getopts c:vx opt
+while getopts qvxc: opt
 do
     case $opt in
     c)   export RPGRCFILE="$OPTARG";;
     v)   export RPGVERBOSE=true;;
     x)   export RPGTRACE=true;;
+    q)   export RPGVERBOSE=false;;
     ?)   echo "$usage"
          exit 2;;
     esac
