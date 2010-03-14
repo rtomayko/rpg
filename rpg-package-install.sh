@@ -35,7 +35,7 @@ test "$1" = '-f' && {
 # Attempt to hard link <dest> to <source> but fall back to cp(1) if
 # you're crossing file systems or the ln fails otherwise.
 rpg_ln () {
-    if ln -f "$1" "$2"
+    if ln -f "$1" "$2" 2>/dev/null
     then notice "$2 [ln]"
     else notice "$2 [cp]"
          cp "$1" "$2"
@@ -149,12 +149,12 @@ test -n "$exts" && {
     echo "$exts" |
     while read dl
     do
-        # make install sitearchdir=/lib
         prefix=$(
             grep '^target_prefix.=' "$(dirname $dl)/Makefile" |
             sed 's/^target_prefix *= *//'
         )
         dest="${RPGLIB}${prefix}/$(basename $dl)"
+        mkdir -p "${RPGLIB}${prefix}"
         rpg_ln "$dl" "$dest"
         echo "$dest" >> "$manifest"
     done
