@@ -1,4 +1,64 @@
 #!/bin/sh
+# The `rpg-update` program is responsible for building the remote package
+# index and keeping it up to date. The package index is a set of simple text
+# files kept under the `RPGINDEX` directory. They include basic information
+# on all gems available at [rubygems.org](http://rubygems.org) and are
+# optimized for use with utilities like `grep(1)`, `sed(1)`, and `join(1)`.
+#
+# `rpg-update` has two modes of operation:
+#
+#   1. Someone runs `rpg-update` directly to bring the package index in sync
+#      with the remote repository. If the command completes successfully,
+#      the index is guaranteed to be up to date with the repository.
+#
+#   2. Some other rpg program (like `rpg-upgrade` or `rpg-status`) executes
+#      `rpg-update -s` before performing an operation on the index. In this
+#      mode, `rpg-update` attempts to determine if the index is overly stale
+#      (based on the `RPGSTALETIME` option) and may or may not perform an
+#      update.
+#
+# Philosophy on Automatic Index Updates
+# -------------------------------------
+#
+# Generally speaking, rpg's philosophy is that the user should control
+# when the package index is updated. The primary reason for this is that
+# rpg should be *fast* *fast* *fast* -- *fast* like a rocket missile -- unless
+# specifically told not to be. Network operations destroy any chance at
+# predictable performance.
+#
+# Rubygems's `gem` command has nearly the opposite philosophy. It tries
+# hard to make sure it's working with current data consistent with
+# the package repository when performing operations involving remote packages
+# (like `gem list --remote`, `gem outdated`, or `gem install`). This has
+# obvious benefits: running `gem install foo` is guaranteed to install the
+# most recent version of `foo` at the time the command is run. Similarly,
+# `gem outdated` is guaranteed to show the most recent package versions
+# available. This is convenient behavior because it removes the
+# responsibility of managing the package index from the user. The downside
+# is wildly unpredictable performance in most commands.
+#
+# rpg attempts to strike a balance between these two extremes in its default
+# configuration and can be customize to get any behavior along the spectrum.
+# By default, the package index is automatically updated when it's more than
+# one day old:
+#
+#     # auto update the package index when it's more than 1 day old
+#     RPGSTALETIME=1d
+#
+# Setting the stale time to `0`, causes the index to be updated before
+# performing any operation that involves remote packages. This is closest to
+# the `gem` commands behavior:
+#
+#     # keep the package index in sync
+#     RPGSTALETIME=0
+#
+# Finally, automatic updates can be disabled completely with:
+#
+#     # never auto update the package index
+#     PGSTALETIME=never
+#
+# See the stale time code below for more information on acceptable values.
+
 set -e
 . rpg-sh-setup
 

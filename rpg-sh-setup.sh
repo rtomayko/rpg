@@ -1,10 +1,32 @@
 #!/bin/sh
-
-: ${__SHC__:=false}
+# RPG shell utility library.
+#
+# This file is sourced by all `rpg-*` utilities. It handles environment
+# setup and provides utility functions.
+#
+# A typical rpg program should look like this:
+#
+#     #!/bin/sh
+#     # Launch a rocket missile or something like that.
+#     set -e
+#     . rpg-sh-setup
+#
+#     ARGV="$@"
+#     USAGE '${PROGNAME} [-f] <missle>
+#     Launch a rocket missile.'
+#
+#     # missile launching code
+#
+# That will handle `--help` usage messages and load the RPG environment.
 
 # Guard against sourcing this file multiple times
 test $__rpg_sh_setup_included && return
 __rpg_sh_setup_included=true
+
+
+# `shc` is a sh combiner. The `__SHC__` variable is set true when running
+# under that environment, which sometimes requires special case logic.
+: ${__SHC__:=false}
 
 # Install Paths
 # -------------
@@ -29,7 +51,8 @@ __rpg_sh_setup_included=true
 # is basically the whole reason `rpg` was written in the first place.
 : ${RPGMAN:=$RPGPATH/man}
 
-
+# RPG Paths
+# ---------
 
 # `RPGCACHE` is where `rpg-fetch(1)` looks for and stores gem files.
 # Set this to your Rubygems `cache` directory to share the gem cache.
@@ -39,7 +62,7 @@ __rpg_sh_setup_included=true
 # package directories are not used after package installation is complete.
 : ${RPGPACKS:=$RPGPATH/packs}
 
-# `RPGDB` is where our local package database is kept. It's a
+# `RPGDB` is where the local package database is kept. It's a
 # filesystem hierarchy. It looks like this:
 #
 #     $RPGDB/
@@ -164,7 +187,7 @@ GEMPRES_PATTERN='[0-9A-Za-z.]\{1,\}'
 #
 # That'll cause empty arg invocations to show the help message.
 USAGE () {
-    USAGE="${1:-$(cat)}"
+    __USAGE__="${1:-$(cat)}"
     case "$ARGV" in
     *--h|*--he|*--hel|*--help|*-h|*-\?)
         helpthem 0
@@ -176,7 +199,7 @@ USAGE () {
 # is first evaluated as a string so interpolations can be performed if
 # necessary.
 helpthem () {
-    : ${REAL_USAGE:=$(eval "echo \"$USAGE\"")}
+    : ${REAL_USAGE:=$(eval "echo \"$__USAGE__\"")}
     echo "Usage: $REAL_USAGE"
     exit ${1:-2}
 }
@@ -233,7 +256,7 @@ ruby_dlext() {
 # Misc Utility Functions
 # ----------------------
 
-# readlink(1) for systems that don't have it.
+# `readlink(1)` for systems that don't have it.
 readlink () {
     test -L "$1"
     command readlink "$1" 2>/dev/null || {
@@ -242,7 +265,7 @@ readlink () {
     }
 }
 
-# Alias yes/no, 1/0 to true/false respectively so options can be
+# Alias `yes`, `no`, `1`, `0` to `true` and `false` so options can be
 # set to any of those values.
 yes () { true; }
 no () { false; }
@@ -253,19 +276,19 @@ alias 0=false
 # Config Files
 # ------------
 
-# source system rpgrc file
+# Source the system `/etc/rpgrc` file.
 test -f /etc/rpgrc &&
 . /etc/rpgrc
 
-# source user rpgrc file
+# Source the user `~/.rpgrc` file.
 test -f ~/.rpgrc &&
 . ~/.rpgrc
 
 # Turn on the shell's built in tracing facilities
 # if RPGTRACE is enabled.
-eval "${RPGTRACE:-false}" && set -x
+${RPGTRACE:-false} && set -x
 
-eval "${RPGVERBOSE:-false}" && {
+${RPGVERBOSE:-false} && {
     notice () { heed "$@"; }
 }
 

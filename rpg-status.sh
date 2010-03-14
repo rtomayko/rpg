@@ -1,4 +1,13 @@
 #!/bin/sh
+# The `rpg-status` program compares installed packages to packages available
+# in the remote repository. It's useful for determining the versions of
+# packages and how they relate to same named packages available in the
+# repository.
+#
+# This is somewhere between a plumbing and porcelain command. It's useful
+# for building other programs and provides options for generating easily
+# parseable output. However, it's also useful to humans and the default
+# output is optimize for human consumption.
 set -e
 . rpg-sh-setup
 
@@ -13,7 +22,6 @@ Options
 
 Passing one or more <glob>s filters the list to matching packages.'
 
-# Argument parsing.
 update=false
 parsey=false
 joiner=
@@ -38,6 +46,13 @@ then  rpg-update
 else  rpg-update -s
 fi
 
+# Parsey Mode
+# -----------
+
+# The `-p` argument causes the output to be varied slightly. These variables
+# control how output lines are formatted and what symbols they use. In
+# parsey mode, simple alpha characters are used since those are a bit easier
+# to `grep` / `sed` without escaping.
 if $parsey
 then  st_outdate="o"
       st_up2date="u"
@@ -50,14 +65,18 @@ else
       st_format="%1s %-35s %-12s %-12s\n"
 fi
 
-# Default to matching everything if no <glob>s were given.
+# Package Selection / Glob Filter
+# -------------------------------
+
+# Default to matching all installed packages -- or all available packages
+# when `-a` was given -- if no `<glob>`s were given.
 [ "$*" ] || set -- '*'
 
 # Build glob BREs for filtering the remote package list. The local package
 # list is filtered by `rpg-list` so we don't need to worry about that
 # side.
 #
-# If there's only one glob and it's "*", don't do any `grep` nonsense,
+# If there's only one glob and it's `*`, don't do any `grep` nonsense,
 # just throw a `cat` in there.
 if   [ "$*" = '*' ]
 then remotefilter="cat"
@@ -66,13 +85,16 @@ else remotefilter="grep"
      do  glob=$(
            echo "$glob"              |
            sed -e 's@\*@[^ ]*@g'     \
-               -e 's/\?/[^ ]/g'     \
+               -e 's/\?/[^ ]/g'      \
          )
          remotefilter="$remotefilter -e '$glob '"
      done
 fi
 
 notice "remote filter: $remotefilter"
+
+# Main Pipeline
+# -------------
 
 # Kick off a pipeline by listing installed packages. The output from
 # `rpg list` looks something like this:
@@ -91,9 +113,9 @@ notice "remote filter: $remotefilter"
 #     coffee-script                  0.3.2
 #     ...
 #
-# So we have the "<package> <version>" pairs separated by whitespace,
+# So we have the `<package> <version>` pairs separated by whitespace,
 # basically.
-rpg list -x "$@" |
+rpg list -x "$@"                                 |
 
 # Okay ...
 #
@@ -127,15 +149,18 @@ rpg list -x "$@" |
 # Additional, we selectively enable some of `join(1)`'s other options (`-a`
 # and `-e`) for achieving "outer joins" and "full joins" when querying
 # against all remote packages.
-join -a 1 $joiner -o 1.1,1.2,2.2,2.1 -e '-' - "$RPGINDEX/release-recent" |
+join -a 1 $joiner                                \
+     -o 1.1,1.2,2.2,2.1                          \
+     -e '-'                                      \
+     - "$RPGINDEX/release-recent"                |
 
 # Grep out remote packages based on our globs. See the *Glob Filter* section
 # above for more information.
-/bin/sh -c "exec $remotefilter"                                           |
+/bin/sh -c "exec $remotefilter"                  |
 
 # Grep out lines that don't match a package. Also, the regular expression
 # is amazing.
-grep -v '. - - .'                                                         |
+grep -v '. - - .'                                |
 
 # All that's left is to read the output from `join` and apply some light
 # formatting.
