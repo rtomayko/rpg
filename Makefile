@@ -38,7 +38,7 @@ PROGRAMS = \
 	rpg-sh-setup rpg rpg-config rpg-deps rpg-fetch \
 	rpg-install rpg-list rpg-version-test rpg-uninstall \
 	rpg-build rpg-env rpg-update rpg-resolve rpg-upgrade \
-	rpg-steal rpg-fsck rpg-status rpg-outdated
+	rpg-steal rpg-fsck rpg-status rpg-outdated rpg-parse-package-list
 
 DOCHTML = \
 	rpg-sh-setup.html rpg.html rpg-config.html rpg-deps.html rpg-fetch.html \
