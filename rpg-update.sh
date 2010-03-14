@@ -155,7 +155,7 @@ gem list --no-installed --remote --all                       |
 
 # Now turn it into something that's easy to use with stream tools like
 # `grep(1)`, `sed(1)`, `cut(1)`, `join(1)`, etc.
-sed -e "s/^\($GEMNAME_PATTERN\) (\(.*\))$/GEM \1 \2/"        \
+sed -e "s/^\($GEMNAME_BRE\) (\(.*\))$/GEM \1 \2/"        \
     -e 's/,//g'                                              |
 
 # Make sure the file is sorted on package names in `sort -b` order. This is

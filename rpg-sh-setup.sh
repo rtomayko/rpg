@@ -138,9 +138,18 @@ export RPGTRACE RPGSHOWBUILD RPGSTALETIME
 # ---------
 
 # Useful BRE patterns for matching various gem stuffs.
-GEMNAME_PATTERN='[0-9A-Za-z_.-]\{1,\}'
-GEMVERS_PATTERN='[0-9.]\{1,\}'
-GEMPRES_PATTERN='[0-9A-Za-z.]\{1,\}'
+GEMNAME_BRE='[0-9A-Za-z_.-]\{1,\}'
+GEMVERS_BRE='[0-9][0-9.]*'
+GEMPRES_BRE='[0-9A-Za-z][0-9A-Za-z.]*'
+
+# This seems to be the most portable way of getting a variable with
+# embedded newline. `$'\n'` is POSIX but doesn't work in my version of
+# `dash(1)`. This works in `bash` and `dash` at least.
+#
+# The `ENEWLINE` is just an escaped version, useful for `sed` patterns.
+NEWLINE='
+'
+ENEWLINE="\\$NEWLINE"
 
 # Usage Messages, Logging, and Stuff Like That
 # --------------------------------------------
@@ -212,7 +221,7 @@ warn () { echo "$PROGNAME:" "$@" 1>&2; }
 # Write an informationational message to stderr prefixed with the name
 # of the current script. Don't use this, use `notice`.
 heed () {
-    printf "%13s %s\n" "${PROGNAME#rpg-}:" "$*" 1>&2
+    printf "%18s %s\n" "${PROGNAME#rpg-}:" "$*" 1>&2
 }
 
 # We rewite the `notice` function to `head` if `RPGVERBOSE` is enabled

@@ -58,7 +58,6 @@ parse_packages () {
 # `package`, `verspec`, and `vers` variables.
 write_package () {
     test "$package" || return 0
-    notice "write_package '$package', '$verspec', '$vers'"
 
     # Use `>=0` if no version was given
     test "$vers" || {
@@ -89,20 +88,21 @@ write_package () {
 #   * `rails/2.3.4` turns into `rails -v 2.3.4`
 #
 preformat () {
-    cr=$'\n'
-    cr="\\$cr"
-    sed -e "s/[= ]\{1,\}/$cr/g"                      |
-    sed -e "s/^-\([a-z]\)\([^ ]\)/-\1$cr\2/g"        \
-        -e "s@^\([a-z][a-z]*\)/\([0-9.]\)@\1$cr\2@g" \
-        -e "s/\([><=~]\)\([0-9]\)/\1$cr\2/g"
+    sed -e "s/[= ]\{1,\}/$ENEWLINE/g"                      |
+    sed -e "s/^-\([a-z]\)\([^ ]\)/-\1$ENEWLINE\2/g"        \
+        -e "s@^\([a-z][a-z]*\)/\([0-9.]\)@\1$ENEWLINE\2@g" \
+        -e "s/\([><=~]\)\([0-9]\)/\1$ENEWLINE\2/g"
 }
+
 
 # Read package list from stdin if - given
 test "$1" = - && {
     shift
+    notice "parsing package list items on stdin"
     preformat |
     parse_packages
 }
 
 # Now format arguments
+notice "parsing package list items in $# arguments"
 echo "$@" | preformat | parse_packages
