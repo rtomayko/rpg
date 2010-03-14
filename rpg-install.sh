@@ -26,6 +26,10 @@ notice "writing user package-list"
 rpg-parse-package-list "$@"  |
 sed "s/^/$(id -un)@$(hostname) /"            > "$packlist"
 
+# Tell the user we're about to begin.
+numpacks=$(wc -l "$packlist" | sed 's/[^0-9]//g')
+heed "calculating dependencies for $numpacks package(s) ..."
+
 notice "entering dep solve loop"
 changed=true
 while $changed
@@ -61,11 +65,20 @@ do
     mv "$packlist+" "$packlist"
 done
 
-echo "HERES THE PACKAGE LIST:"
-cat "$packlist"
+# Tell the user we're about to begin.
+numpacks=$(wc -l $packlist | sed 's/[^0-9]//g')
+heed "installing $numpacks total package(s):
+$(cat "$sessiondir"/solved)"
 
-echo "HERES YOUR JANK:"
-cat "$sessiondir"/solved
+# echo "HERES THE PACKAGE LIST:"
+# cat "$packlist"
+#
+# echo "HERES YOUR JANK:"
+# cat "$sessiondir"/solved
 
 cat "$sessiondir"/solved |
 xargs -n 3 rpg-package-install
+
+heed "installation complete"
+
+true
