@@ -37,3 +37,7 @@
 /rpg-outdated.html
 /rpg-resolve.html
 /rpg-status.html
+/rpg-package-install
+/rpg-package-register
+/rpg-parse-package-list
+/rpg-solve
