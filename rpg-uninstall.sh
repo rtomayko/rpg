@@ -16,25 +16,25 @@ name="$1"
 
 # Get the manifest file going.
 dbdir="$RPGDB/$name"
-manifest="$dbdir/active"
+manifest="$dbdir/active/manifest"
 
 # Bail out if the db doesn't have this package or the package
 # isn't active.
-test -d "$dbdir" -a -L "$manifest" || {
+test -d "$dbdir" -a -f "$manifest" || {
     warn "$name is not installed"
     exit 1
 }
 
 # Grab the currently installed version from the active symlink.
-vers=$(readlink $manifest)
+vers=$(readlink "$dbdir/active")
 
 # Remove all files installed by this package
-cat "$dbdir/active" |
-grep -v '^#' |
+cat "$dbdir/active/manifest" |
+grep -v '^#'                 |
 xargs -n 1 unlink
 
 # Unlink the active symlink
-unlink $manifest
+unlink "$dbdir/active"
 
 notice "$name $vers"
 
