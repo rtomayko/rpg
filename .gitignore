@@ -41,3 +41,5 @@
 /rpg-package-register
 /rpg-parse-package-list
 /rpg-solve
+/rpg-unpack
+/rpg-package-spec

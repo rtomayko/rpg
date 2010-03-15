@@ -59,25 +59,10 @@ do
     # The `name` and `version` files are redundant since that info can be
     # obtained from `$(basename $(dirname <path>))` and `$(basename <path>)`,
     # but having them there makes some things a bit easier.
-    #
-    # TODO this gemspec extraction nonsense needs to go. find a better way
-    # to get the deps and other information.
     mkdir -p "$packagedir"
     echo "$package" > "$packagedir/name"
     echo "$version" > "$packagedir/version"
-
-    gem spec --ruby "$file" > "$gemspec"
-    ruby <<RUBY
-    require 'rubygems'
-    spec = eval(File.read('$gemspec'), binding, '$gemspec', 1)
-    File.open('$deps', 'wb') do |fd|
-      spec.dependencies.each do |dep|
-        dep.requirement.as_list.each do |req|
-          fd.puts '%s %s %s' % [dep.type, dep.name, req]
-        end
-      end
-    end
-RUBY
-
+    rpg-unpack -cm "$file" > "$gemspec"
+    rpg-package-spec -i "$gemspec"
     echo "$packagedir"
 done
