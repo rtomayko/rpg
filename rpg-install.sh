@@ -46,9 +46,9 @@ do
         packagedir=$(rpg-package-register "$gemfile")
 
         notice "adding $package $version deps to packlist"
-        grep '^runtime ' < "$packagedir"/deps |
-        cut -d ' ' -f 2-                      |
-        sed "s/^/$package /"                  |
+        grep '^runtime ' < "$packagedir"/dependencies |
+        cut -d ' ' -f 2-                              |
+        sed "s/^/$package /"                          |
         cat "$packlist" -
     done |
     sort -b -u -k 2,4 >> "$packlist+"
