@@ -64,25 +64,90 @@ __rpg_sh_setup_included=true
 
 # `RPGDB` is where the local package database is kept. It's a
 # filesystem hierarchy. It looks like this:
-#
-#     $RPGDB/
-#     |-- ronn
-#     |   |-- 0.4
-#     |   |-- 0.4.1
-#     |   `-- active -> 0.4.1
-#     |-- sinatra
-#     |   |-- 0.9.4
-#     |   |-- 0.9.6
-#     |   `-- active -> 0.9.6
-#     |-- stemmer
-#     |   |-- 1.0.1
-#     |   `-- active -> 1.0.1
-#     |-- syntax
-#     |   |-- 1.0.0
-#     |   `-- active -> 1.0.0
-#     `-- turn
-#         |-- 0.7.0
-#         `-- active -> 0.10.0
+#     $ rpg-env sh -c 'cd $RPGDB && tree'
+#     RPGDB
+#     |-- bcrypt-ruby
+#     |   |-- 2.1.2
+#     |   |   |-- authors
+#     |   |   |-- bindir
+#     |   |   |-- date
+#     |   |   |-- dependencies
+#     |   |   |-- description
+#     |   |   |-- email
+#     |   |   |-- executables
+#     |   |   |-- extensions
+#     |   |   |-- files
+#     |   |   |-- gemspec
+#     |   |   |-- homepage
+#     |   |   |-- manifest
+#     |   |   |-- name
+#     |   |   |-- platform
+#     |   |   |-- require_paths
+#     |   |   |-- summary
+#     |   |   |-- test_files
+#     |   |   `-- version
+#     |   `-- active -> 2.1.2
+#     |-- do_sqlite3
+#     |   |-- 0.10.1.1
+#     |   |   |-- authors
+#     |   |   |-- bindir
+#     |   |   |-- date
+#     |   |   |-- dependencies
+#     |   |   |-- description
+#     |   |   |-- email
+#     |   |   |-- executables
+#     |   |   |-- extensions
+#     |   |   |-- files
+#     |   |   |-- gemspec
+#     |   |   |-- homepage
+#     |   |   |-- manifest
+#     |   |   |-- name
+#     |   |   |-- platform
+#     |   |   |-- require_paths
+#     |   |   |-- summary
+#     |   |   |-- test_files
+#     |   |   `-- version
+#     |   `-- active -> 0.10.1.1
+#     `-- sinatra
+#         |-- 0.9.6
+#         |   |-- authors
+#         |   |-- bindir
+#         |   |-- date
+#         |   |-- dependencies
+#         |   |-- description
+#         |   |-- email
+#         |   |-- executables
+#         |   |-- extensions
+#         |   |-- files
+#         |   |-- gemspec
+#         |   |-- homepage
+#         |   |-- manifest
+#         |   |-- name
+#         |   |-- platform
+#         |   |-- require_paths
+#         |   |-- summary
+#         |   |-- test_files
+#         |   `-- version
+#         |-- 1.0.b
+#         |   |-- authors
+#         |   |-- bindir
+#         |   |-- date
+#         |   |-- dependencies
+#         |   |-- description
+#         |   |-- email
+#         |   |-- executables
+#         |   |-- extensions
+#         |   |-- files
+#         |   |-- gemspec
+#         |   |-- homepage
+#         |   |-- manifest
+#         |   |-- name
+#         |   |-- platform
+#         |   |-- require_paths
+#         |   |-- summary
+#         |   |-- test_files
+#         |   `-- version
+#         `-- active -> 0.9.6
 #
 # The database is meant to be "stable". That is, you can write programs
 # that rely on this structure. Maybe it should be documented first.
