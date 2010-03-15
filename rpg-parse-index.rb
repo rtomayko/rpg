@@ -104,14 +104,21 @@ module Gem
       map! { |p| p.to_i }
     end
 
+    def prerelease?
+      @string.match(/[^0-9.]/)
+    end
+
     def to_s
       @string
     end
   end
 end
 
-# Load packages in from STDIN.
+# Load packages in from STDIN and unmarshal.
 packages = Marshal.load(STDIN)
+
+# XXX reject prerelease packages for now until we can deal with them.
+packages.reject! { |name,version,platform| version.prerelease? }
 
 # Sort packages by name and then reverse version number.
 #
@@ -126,6 +133,7 @@ end
 
 # Finally, run over the sorted list and write a line of output for each package.
 packages.each do |name,version,platform|
+  platform.gsub!(/[^A-Za-z0-9_-]/, '_')
   puts "#{name} #{version} #{platform}"
 end
 
