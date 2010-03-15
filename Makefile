@@ -34,7 +34,7 @@ SOURCES = \
 	rpg-build.sh rpg-env.sh rpg-update.sh rpg-resolve.sh rpg-upgrade.sh \
 	rpg-steal.sh rpg-fsck.sh rpg-status.sh rpg-outdated.sh \
 	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh \
-	rpg-package-spec.rb
+	rpg-package-spec.rb rpg-parse-index.rb
 
 PROGRAMS = \
 	rpg-sh-setup rpg rpg-config rpg-fetch \
@@ -42,7 +42,7 @@ PROGRAMS = \
 	rpg-build rpg-env rpg-update rpg-resolve rpg-upgrade \
 	rpg-steal rpg-fsck rpg-status rpg-outdated rpg-parse-package-list \
 	rpg-package-register rpg-package-install rpg-solve rpg-unpack \
-	rpg-package-spec
+	rpg-package-spec rpg-parse-index
 
 DOCHTML = \
 	rpg-sh-setup.html rpg.html rpg-config.html rpg-fetch.html \
@@ -50,27 +50,37 @@ DOCHTML = \
 	rpg-build.html rpg-env.html rpg-update.html rpg-resolve.html \
 	rpg-upgrade.html rpg-steal.html rpg-fsck.html rpg-status.html \
 	rpg-outdated.html rpg-package-register.html rpg-package-install.html \
-	rpg-solve.html
+	rpg-solve.html rpg-package-spec.html rpg-parse-index.html
 
 STANDALONE = $(NAME)-sa
 
+.SUFFIXES: .sh .rb .html
+
 .sh:
-	echo "    SH  $@"
+	printf "%13s  %-30s" "[SH]" "$@"
 	$(SHELL) -n $<
 	rm -f $@
 	cp $< $@
 	chmod a-w+x $@
+	printf "       OK\n"
 
 .sh.html:
-	echo " SHOCCO $@"
+	printf "%13s  %-30s" "[SHOCCO]" "$@"
 	shocco $< > $@
+	printf "       OK\n"
 
 .rb:
-	echo "   RUBY $@"
-	ruby -c $<
+	printf "%13s  %-30s" "[RUBY]" "$@"
+	ruby -c $< >/dev/null
 	rm -f $@
 	cp $< $@
 	chmod a-w+x $@
+	printf "       OK\n"
+
+.rb.html:
+	printf "%13s  %-30s" "[ROCCO]" "$@"
+	rocco $<
+	printf "       OK\n"
 
 build: $(PROGRAMS)
 
@@ -113,5 +123,3 @@ clean:
 	echo $(STANDALONE) $(PROGRAMS) $(DOCHTML) | xargs -tn 1 rm -f
 
 .SILENT:
-
-.SUFFIXES: .sh .html .rb
