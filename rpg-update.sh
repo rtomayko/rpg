@@ -123,14 +123,14 @@ then
     if test -z "$(find "$release" -maxdepth 0 $fargs 2>/dev/null)"
     then notice "release index is missing or stale [> $staletime old]"
          if test -f "$release"
-         then heed "package index is stale [> $staletime old]. rebuilding now."
-         else heed "package index not found. building now."
+         then heed "package index is stale [> $staletime old]. retrieving now."
+         else heed "package index not found. retrieving now."
          fi
     else notice "release index is fresh [< $staletime old]"
          exit 0
     fi
 else
-    notice "index rebuild forced"
+    heed "retrieving package index: $RPGSPECSURL"
 fi
 
 # First thing we do, we create the `RPGINDEX` directory if it doesn't exist.
@@ -141,32 +141,22 @@ test -d "$RPGINDEX" || {
 
 notice "building release file [$release+]"
 
-# The `gem list --all` output looks like this:
-#
-#     clown (0.0.8)
-#     ClsRuby (1.0.1, 1.0.0)
-#     clusterer (0.1.9, 0.1.0)
-#     clusterfuck (0.1.0)
-#     cmd (0.7.2, 0.7.1, 0.7.0)
-#     cmd_line_test (0.1.5, 0.1.4)
-#     cmdline (0.0.2, 0.0.1, 0.0.0)
-#     Cmdline_Parser (0.1.1, 0.1.0)
-#     cmdparse (2.0.2, 2.0.1, 2.0.0, 1.0.5, 1.0.4, 1.0.3)
-#     cmdrkeene-foursquare (0.0.4)
-#
-# It includes all gems and all versions of all gems.
-gem list --no-installed --remote --all                       |
+# Fetching and Formatting The Spec Index
+# --------------------------------------
 
-# Now turn it into something that's easy to use with stream tools like
-# `grep(1)`, `sed(1)`, `cut(1)`, `join(1)`, etc.
-sed -e "s/^\($GEMNAME_BRE\) (\(.*\))$/GEM \1 \2/"        \
-    -e 's/,//g'                                              |
+# Fetch the latest specs file from rubygems.org.
+curl -sL "$RPGSPECSURL"                     |
 
-# Make sure the file is sorted on package names in `sort -b` order. This is
-# important for `join(1)` and `uniq(1)`.
-sort -b -k 1,1 -k2,2rn                                       |
+# Decompress.
+gzip -dc -                                  |
 
-# It looks like this when we're done with it:
+# Now turn this mess of Marshal data into something we can deal with using
+# `rpg-parse-index`. See that file for more info on the `specs.gz` file
+# format.
+rpg-parse-index                             |
+
+# We don't need the platform, yet. Grab only the `<name>` and `<version>`
+# fields. After `cut`, our stream text looks like this:
 #
 #     clown 0.0.8
 #     ClsRuby 1.0.1
@@ -180,27 +170,26 @@ sort -b -k 1,1 -k2,2rn                                       |
 #     cmd_line_test 0.1.5
 #     cmd_line_test 0.1.4
 #
-# One line per package and package version.
+# One line per package and package version. Output is sorted on package name
+# and then reverse by version.
 #
-# This is slow but it'll have to do for now. We should be able to do the same
-# fairly easily with `sed(1)` or `awk(1)` but I'm not familiar with any
-# approaches.
-while read leader name versions
-do
-    if test "$leader" = "GEM"
-    then
-        for ver in $versions
-        do echo "$name $ver"
-        done
-    else
-        warn "malformed input from \`gem list': $leader $name $versions"
-    fi
-done > "$release+"
+# Write that out to our staged release file so we can pass over it a bit.
+cut -d ' ' -f 1,2 > "$release+"
+
+# There's a chance that `curl` or `gzip` or something else in the above
+# pipeline failed. `set -e` won't catch that since it's not the last command
+# in the pipeline. Detect it by checking the contents of the file and bail
+# if there's nothing there.
+if test -z "$(head -1 "$release+" 2>/dev/null)"
+then warn "failed to retrieve package index from remote server."
+     exit 1
+fi
+
 
 # The Release Diff
 # ----------------
 
-# We wrote the new index to separate file, so we can take a quick diff
+# We wrote the new index to a separate file, so we can take a quick diff
 # now. We can show the diff directly, which is awesome, but this could also
 # be used to roll back and update (`patch -R`) if something goes wrong.
 #
@@ -208,16 +197,15 @@ done > "$release+"
 # `diff(1)` not being availble.
 notice "building release diff [$release-diff+]"
 
-(diff -u "$release" "$release+" 2>&1 && true) \
-> "$release-diff+"
+(diff -u "$release" "$release+" 2>&1 && true) > "$release-diff+"
 
 # Write a list of new packages to stdout if the verbose flag was given.
-$verbose && {
-    echo "# New packages:"
-    grep '^+' < "$release-diff+"   |
-    grep -v '^++'                  |
-    cut -c2-
-}
+if $verbose
+then echo "# New packages:"
+     grep '^+' < "$release-diff+"   |
+     grep -v '^++'                  |
+     cut -c2-
+fi
 
 # The Recent Release Index
 # ------------------------
@@ -240,9 +228,17 @@ sort -u -b -k 1,1 < "$release+" > "$release-recent+"
 # Move the new index files into place.
 notice "committing new release index files..."
 for file in "$release-diff" "$release-recent" "$release"
-do  mv "$file+" "$file"
+do mv "$file+" "$file"
 done
 notice "index rebuild complete"
+
+# Write some stats on the number of packages available, both total and newly
+# updated.
+tot="$(wc -l "$release" | sed 's/[^0-9]//g')"
+new="$(grep -e '^+[^+]' "$release-diff" | wc -l | sed 's/[^0-9]//g')"
+message="complete. $tot packages available."
+test "$new" -gt 0 && message="$message +$new since last update."
+heed "$message"
 
 # Careful now.
 :

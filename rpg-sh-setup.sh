@@ -130,9 +130,12 @@ __rpg_sh_setup_included=true
 # course of running other programs.
 : ${RPGSTALETIME:=1 day}
 
+# URL to the specs file used to build the package index.
+: ${RPGSPECSURL:='http://rubygems.org/specs.4.8.gz'}
+
 # export all RPG variables
 export RPGPATH RPGLIB RPGBIN RPGMAN RPGCACHE RPGPACKS RPGDB RPGINDEX
-export RPGTRACE RPGSHOWBUILD RPGSTALETIME
+export RPGTRACE RPGSHOWBUILD RPGSTALETIME RPGSPECSURL
 
 # Constants
 # ---------
