@@ -27,7 +27,7 @@ elsif ARGV.include?('--help')
 end
 
 # Re-execute through rpg if the environment isn't right.
-exec "rpg", $0, *ARGV if ENV['RPGDB'].empty?
+exec "rpg", "package-spec", *ARGV if ENV['RPGDB'].to_s == ''
 
 # Figure out if we're in import mode or print formatted output mode.
 if ['-i', '--import'].include?(ARGV.first)
