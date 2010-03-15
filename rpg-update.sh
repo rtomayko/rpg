@@ -122,6 +122,10 @@ then
 
     if test -z "$(find "$release" -maxdepth 0 $fargs 2>/dev/null)"
     then notice "release index is missing or stale [> $staletime old]"
+         if test -f "$release"
+         then heed "package index is stale [> $staletime old]. rebuilding now."
+         else heed "package index not found. building now."
+         fi
     else notice "release index is fresh [< $staletime old]"
          exit 0
     fi
