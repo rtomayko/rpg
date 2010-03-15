@@ -27,7 +27,11 @@ else
     # We're going to need to pull the gem off the server.
     mkdir -p "$RPGCACHE"
     cd "$RPGCACHE"
-    heed "$package $version [fetching: $bestver]"
+
+    if test "$bestver" != "$version"
+    then heed "$package $version [resolved: $bestver]"
+    else heed "$package $version"
+    fi
 
     # Grab the gem with curl(1) and write to a temporary file just
     # in case something goes wrong during transfer.

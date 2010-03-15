@@ -9,7 +9,6 @@ USAGE '${PROGNAME} <package> [[-v] <version>] ...
        ${PROGNAME} <package>[/<version>]...
 Install packages into rpg environment.'
 
-
 RPGSESSION="$RPGDB/@session"
 sessiondir="$RPGSESSION"
 packlist="$sessiondir"/package-list
@@ -24,7 +23,10 @@ done > "$sessiondir"/argv
 
 notice "writing user package-list"
 rpg-parse-package-list "$@"  |
-sed "s/^/$(id -un)@$(hostname) /"            > "$packlist"
+sed "s/^/@user /"            > "$packlist"
+
+# see if we need to update the index
+rpg update -s
 
 # Tell the user we're about to begin.
 numpacks=$(wc -l "$packlist" | sed 's/[^0-9]//g')
