@@ -12,9 +12,19 @@ added PATH before executing command.
 If no <command> is specified, ${PROGNAME} writes the name and values
 of variables in the environment to stdout with one <name>=<value> per line.'
 
-# Setup RUBYLIB and PATH.
-RUBYLIB="$RPGLIB:$RUBYLIB"
-PATH="$RPGBIN:$PATH"
+# Put RPGBIN on PATH if it isn't there already.
+if expr "$PATH" : ".*$RPGBIN" &&
+   ! echo "$PATH" | tr ':' '\n' | grep -q -e "^$RPGBIN$" >/dev/null
+then PATH="$RPGBIN:$PATH"
+fi
+
+# Put RUBYLIB on PATH if it isn't there already.
+if   test -z "$RUBYLIB"
+then RUBYLIB="$RPGLIB"
+elif ! echo "$RUBYLIB" | tr ':' '\n' | grep -e "^$RPGLIB$" >/dev/null
+then RUBYLIB="$RPGLIB:$RUBYLIB"
+fi
+
 export RUBYLIB PATH
 
 # Leave the rest of the work to env(1).

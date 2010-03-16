@@ -104,6 +104,7 @@ fi
 
 # `RPGDB` is where the local package database is kept. It's a
 # filesystem hierarchy. It looks like this:
+#
 #     $ rpg-env sh -c 'cd $RPGDB && tree'
 #     RPGDB
 #     |-- bcrypt-ruby
