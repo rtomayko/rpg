@@ -18,14 +18,14 @@ exit 0
 find "$path/ext" -name "extconf.rb" |
 while read file
 do
-    heed "$(basename $path) $(basename $(dirname $file))"
-    cd $(dirname $file)
+    heed "$(basename "$path") $(basename $(dirname "$file"))"
+    cd "$(dirname "$file")"
     if (ruby extconf.rb &&
         { make clean || true; } &&
         make) 1> build.log 2>&1
     then
         $RPGSHOWBUILD && cat build.log 1>&2
-        find "$(pwd)" -name "*.$(ruby_dlext)"
+        find "$path" -name "*.$(ruby_dlext)"
     else
         cat build.log 1>&2
     fi
