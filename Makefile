@@ -117,6 +117,13 @@ uninstall:
 		rm "$(libexecdir)/$$f"; \
 	done
 
+install-local:
+	./configure --prefix=/usr/local
+	sleep 1
+	make
+	make install
+	./configure --development
+
 clean:
 	rm -vf $(PROGRAMS) $(DOCHTML)
 
