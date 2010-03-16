@@ -5,6 +5,7 @@
 #/ Options
 #/   --with-ruby[=RUBY]       tie to specific ruby installation. RUBY is
 #/                            path to ruby executable.
+#/   --development            configure for local working copy development
 #/
 #/ Installation locations
 #/   --prefix=PREFIX          install files in PREFIX [/usr/local]
@@ -21,12 +22,27 @@ longarg () { echo "$1" | sed "s/^$2=//"; }
 # Argument Parsing
 # ----------------
 
+sourcedir="$(cd "$(dirname $0)" && pwd)"
+develmode=false
+
 while test $# -gt 0
 do
     case "$1" in
     # Options
     --with-ruby)       RUBY="ruby";shift;;
     --with-ruby=*)     RUBY=$(longarg "$1" --with-ruby);shift;;
+    --develop|--development)
+                       prefix="$sourcedir/work"
+                       bindir="$sourcedir"
+                       libexecdir="$sourcedir"
+                       localstatedir="$prefix"
+                       sysconfdir="$sourcedir"
+                       datarootdir="$sourcedir"
+                       datadir="$sourcedir"
+                       mandir="$sourcedir/man"
+                       develmode=true
+                       shift
+                       ;;
 
     # Installation locations:
     --prefix)          prefix="$2";shift;shift;;
@@ -241,6 +257,7 @@ recordconfig sysconfdir    "$sysconfdir"
 recordconfig datarootdir   "$datarootdir"
 recordconfig datadir       "$datadir"
 recordconfig mandir        "$mandir"
+recordconfig develmode     "$develmode"
 
 # Establish RPGPATHS from active Ruby install
 
@@ -279,4 +296,7 @@ configuration:
   mandir:     $mandir
 MESSAGE
 
-echo "okay. run \`make' to build and \`make install' to install."
+if $develmode
+then echo "okay. ready for development. run \`make' or \`make auto' to build."
+else echo "okay. run \`make' to build and \`make install' to install."
+fi
