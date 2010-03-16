@@ -1,13 +1,15 @@
 #!/bin/sh
-# The `rpg-install` program
-#
+# TODO Documentation and cleanup
 set -e
 . rpg-sh-setup
 
 [ "$*" ] || set -- '--help'; ARGV="$@"
-USAGE '${PROGNAME} <package> [[-v] <version>] ...
-       ${PROGNAME} <package>[/<version>]...
-Install packages into rpg environment.'
+USAGE '${PROGNAME} [-f] <package> [[-v] <version>] ...
+       ${PROGNAME} [-f] <package>[/<version>]...
+Install packages into rpg environment.
+
+Options
+  -f          Force package installation even if already installed'
 
 RPGSESSION="$RPGDB/@session"
 sessiondir="$RPGSESSION"
@@ -20,6 +22,13 @@ notice "writing argv"
 for a in "$@"
 do echo "$a"
 done > "$sessiondir"/argv
+
+# Pass the -f argument on to `rpg-package-install` if given.
+packageinstallargs=
+test "$1" = -f && {
+    packageinstallargs=-f
+    shift
+}
 
 notice "writing user package-list"
 rpg-parse-package-list "$@"  |
@@ -39,9 +48,9 @@ do
     </dev/null >"$packlist+"
 
     notice "solving deplist"
-    cut -d ' ' -f 2- "$packlist"                |
-    rpg-solve -u                                |
-    tee "$sessiondir/solved"                    |
+    cut -d ' ' -f 2- "$packlist"                      |
+    rpg-solve -u                                      |
+    tee "$sessiondir/solved"                          |
     while read package op version
     do
         gemfile=$(rpg-fetch "$package" "$version")
@@ -79,7 +88,7 @@ $(cat "$sessiondir"/solved)"
 # cat "$sessiondir"/solved
 
 cat "$sessiondir"/solved |
-xargs -n 3 rpg-package-install
+xargs -n 3 rpg-package-install $packageinstallargs
 
 heed "installation complete"
 
