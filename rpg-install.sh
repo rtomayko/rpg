@@ -29,7 +29,7 @@ sed "s/^/@user /"            > "$packlist"
 rpg update -s
 
 # Tell the user we're about to begin.
-numpacks=$(wc -l "$packlist" | sed 's/[^0-9]//g')
+numpacks=$(lc "$packlist")
 heed "calculating dependencies for $numpacks package(s) ..."
 
 notice "entering dep solve loop"
@@ -68,7 +68,7 @@ do
 done
 
 # Tell the user we're about to begin.
-numpacks=$(wc -l $packlist | sed 's/[^0-9]//g')
+numpacks=$(lc "$packlist")
 heed "installing $numpacks total package(s):
 $(cat "$sessiondir"/solved)"
 
