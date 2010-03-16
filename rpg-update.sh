@@ -232,11 +232,16 @@ do mv "$file+" "$file"
 done
 notice "index rebuild complete"
 
+# Count the number of lines in a file.
+lc () {
+    wc -l "$@" | cut -c 1-8 | sed 's/^ *//'
+}
+
 # Write some stats on the number of packages available, both total and newly
 # updated.
-tot="$(wc -l "$release" | sed 's/[^0-9]//g')"
-new="$(grep -e '^+[^+]' "$release-diff" | wc -l | sed 's/[^0-9]//g')"
-message="complete. $tot packages available."
+packs="$(lc "$release-recent")"
+new="$(grep -e '^+[^+]' "$release-diff" | lc)"
+message="complete. $packs packages available."
 test "$new" -gt 0 && message="$message +$new since last update."
 heed "$message"
 
