@@ -51,6 +51,10 @@ do
     cut -d ' ' -f 2- "$packlist"                      |
     rpg-solve -u                                      |
     tee "$sessiondir/solved"                          |
+    cut -f 1,3 -d ' '                                 |
+    xargs -P 4 -n 2 rpg-fetch >/dev/null
+
+    cat "$sessiondir/solved"                          |
     while read package op version
     do
         gemfile=$(rpg-fetch "$package" "$version")
