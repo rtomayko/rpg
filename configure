@@ -185,6 +185,7 @@ stdutil tar       TAR        tar gtar
 stdutil curl      CURL       curl
 stdutil gem       GEM        "$(rbconfig bindir)/gem" gem
 stdutil schocco   SHOCCO     shocco
+stdutil rocco     ROCCO      rocco
 stdutil ronn      RONN       ronn
 
 recordconfig INSTALL_PROGRAM "$INSTALL"
@@ -252,7 +253,7 @@ recordconfig prefix        "$prefix"
 recordconfig exec_prefix   "$exec_prefix"
 recordconfig bindir        "$bindir"
 recordconfig libexecdir    "$libexecdir"
-recordconfig localstatedir "$libexecdir"
+recordconfig localstatedir "$localstatedir"
 recordconfig sysconfdir    "$sysconfdir"
 recordconfig datarootdir   "$datarootdir"
 recordconfig datadir       "$datadir"
@@ -289,11 +290,12 @@ EOF
 
 cat <<MESSAGE
 configuration:
-  ruby:       $RUBY
-  bindir:     $bindir
-  libexecdir: $libexecdir
-  sysconfdir: $sysconfdir
-  mandir:     $mandir
+  ruby:          $RUBY
+  bindir:        $bindir
+  libexecdir:    $libexecdir
+  sysconfdir:    $sysconfdir
+  localstatedir: $localstatedir
+  mandir:        $mandir
 MESSAGE
 
 if $develmode

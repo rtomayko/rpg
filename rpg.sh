@@ -45,30 +45,15 @@ do
 done
 shift $(( $OPTIND - 1 ))
 
-# Bring in rpg config
-. rpg-sh-setup
+# This is replaced by the generated config.sh file at build time.
+: __RPGCONFIG__
+
+# Bring in the rpg sh library.
+. "$bindir"/rpg-sh-setup
 
 # Shift off the first argument to determine the real command:
 command="$1"
 shift
 
-if $__SHC__
-then
-    case $command in
-    build)         rpg_build "$@";;
-    config)        rpg_config "$@";;
-    deps)          rpg_deps "$@";;
-    env)           rpg_env "$@";;
-    fetch)         rpg_fetch "$@";;
-    install)       rpg_install "$@";;
-    list)          rpg_list "$@";;
-    resolve)       rpg_resolve "$@";;
-    sh-setup)      true ;;
-    uninstall)     rpg_uninstall "$@";;
-    update)        rpg_update "$@";;
-    version-test)  rpg_version_test "$@";;
-    *)             exec rpg-$command "$@";;
-    esac
-else
-    exec "rpg-${command}" "$@"
-fi
+# Exec the command or exit with failure if the command doesn't exist.
+exec "$libexecdir/rpg-${command}" "$@"

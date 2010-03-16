@@ -12,15 +12,15 @@ NAME = rpg
 TARNAME = $(NAME)
 SHELL = /bin/sh
 
-srcdir      = .
-prefix      = /usr/local
-exec_prefix = ${prefix}
-bindir      = ${exec_prefix}/bin
-libexecdir  = ${exec_prefix}/libexec
-datarootdir = ${prefix}/share
-datadir     = ${datarootdir}
-mandir      = ${datarootdir}/man
-docdir      = $(datadir)/doc/$(TARNAME)
+# srcdir      = .
+# prefix      = /usr/local
+# exec_prefix = ${prefix}
+# bindir      = ${exec_prefix}/bin
+# libexecdir  = ${exec_prefix}/libexec
+# datarootdir = ${prefix}/share
+# datadir     = ${datarootdir}
+# mandir      = ${datarootdir}/man
+# docdir      = $(datadir)/doc/$(TARNAME)
 
 # ---- END OF CONFIGURATION ----
 
@@ -84,6 +84,7 @@ DOCHTML = \
 	printf "       OK\n"
 
 rpg-sh-setup: config.sh munge.rb
+rpg: config.sh munge.rb
 
 build: $(PROGRAMS)
 
