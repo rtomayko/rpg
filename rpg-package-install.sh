@@ -168,7 +168,7 @@ test -n "$exts" && {
 # ------------------
 
 # Recursively install all library files into `RPGLIB`.
-test -d lib && {
+test -d "$pack"/lib && {
     mkdir -p "$RPGLIB"
     rpg_install_dir "$pack/lib" "$RPGLIB" "$manifest"
 }
@@ -177,7 +177,7 @@ test -d lib && {
 # ----------------
 
 # Write executable scripts into `RPGBIN` and rewrite shebang lines.
-test -d bin && {
+test -d "$pack"/bin && {
     mkdir -p "$RPGBIN"
     for file in "$pack"/bin/*
     do  dest="$RPGBIN/$(basename $file)"
@@ -195,7 +195,7 @@ test -d bin && {
 
 # Install any manpages included with the package into `RPGMAN`. Make
 # sure files are being installed under the prescribed hierarchy.
-test -d man && {
+test -d "$pack"/man && {
     for file in "$pack"/man/*
     do  if test -f "$file" &&
            expr "$file" : '.*\.[0-9][0-9A-Za-z]*$' >/dev/null
