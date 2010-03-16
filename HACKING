@@ -21,15 +21,18 @@ If you haven't already:
 Working out of a source directory
 ---------------------------------
 
-You can run rpg programs right out of a working directory by adding it
-to your PATH. Assuming you're at a shell in the rpg source directory:
+There's a special configure option for working out of a source
+directory:
 
-    $ PATH="$(pwd):$PATH"
+    ./configure --development
 
-You'll also want to set the RPGPATH to some temporary area while
-working, otherwise the programs run against your system rpg paths:
+This generates default config.sh and config.mk files that cause the rpg
+programs run out of the current directory to use a temporary work area
+(<sourcedir>/work) for keep the database and installing files. Once
+`configure --development' is complete, add source dir at the beginning
+of your PATH and you should be all set:
 
-    $ export RPGPATH="$(pwd)/work"
+    PATH="$(pwd):$PATH"
 
 With the source directory on your PATH and RPGPATH set, the general
 workflow is to edit the "rpg-<name>.sh" and "rpg-<name>.rb" files, then

@@ -66,6 +66,14 @@ eval "$(rubyenv)"
 export __RPGENV__ RUBY
 export RUBYPREFIX RUBYDLEXT RUBYSITEDIR RUBYVENDORDIR RUBYMANDIR RUBYBINDIR
 export RUBYSTATEDIR RUBYLIBDIR RUBYVERSION
+
+    # With `configure --development`, set all paths to be inside a work dir.
+    if $develmode; then
+        : ${RPGPATH:="./work"}
+        : ${RPGLIB:="$RPGPATH/lib"}
+        : ${RPGMAN:="$RPGPATH/man"}
+        : ${RPGBIN:="$RPGPATH/bin"}
+    fi
 fi
 
 # Install Paths
@@ -90,6 +98,7 @@ fi
 # `RPGMAN` is where manpages included with packages are installed. This
 # is basically the whole reason `rpg` was written in the first place.
 : ${RPGMAN:="${RUBYMANDIR:-$RPGPATH/man}"}
+
 
 # RPG Paths
 # ---------
