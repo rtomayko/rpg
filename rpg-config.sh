@@ -6,4 +6,4 @@ ARGV="$@"
 USAGE '${PROGNAME}
 Write rpg configuration values to standard output.'
 
-env | grep ^RPG
+env | grep ^RPG | sort
