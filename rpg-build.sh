@@ -21,7 +21,7 @@ do
     heed "$(basename $path) $(basename $(dirname $file))"
     cd $(dirname $file)
     if (ruby extconf.rb &&
-        make clean &&
+        { make clean || true; } &&
         make) 1> build.log 2>&1
     then
         $RPGSHOWBUILD && cat build.log 1>&2
