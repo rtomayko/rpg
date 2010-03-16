@@ -72,7 +72,7 @@ The rpg shell sources should conform to "The Standard" where possible.
 Any shell language features, utility programs, or arguments to utility
 programs not documented here should be avoided:
 
-<http://www.opengroup.org/onlinepubs/009695399/utilities/contents.html>
+http://www.opengroup.org/onlinepubs/009695399/utilities/contents.html
 
 This isn't really about portability (although that's a nice feature).
 The main reason for conforming to the POSIX defined portions of the
@@ -86,10 +86,10 @@ bit easier to read than the opengroup.org documentation for my eyes.
 HOWEVER, make sure you're looking at a 1posix section manpage. You can
 tell because there'll be "(1posix)" in the URL. Some examples:
 
-    <http://man.cx/sh(1posix)>
-    <http://man.cx/sort(1posix)>
-    <http://man.cx/join(1posix)>
-    <http://man.cx/sed(1posix)>
+    http://man.cx/sh(1posix)
+    http://man.cx/sort(1posix)
+    http://man.cx/join(1posix)
+    http://man.cx/sed(1posix)
 
 Lastly, shell programs should be tested under dash if possible.  This is
 the default /bin/sh on recent Debian versions and can be easily
@@ -100,7 +100,7 @@ POSIX make
 
 The makefile shall remain POSIX so that it works with GNU and BSD makes.
 
-    <http://man.cx/make(1posix)>
+    http://man.cx/make(1posix)
 
 There's no reason to use the advanced features of non-POSIX makes.
 
@@ -119,13 +119,13 @@ Or for a specific set of files with:
 
 These docs are also available on the web at:
 
-    <http://rtomayko.github.com/rpg/>
+    http://rtomayko.github.com/rpg/
 
 For more information on Docco, Rocco, and shocco:
 
-    <http://jashkenas.github.com/docco/>
-    <http://rtomayko.github.com/rocco/>
-    <http://rtomayko.github.com/shocco/>
+    http://jashkenas.github.com/docco/
+    http://rtomayko.github.com/rocco/
+    http://rtomayko.github.com/shocco/
 
 Manpages
 --------
@@ -139,4 +139,4 @@ And that should do it.
 
 Have fun!
 
-Ryan Tomayko <http://tomayko.com/about>
+Ryan Tomayko < http://tomayko.com/about >
