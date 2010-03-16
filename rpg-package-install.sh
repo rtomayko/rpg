@@ -42,21 +42,22 @@ rpg_ln () {
     fi
 }
 
+# Usage: rpg_install_dir `<source>` `<dest>` `<manifest>`
+#
 # Recursive file hierarchy copy routine. Attempts to hardlink files
 # and falls back to normal copies.
 rpg_install_dir () {
-    local src="$1" dest="$2" manifest="$3"
-    mkdir -p "$dest"
+    mkdir -p "$2"
     for file in "$1"/*
     do
         if test -f "$file"
         then # link dest to source
-             rpg_ln "$file" "$dest/$(basename $file)"
-             echo "$dest/$(basename $file)" >> "$manifest"
+             rpg_ln "$file" "$2/$(basename $file)"
+             echo "$2/$(basename $file)" >> "$3"
 
         elif test -d "$file"
         then # recurse into directories
-             rpg_install_dir "$file" "$dest/$(basename $file)" "$manifest"
+             rpg_install_dir "$file" "$2/$(basename $file)" "$manifest"
 
         else warn "unknown file type: $file"
              return 1
@@ -85,12 +86,14 @@ notice "$package $version"
 
 # Fetch the gem into the cache and unpack into the packs area if
 # its not already there.
-if test -d "$RPGPACKS/$package-$version"
+if ! $force && test -d "$RPGPACKS/$package-$version"
 then notice "sources already exist. bypassing fetch and unpack."
-else gemfile=$(rpg-fetch "$package" "$version")
+else rm -rf "$RPGPACKS/$package-$version"
+     gemfile=$(rpg-fetch "$package" "$version")
      notice "unpacking $gemfile into $RPGPACKS"
      mkdir -p "$RPGPACKS"
      rpg-unpack -p "$RPGPACKS" "$gemfile"
+     rpg-shit-list "$package" "$version" "$RPGPACKS/$package-$version"
 fi
 
 # If the package already has an active/installed version, check if its
@@ -113,6 +116,9 @@ test -e "$packagedir/active" && {
     fi
 }
 
+# Path to the unpacked package directory.
+pack="$RPGPACKS/$package-$version"
+
 # This is our file manifest. We record everything installed in here
 # so we know how to uninstall the package. Create/truncate it in case
 # it already exists.
@@ -127,15 +133,13 @@ echo "# $(date)" > "$manifest"
 # detect in progress or failed installations.
 ln -sf "$version" "$packagedir/installing"
 
-# Go into the unpackaged package dir to make installing a bit easier.
-cd "$RPGPACKS/$package-$version"
 
 
 # Extension Libraries
 # -------------------
 
 # Build extension libraries if they exist. Bail out if the build fails.
-exts="$(rpg-build "$(pwd)")" || {
+exts="$(rpg-build "$pack")" || {
     warn "extension failed to build"
     exit 1
 }
@@ -150,12 +154,12 @@ test -n "$exts" && {
     while read dl
     do
         prefix=$(
-            grep '^target_prefix.=' "$(dirname $dl)/Makefile" |
+            grep '^target_prefix.=' "$pack/$(dirname $dl)/Makefile" |
             sed 's/^target_prefix *= *//'
         )
         dest="${RPGLIB}${prefix}/$(basename $dl)"
         mkdir -p "${RPGLIB}${prefix}"
-        rpg_ln "$dl" "$dest"
+        rpg_ln "$pack/$dl" "$dest"
         echo "$dest" >> "$manifest"
     done
 }
@@ -166,7 +170,7 @@ test -n "$exts" && {
 # Recursively install all library files into `RPGLIB`.
 test -d lib && {
     mkdir -p "$RPGLIB"
-    rpg_install_dir lib "$RPGLIB" "$manifest"
+    rpg_install_dir "$pack/lib" "$RPGLIB" "$manifest"
 }
 
 # Ruby Executables
@@ -175,7 +179,7 @@ test -d lib && {
 # Write executable scripts into `RPGBIN` and rewrite shebang lines.
 test -d bin && {
     mkdir -p "$RPGBIN"
-    for file in bin/*
+    for file in "$pack"/bin/*
     do  dest="$RPGBIN/$(basename $file)"
         notice "$dest [!]"
         sed "s@^#!.*ruby.*@#!$(ruby_command)@" \
@@ -192,8 +196,9 @@ test -d bin && {
 # Install any manpages included with the package into `RPGMAN`. Make
 # sure files are being installed under the prescribed hierarchy.
 test -d man && {
-    for file in man/*
-    do  if test -f "$file" && expr "$file" : '.*\.[0-9][0-9A-Za-z]*$' >/dev/null
+    for file in "$pack"/man/*
+    do  if test -f "$file" &&
+           expr "$file" : '.*\.[0-9][0-9A-Za-z]*$' >/dev/null
         then
             section=${file##*\.}
             dest="$RPGMAN/man$section/$(basename $file)"

@@ -32,7 +32,7 @@ SOURCES = \
 	rpg-build.sh rpg-env.sh rpg-update.sh rpg-resolve.sh rpg-upgrade.sh \
 	rpg-steal.sh rpg-fsck.sh rpg-status.sh rpg-outdated.sh \
 	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh \
-	rpg-package-spec.rb rpg-parse-index.rb
+	rpg-package-spec.rb rpg-parse-index.rb rpg-shit-list.sh
 
 USERPROGRAMS = rpg rpg-sh-setup
 
@@ -42,7 +42,7 @@ PROGRAMPROGRAMS = \
 	rpg-build rpg-env rpg-update rpg-resolve rpg-upgrade \
 	rpg-steal rpg-fsck rpg-status rpg-outdated rpg-parse-package-list \
 	rpg-package-register rpg-package-install rpg-solve rpg-unpack \
-	rpg-package-spec rpg-parse-index
+	rpg-package-spec rpg-parse-index rpg-shit-list
 
 PROGRAMS = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 
@@ -52,7 +52,7 @@ DOCHTML = \
 	rpg-build.html rpg-env.html rpg-update.html rpg-resolve.html \
 	rpg-upgrade.html rpg-steal.html rpg-fsck.html rpg-status.html \
 	rpg-outdated.html rpg-package-register.html rpg-package-install.html \
-	rpg-solve.html rpg-package-spec.html rpg-parse-index.html
+	rpg-solve.html rpg-package-spec.html rpg-parse-index.html rpg-shit-list.html
 
 .SUFFIXES: .sh .rb .html
 
