@@ -23,10 +23,11 @@
 test $__rpg_sh_setup_included && return
 __rpg_sh_setup_included=true
 
-
-# `shc` is a sh combiner. The `__SHC__` variable is set true when running
-# under that environment, which sometimes requires special case logic.
-: ${__SHC__:=false}
+# This is replaced with the `config.sh` file that's generated when the
+# `./configure` script is run. It includes a bunch of environment variables
+# for program paths and defaults for the `RPGPATH`, `RPGBIN`, `RPGLIB`, etc.
+# options.
+: __RPGCONFIG__
 
 # Install Paths
 # -------------
@@ -198,9 +199,18 @@ __rpg_sh_setup_included=true
 # URL to the specs file used to build the package index.
 : ${RPGSPECSURL:='http://rubygems.org/specs.4.8.gz'}
 
+# The system configuration file. Sourced near the end of this script. This
+# is one of the variables that the configure script overrides.
+: ${RPGSYSCONF:=/etc/rpgrc}
+
+# The user configuration file. Sourced immediately after the system
+# configuration file.
+: ${RPGUSERCONF:=~/.rpgrc}
+
 # export all RPG variables
 export RPGPATH RPGLIB RPGBIN RPGMAN RPGCACHE RPGPACKS RPGDB RPGINDEX
 export RPGTRACE RPGSHOWBUILD RPGSTALETIME RPGSPECSURL
+export RPGSYSCONF RPGUSERCONF
 
 # Constants
 # ---------
@@ -236,7 +246,7 @@ ENEWLINE="\\$NEWLINE"
 # follows to take advantage of it:
 #
 #     set -e           # always
-#     . rpg-sh-setup  # bring in support lib
+#     . rpg-sh-setup   # bring in support lib
 #
 #     ARGV="$@"
 #     USAGE '${PROGNAME} <options> ...
@@ -355,12 +365,10 @@ alias 0=false
 # ------------
 
 # Source the system `/etc/rpgrc` file.
-test -f /etc/rpgrc &&
-. /etc/rpgrc
+test -f "$RPGSYSCONF" && . "$RPGSYSCONF"
 
 # Source the user `~/.rpgrc` file.
-test -f ~/.rpgrc &&
-. ~/.rpgrc
+test -f "$RPGUSERCONF" && . "$RPGUSERCONF"
 
 # Turn on the shell's built in tracing facilities
 # if RPGTRACE is enabled.

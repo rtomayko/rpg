@@ -4,6 +4,10 @@
 # Default make target
 all::
 
+# XXX include isn't POSIX but I don't feel like dealing with it right now.
+# we'll move to a separate Makefile.in eventually.
+include config.mk
+
 NAME = rpg
 TARNAME = $(NAME)
 SHELL = /bin/sh
@@ -18,12 +22,6 @@ datadir     = ${datarootdir}
 mandir      = ${datarootdir}/man
 docdir      = $(datadir)/doc/$(TARNAME)
 
-# Change this to `install-standalone' if you want a single rpg command. By
-# default, all rpg- commands are installed.
-#
-# NOTE: the standalone stuff doesn't work yet.
-INSTALLMETHOD = install-multi
-
 # ---- END OF CONFIGURATION ----
 
 all:: build
@@ -36,13 +34,17 @@ SOURCES = \
 	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh \
 	rpg-package-spec.rb rpg-parse-index.rb
 
-PROGRAMS = \
-	rpg-sh-setup rpg rpg-config rpg-fetch \
+USERPROGRAMS = rpg rpg-sh-setup
+
+PROGRAMPROGRAMS = \
+	rpg-config rpg-fetch \
 	rpg-install rpg-list rpg-version-test rpg-uninstall \
 	rpg-build rpg-env rpg-update rpg-resolve rpg-upgrade \
 	rpg-steal rpg-fsck rpg-status rpg-outdated rpg-parse-package-list \
 	rpg-package-register rpg-package-install rpg-solve rpg-unpack \
 	rpg-package-spec rpg-parse-index
+
+PROGRAMS = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 
 DOCHTML = \
 	rpg-sh-setup.html rpg.html rpg-config.html rpg-fetch.html \
@@ -52,16 +54,15 @@ DOCHTML = \
 	rpg-outdated.html rpg-package-register.html rpg-package-install.html \
 	rpg-solve.html rpg-package-spec.html rpg-parse-index.html
 
-STANDALONE = $(NAME)-sa
-
 .SUFFIXES: .sh .rb .html
 
 .sh:
 	printf "%13s  %-30s" "[SH]" "$@"
 	$(SHELL) -n $<
 	rm -f $@
-	cp $< $@
-	chmod a-w+x $@
+	$(RUBY) ./munge.rb __RPGCONFIG__ config.sh <$< >$@+
+	chmod a-w+x $@+
+	mv $@+ $@
 	printf "       OK\n"
 
 .sh.html:
@@ -82,6 +83,8 @@ STANDALONE = $(NAME)-sa
 	rocco $<
 	printf "       OK\n"
 
+rpg-sh-setup: config.sh munge.rb
+
 build: $(PROGRAMS)
 
 auto:
@@ -89,37 +92,33 @@ auto:
 
 doc: $(DOCHTML)
 
-$(STANDALONE): $(SOURCES) shc
-	echo "   SHC  $(STANDALONE)"
-	$(SHELL) shc -m rpg $(SOURCES) > $(STANDALONE) || { \
-		rm -f $(STANDALONE); \
-		false; \
-	}; \
-	chmod 0755 $(STANDALONE)
-
-install: $(INSTALLMETHOD)
-
-install-standalone:
-	mkdir -p $(bindir)
-	cp rpg-sa $(bindir)/rpg
-	chmod 0755 $(bindir)/rpg
-
-install-multi:
-	mkdir -p $(bindir)
-	for f in $(PROGRAMS); do \
-		echo "installing: $$f"; \
-		cp $$f "$(bindir)/$$f" && \
-		chmod 0755 "$(bindir)/$$f"; \
+install:
+	mkdir -p "$(bindir)" || true
+	for f in $(USERPROGRAMS); do \
+		echo "$(INSTALL_PROGRAM) $$f $(bindir)"; \
+		$(INSTALL_PROGRAM) $$f "$(bindir)"; \
+	done
+	mkdir -p "$(libexecdir)" || true
+	for f in $(PROGRAMPROGRAMS); do \
+		echo "$(INSTALL_PROGRAM) $$f $(libexecdir)"; \
+		$(INSTALL_PROGRAM) $$f "$(libexecdir)"; \
 	done
 
 uninstall:
-	for f in $(PROGRAMS); do \
+	for f in $(USERPROGRAMS); do \
 		test -e "$(bindir)/$$f" || continue; \
-		echo "uninstalling: $$f"; \
-		rm -f "$(bindir)/$$f"; \
+		echo "rm -f $(bindir)/$$f"; \
+		rm "$(bindir)/$$f"; \
+	done
+	for f in $(PROGRAMPROGRAMS); do \
+		test -e "$(libexecdir)/$$f" || continue; \
+		echo "rm -f $(libexecdir)/$$f"; \
+		rm "$(libexecdir)/$$f"; \
 	done
 
 clean:
-	echo $(STANDALONE) $(PROGRAMS) $(DOCHTML) | xargs -tn 1 rm -f
+	rm -vf $(PROGRAMS) $(DOCHTML)
 
 .SILENT:
+
+.PHONY: install uninstall clean
