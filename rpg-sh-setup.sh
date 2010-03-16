@@ -29,6 +29,43 @@ __rpg_sh_setup_included=true
 # options.
 : __RPGCONFIG__
 
+
+# rpg's default installation and database locations are based on the
+# currently active ruby environment. We use Ruby's `rbconfig` module to
+# load the `bin`, `lib`, `man`, and `var` directories then set and export
+# the `__RPGRUBYENV__` variable so that we only do this once per rpg
+# process hierarchy.
+#
+# Any of the variables exported below may be used in `rpgrc` config files to
+# determine the best locations for various RPG paths.
+if test -z "$__RPGRUBYENV__"
+then
+RUBY="$(command -v ruby 2>/dev/null || echo "${RUBY:-ruby}")"
+__RPGRUBYENV__="$RUBY"
+
+rubyenv () {
+$RUBY <<RUBY
+require 'rbconfig'
+conf = RbConfig::CONFIG
+puts "
+RUBYPREFIX='#{conf['prefix']}'
+RUBYDLEXT='#{conf['DLEXT']}'
+RUBYSITEDIR='#{conf['sitelibdir']}'
+RUBYVENDORDIR='#{conf['vendorlibdir']}'
+RUBYMANDIR='#{conf['mandir']}'
+RUBYBINDIR='#{conf['bindir']}'
+RUBYSTATEDIR='#{conf['localstatedir']}'
+RUBYVERSION='#{conf['ruby_version']}'
+RUBYLIBDIR='#{File.dirname(conf['rubylibdir'])}'
+"
+RUBY
+}
+eval "$(rubyenv)"
+export __RPGRUBYENV__ RUBY
+export RUBYPREFIX RUBYDLEXT RUBYSITEDIR RUBYVENDORDIR RUBYMANDIR RUBYBINDIR
+export RUBYSTATEDIR RUBYLIBDIR RUBYVERSION
+fi
+
 # Install Paths
 # -------------
 
@@ -37,20 +74,20 @@ __rpg_sh_setup_included=true
 # *HOWEVER*, no rpg utility targets this directory -- every significant
 # location must have a separate path variable so that things stay
 # flexible in configuration.
-: ${RPGPATH:=/var/lib/rpg}
+: ${RPGPATH:=${RUBYLIBDIR:-/var/lib}/rpg}
 
 # `RPGLIB` is the shared Ruby `lib` directory where library files are
 # installed. You can set this to the current Ruby's site packages with:
 #
 #     RPGLIB=$(ruby_sitelibdir)
-: ${RPGLIB:=$RPGPATH/lib}
+: ${RPGLIB:="${RUBYVENDORDIR:-${RPGSITEDIR:-$RPGPATH/lib}}"}
 
 # `RPGBIN` is where executable scripts included in packages are installed.
-: ${RPGBIN:=$RPGPATH/bin}
+: ${RPGBIN:="${RUBYBINDIR:-$RPGPATH/bin}"}
 
 # `RPGMAN` is where manpages included with packages are installed. This
 # is basically the whole reason `rpg` was written in the first place.
-: ${RPGMAN:=$RPGPATH/man}
+: ${RPGMAN:="${RUBYMANDIR:-$RPGPATH/man}"}
 
 # RPG Paths
 # ---------
@@ -312,34 +349,22 @@ notice () { true; }
 
 # The command that should be executed to run `ruby`. This is used to
 # rewrite shebang lines.
+#
+# TODO this is only used in rpg-build and should be updated to use something
+# else.
 ruby_command () {
     command -v ruby 2>/dev/null ||
     echo "/usr/bin/env ruby"
 }
 
 # Retrieve a rbconfig value.
-ruby_config () {
-    ruby -rrbconfig -e "puts RbConfig::CONFIG['$1']"
-}
-
-# Ruby's `site_ruby` directory.
-ruby_sitelibdir () {
-    test "$RUBYSITEDIR" || {
-        RUBYSITEDIR=$(ruby_config sitelibdir)
-        export RUBYSITEDIR
-    }
-    echo "$RUBYSITEDIR"
+rbconfig () {
+    $RUBY -rrbconfig -e "puts RbConfig::CONFIG['$1']"
 }
 
 # The file extension for dynamic libraries on this operating system.
 # e.g., `so` on Linux, `dylib` on MacOS.
-ruby_dlext() {
-    test "$RUBYDLEXT" || {
-        RUBYDLEXT=$(ruby_config DLEXT)
-        export RUBYDLEXT
-    }
-    echo "$RUBYDLEXT"
-}
+ruby_dlext() { echo "$RUBYDLEXT"; }
 
 # Misc Utility Functions
 # ----------------------
