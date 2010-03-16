@@ -33,15 +33,16 @@ __rpg_sh_setup_included=true
 # rpg's default installation and database locations are based on the
 # currently active ruby environment. We use Ruby's `rbconfig` module to
 # load the `bin`, `lib`, `man`, and `var` directories then set and export
-# the `__RPGRUBYENV__` variable so that we only do this once per rpg
+# the `__RPGENV__` variable so that we only do this once per rpg
 # process hierarchy.
 #
 # Any of the variables exported below may be used in `rpgrc` config files to
 # determine the best locations for various RPG paths.
-if test -z "$__RPGRUBYENV__"
+if test -z "$__RPGENV__"
 then
+PATH="${libexecdir}:$PATH"
 RUBY="$(command -v ruby 2>/dev/null || echo "${RUBY:-ruby}")"
-__RPGRUBYENV__="$RUBY"
+__RPGENV__="$RUBY"
 
 rubyenv () {
 $RUBY <<RUBY
@@ -61,7 +62,8 @@ RUBYLIBDIR='#{File.dirname(conf['rubylibdir'])}'
 RUBY
 }
 eval "$(rubyenv)"
-export __RPGRUBYENV__ RUBY
+
+export __RPGENV__ RUBY
 export RUBYPREFIX RUBYDLEXT RUBYSITEDIR RUBYVENDORDIR RUBYMANDIR RUBYBINDIR
 export RUBYSTATEDIR RUBYLIBDIR RUBYVERSION
 fi
