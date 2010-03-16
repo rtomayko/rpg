@@ -18,7 +18,7 @@ exit 0
 find "$path/ext" -name "extconf.rb" |
 while read file
 do
-    notice "$(basename $path) $(basename $(dirname $file))"
+    heed "$(basename $path) $(basename $(dirname $file))"
     cd $(dirname $file)
     if (ruby extconf.rb &&
         make clean &&
