@@ -33,7 +33,7 @@ else
     else heed "$package $version"
     fi
 
-    # Grab the gem with curl(1) and write to a temporary file just
+    # Grab the gem with `curl(1)` and write to a temporary file just
     # in case something goes wrong during transfer.
     curl -s -L "http://rubygems.org/downloads/${gemfile}" > "${gemfile}+"
     mv "${gemfile}+" "$gemfile"
