@@ -154,12 +154,12 @@ test -n "$exts" && {
     while read dl
     do
         prefix=$(
-            grep '^target_prefix.=' "$pack/$(dirname $dl)/Makefile" |
+            grep '^target_prefix.=' "$(dirname $dl)/Makefile" |
             sed 's/^target_prefix *= *//'
         )
         dest="${RPGLIB}${prefix}/$(basename $dl)"
         mkdir -p "${RPGLIB}${prefix}"
-        rpg_ln "$pack/$dl" "$dest"
+        rpg_ln "$dl" "$dest"
         echo "$dest" >> "$manifest"
     done
 }
