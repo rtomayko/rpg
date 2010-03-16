@@ -57,7 +57,7 @@ rpg_install_dir () {
 
         elif test -d "$file"
         then # recurse into directories
-             rpg_install_dir "$file" "$2/$(basename $file)" "$manifest"
+             rpg_install_dir "$file" "$2/$(basename $file)" "$3"
 
         else warn "unknown file type: $file"
              return 1
