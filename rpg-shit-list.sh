@@ -27,12 +27,6 @@ fixable () {
 
 # Master list of shit list packages with hacks.
 case "$package" in
-memcached)
-    fixable "memcached.rb reads VERSION file from package root"
-    cd "$path"
-    sedi "s/VERSION = File.read.*/VERSION = '$version'/" lib/memcached.rb
-    ;;
-
 haml)
     fixable "haml reads VERSION, VERSION_NAME, REVISION files from package root"
     cd "$path"
@@ -44,6 +38,22 @@ haml)
         s/File.read(scope('VERSION_NAME'))/'$vername'/g
     " lib/haml/version.rb
     ;;
+
+memcache-client)
+    fixable "memcache.rb reads VERSION.yml file from package root"
+    cd "$path"
+    sedi "
+        s/VERSION = begin/VERSION = '$version';0.times do/
+        s/\"#{config[:major].*//
+    " lib/memcache.rb
+    ;;
+
+memcached)
+    fixable "memcached.rb reads VERSION file from package root"
+    cd "$path"
+    sedi "s/VERSION = File.read.*/VERSION = '$version'/" lib/memcached.rb
+    ;;
+
 esac
 
 # Make sure we exit with success.
