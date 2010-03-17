@@ -10,5 +10,5 @@ case "$1" in
     help) helpthem;;
      rpg) exec rpg --help;;
   [a-z]*) exec rpg "$1" --help;;
-       *) helpthem;;
+       *) exec rpg --help;;
 esac
