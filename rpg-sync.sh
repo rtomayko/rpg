@@ -11,7 +11,7 @@
 #      with the remote repository. If the command completes successfully,
 #      the index is guaranteed to be up to date with the repository.
 #
-#   2. Some other rpg program (like `rpg-upgrade` or `rpg-status`) executes
+#   2. Some other rpg program (like `rpg-upgrade` or `rpg-list`) executes
 #      `rpg-sync -s` before performing an operation on the index. In this
 #      mode, `rpg-sync` attempts to determine if the index is overly stale
 #      (based on the `RPGSTALETIME` option) and may or may not perform an

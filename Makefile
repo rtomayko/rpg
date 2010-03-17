@@ -27,31 +27,29 @@ SHELL = /bin/sh
 all:: build
 
 SOURCES = \
-	rpg-sh-setup.sh rpg.sh rpg-config.sh rpg-fetch.sh \
-	rpg-install.sh rpg-version-test.sh rpg-uninstall.sh \
-	rpg-build.sh rpg-env.sh rpg-sync.sh rpg-resolve.sh rpg-upgrade.sh \
-	rpg-steal.sh rpg-fsck.sh rpg-status.sh rpg-outdated.sh \
+	rpg-sh-setup.sh rpg.sh rpg-config.sh rpg-fetch.sh rpg-install.sh \
+	rpg-version-test.sh rpg-uninstall.sh rpg-build.sh rpg-env.sh rpg-sync.sh \
+	rpg-resolve.sh rpg-upgrade.sh rpg-steal.sh rpg-fsck.sh rpg-outdated.sh \
 	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh \
 	rpg-package-spec.rb rpg-parse-index.rb rpg-shit-list.sh rpg-prepare.sh \
-	rpg-help.sh rpg-package-list.sh
-
-USERPROGRAMS = rpg rpg-sh-setup
-
-PROGRAMPROGRAMS = \
-	rpg-config rpg-fetch \
-	rpg-install rpg-version-test rpg-uninstall \
-	rpg-build rpg-env rpg-sync rpg-resolve rpg-upgrade \
-	rpg-steal rpg-fsck rpg-status rpg-outdated rpg-parse-package-list \
-	rpg-package-register rpg-package-install rpg-solve rpg-unpack \
-	rpg-package-spec rpg-parse-index rpg-shit-list rpg-prepare \
-	rpg-complete rpg-help rpg-package-list
-
-PROGRAMS = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
+	rpg-help.sh rpg-package-list.sh rpg-list.sh
 
 DOCHTML = \
 	rpg-sh-setup.html rpg.html rpg-fetch.html rpg-version-test.html \
-	rpg-sync.html rpg-upgrade.html rpg-status.html rpg-outdated.html \
-	rpg-package-install.html rpg-package-spec.html rpg-parse-index.html
+	rpg-sync.html rpg-upgrade.html rpg-outdated.html \
+	rpg-package-install.html rpg-package-spec.html rpg-parse-index.html \
+	rpg-list.html
+
+PROGRAMPROGRAMS = \
+	rpg-config rpg-fetch rpg-install rpg-version-test rpg-uninstall rpg-build \
+	rpg-env rpg-sync rpg-resolve rpg-upgrade rpg-steal rpg-fsck rpg-status \
+	rpg-outdated rpg-parse-package-list rpg-package-register rpg-package-install \
+	rpg-solve rpg-unpack rpg-package-spec rpg-parse-index rpg-shit-list \
+	rpg-prepare rpg-complete rpg-help rpg-package-list rpg-list
+
+USERPROGRAMS = rpg rpg-sh-setup
+
+PROGRAMS = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 
 .SUFFIXES: .sh .rb .html
 

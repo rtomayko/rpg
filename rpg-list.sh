@@ -1,5 +1,5 @@
 #!/bin/sh
-# The `rpg-status` program compares installed packages to packages available
+# The `rpg-list` program compares installed packages to packages available
 # in the remote repository. It's useful for determining the versions of
 # packages and how they relate to same named packages available in the
 # repository.
@@ -12,25 +12,29 @@ set -e
 . rpg-sh-setup
 
 ARGV="$@"
-USAGE '${PROGNAME} [-u] [-p] [<glob>...]
-Show status of installed packages vs available packages.
+USAGE '${PROGNAME} [-u] [-a] [-p|-s] [<glob>...]
+List installed and/or available packages.
+
+Passing one or more <glob>s filters the list to matching packages.
 
 Options
-  -a               Include all packages, not just installed, packages
-  -u               Sync the available package index before running
-  -p               Generate more parseable output
-
-Passing one or more <glob>s filters the list to matching packages.'
+  -a               Include packages available but not installed
+  -u               Sync the package index with remote repository first
+  -p               Generate easily parseable output
+  -s               Write package names only (no versions or status)'
 
 sync=false
 parsey=false
+simple=false
 joiner=
-while getopts apu opt
+while getopts apus opt
 do
     case $opt in
     a)   joiner="-a2";;
     u)   sync=true;;
     p)   parsey=true;;
+    s)   simple=true
+         parsey=true;;
     ?)   helpthem;
          exit 2;;
     esac
@@ -89,8 +93,6 @@ else remotefilter="grep"
          remotefilter="$remotefilter -e '$glob '"
      done
 fi
-
-notice "remote filter: $remotefilter"
 
 # Main Pipeline
 # -------------
@@ -163,23 +165,34 @@ grep -v '. - - .'                                |
 
 # All that's left is to read the output from `join` and apply some light
 # formatting.
-while read package curvers recvers pdup
-do
-    test "$package" = '-' &&
-    package="$pdup"
+if $simple
+then
+    awk '{
+        if ( $1 != "-" ) {
+            print $1;
+        } else if ($4 != "-") {
+            print $4;
+        }
+    }'
+else
+    while read package curvers recvers pdup
+    do
+        test "$package" = '-' &&
+        package="$pdup"
 
-    if   test "$recvers" = '-'
-    then sig="$st_missing"
+        if   test "$recvers" = '-'
+        then sig="$st_missing"
 
-    elif test "$curvers" = "-"
-    then sig="$st_missing"
-         curvers="-"
+        elif test "$curvers" = "-"
+        then sig="$st_missing"
+             curvers="-"
 
-    elif test "$curvers" = "$recvers"
-    then sig="$st_up2date"
+        elif test "$curvers" = "$recvers"
+        then sig="$st_up2date"
 
-    else sig="$st_outdate"
-    fi
+        else sig="$st_outdate"
+        fi
 
-    printf "$st_format" "$sig" "$package" "$curvers" "$recvers"
-done
+        printf "$st_format" "$sig" "$package" "$curvers" "$recvers"
+    done
+fi

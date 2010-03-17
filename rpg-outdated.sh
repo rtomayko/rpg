@@ -4,15 +4,12 @@ set -e
 
 ARGV="$@"
 USAGE '${PROGNAME} [-u] [<glob>...]
-List packages that can be upgraded.
+List locally packages that can be updated.
 
 Options
   -u               Sync the available package index before running.'
 
-# rpg-status implements -u so just pass everything right on over.
-rpg-status -p "$@" |
-grep '^o'           |
-while read _ package curvers newvers
-do
-    echo "$package $curvers -> $newvers"
-done
+# `rpg-list` implements `-u` so just pass everything right on over.
+rpg-list "$@"    |
+grep '^\*'       |
+sed 's/..//'
