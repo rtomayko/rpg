@@ -1,4 +1,8 @@
 #!/bin/sh
+# The `rpg-version-test` program tests a version string against one or more
+# matching expressions. When all expressions match the version, the program
+# exits successfully. When any expression fails to match, the program exits
+# non-zero.
 set -e
 . rpg-sh-setup
 
@@ -23,26 +27,26 @@ test "$1" = '-q' && {
     shift
 }
 
-# Like expr(1) but ignore stdout.
+# Like `expr(1)` but ignore stdout.
 compare () { expr "$1" "$2" "$3" >/dev/null; }
 
-# Usage: rpg_version_eval <ver1> <op> <ver2>
-# Compare <ver1> with <ver2> using operator <op>.
-# Return zero if <ver1> matches <ver2>, non-zero otherwise.
+#/ Usage: rpg_version_eval <ver1> <op> <ver2>
+#/ Compare <ver1> with <ver2> using operator <op>.
+#/ Return zero if <ver1> matches <ver2>, non-zero otherwise.
 version_compare () {
     v1="$1."; op="$2"; v2="$3."
     while test -n "$v1" -o -n "$v2"
     do
-        # take left-most item from v1 and v2
+        # Take left-most item from `v1` and `v2`.
         left=${v1%%.*}; right=${v2%%.*}
 
-        # remove left-most item from v1 and v2
+        # Remove left-most item from `v1` and `v2`.
         v1=${v1#*.}; v2=${v2#*.}
 
-        # use 0 if we've eaten through either side
+        # Use `0` if we've eaten through either side.
         left=${left:-0}; right=${right:-0}
 
-        # check if v1 satisfies operator w/ v2.
+        # Check if `v1` satisfies operator w/ `v2`.
         if compare $left $op $right
         then compare $left = $right || return 0
         else compare $left = $right || return 1
@@ -74,28 +78,32 @@ allmatch=true
 for ver in $vers
 do satisfied=true
    for exp in $exps
-   do # extract operator part or default to '='
+   do
+      # Extract the operator part or default to '='.
       operator=${exp%%[!><=~]*}
       operator=${operator:-=}
 
-      # extract version part
+      # Extract the version part.
       ver2=${exp##*[><=~]}
 
       case "$operator" in
-      =)   # fast path equality
-           test "$ver" = "$ver2" || {
+
+      # Fast path equality.
+      =)   test "$ver" = "$ver2" || {
               satisfied=false
               break
            };;
-      ~\>) # handle squiggly guy
-           lt="${ver2%.*}.999999" # gross
+
+      # Handle the squiggly guy.
+      ~\>) lt="${ver2%.*}.999999" # gross
            version_compare "$ver" "<" "$lt" &&
            version_compare "$ver" ">=" "$ver2" || {
               satisfied=false
               break
            };;
-      *)   # normal comparison
-           version_compare "$ver" "$operator" "$ver2" || {
+
+      # Normal comparison.
+      *)   version_compare "$ver" "$operator" "$ver2" || {
               satisfied=false
               break
            };;

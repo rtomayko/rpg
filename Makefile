@@ -49,13 +49,9 @@ PROGRAMPROGRAMS = \
 PROGRAMS = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 
 DOCHTML = \
-	rpg-sh-setup.html rpg.html rpg-config.html rpg-fetch.html \
-	rpg-install.html rpg-list.html rpg-version-test.html rpg-uninstall.html \
-	rpg-build.html rpg-env.html rpg-sync.html rpg-resolve.html \
-	rpg-upgrade.html rpg-steal.html rpg-fsck.html rpg-status.html \
-	rpg-outdated.html rpg-package-register.html rpg-package-install.html \
-	rpg-solve.html rpg-package-spec.html rpg-parse-index.html \
-	rpg-shit-list.html rpg-prepare.html
+	rpg-sh-setup.html rpg.html rpg-fetch.html rpg-version-test.html \
+	rpg-sync.html rpg-upgrade.html rpg-status.html rpg-outdated.html \
+	rpg-package-install.html rpg-package-spec.html rpg-parse-index.html
 
 .SUFFIXES: .sh .rb .html
 
@@ -83,7 +79,7 @@ DOCHTML = \
 
 .rb.html:
 	printf "%13s  %-30s" "[ROCCO]" "$@"
-	rocco $<
+	rocco $< >/dev/null
 	printf "       OK\n"
 
 rpg-sh-setup: config.sh munge.rb

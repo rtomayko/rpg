@@ -40,35 +40,35 @@ __rpg_sh_setup_included=true
 # determine the best locations for various RPG paths.
 if test -z "$__RPGENV__"
 then
-PATH="${libexecdir}:$PATH"
-RUBY="$(command -v ruby 2>/dev/null || echo "${RUBY:-ruby}")"
-__RPGENV__="$RUBY"
+    PATH="${libexecdir}:$PATH"
+    RUBY="$(command -v ruby 2>/dev/null || echo "${RUBY:-ruby}")"
+    __RPGENV__="$RUBY"
 
-rubyenv () {
-$RUBY <<RUBY
-require 'rbconfig'
-conf = RbConfig::CONFIG
-puts "
-RUBYPREFIX='#{conf['prefix']}'
-RUBYDLEXT='#{conf['DLEXT']}'
-RUBYSITEDIR='#{conf['sitelibdir']}'
-RUBYVENDORDIR='#{conf['vendorlibdir']}'
-RUBYMANDIR='#{conf['mandir']}'
-RUBYBINDIR='#{conf['bindir']}'
-RUBYSTATEDIR='#{conf['localstatedir']}'
-RUBYVERSION='#{conf['ruby_version']}'
-RUBYLIBDIR='#{File.dirname(conf['rubylibdir'])}'
-"
-RUBY
-}
-eval "$(rubyenv)"
+    eval "$(
+    $RUBY <<__RUBY__
+        require 'rbconfig'
+        conf = RbConfig::CONFIG
+        puts "
+        RUBYPREFIX='#{conf['prefix']}'
+        RUBYDLEXT='#{conf['DLEXT']}'
+        RUBYSITEDIR='#{conf['sitelibdir']}'
+        RUBYVENDORDIR='#{conf['vendorlibdir']}'
+        RUBYMANDIR='#{conf['mandir']}'
+        RUBYBINDIR='#{conf['bindir']}'
+        RUBYSTATEDIR='#{conf['localstatedir']}'
+        RUBYVERSION='#{conf['ruby_version']}'
+        RUBYLIBDIR='#{File.dirname(conf['rubylibdir'])}'
+        "
+__RUBY__
+    )"
 
-export __RPGENV__ RUBY
-export RUBYPREFIX RUBYDLEXT RUBYSITEDIR RUBYVENDORDIR RUBYMANDIR RUBYBINDIR
-export RUBYSTATEDIR RUBYLIBDIR RUBYVERSION
+    export __RPGENV__ RUBY
+    export RUBYPREFIX RUBYDLEXT RUBYSITEDIR RUBYVENDORDIR RUBYMANDIR RUBYBINDIR
+    export RUBYSTATEDIR RUBYLIBDIR RUBYVERSION
 
     # With `configure --development`, set all paths to be inside a work dir.
-    if $develmode; then
+    if $develmode
+    then
         : ${RPGPATH:="./work"}
         : ${RPGLIB:="$RPGPATH/lib"}
         : ${RPGMAN:="$RPGPATH/man"}

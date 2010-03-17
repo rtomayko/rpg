@@ -1,5 +1,10 @@
 #!/bin/sh
+# The main rpg user executable. `rpg` sets environment variables for global
+# options and execs child commands.
 set -e
+
+# This usage message only lists porcelainish commands. The rpg(1) manpage
+# documents all commands in detail.
 PROGNAME="$(basename $0)"
 usage="Usage: ${PROGNAME} [-vx] [-c <path>] <command> [<args>...]
 Manage gem packages, quickly.
@@ -21,7 +26,10 @@ Options
   -x               Enable shell tracing to stderr (extremely verbose)
 
 See \`${PROGNAME} help <command>' for more information on a specific command."
+
 [ "$*" ] || set -- "--help"
+
+# Look for --help before the child command.
 for a in "$@"
 do
     case "$a" in
@@ -31,7 +39,7 @@ do
     esac
 done
 
-# Argument parsing.
+# Global options.
 while getopts qvxc: opt
 do
     case $opt in
