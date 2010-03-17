@@ -42,10 +42,10 @@ DOCHTML = \
 
 PROGRAMPROGRAMS = \
 	rpg-config rpg-fetch rpg-install rpg-version-test rpg-uninstall rpg-build \
-	rpg-env rpg-sync rpg-resolve rpg-upgrade rpg-steal rpg-fsck rpg-status \
+	rpg-env rpg-sync rpg-resolve rpg-upgrade rpg-steal rpg-fsck rpg-list \
 	rpg-outdated rpg-package-list rpg-package-register rpg-package-install \
 	rpg-solve rpg-unpack rpg-package-spec rpg-parse-index rpg-shit-list \
-	rpg-prepare rpg-complete rpg-help rpg-package-index rpg-list
+	rpg-prepare rpg-complete rpg-help rpg-package-index
 
 USERPROGRAMS = rpg rpg-sh-setup
 
