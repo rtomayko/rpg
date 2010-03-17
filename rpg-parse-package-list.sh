@@ -6,7 +6,7 @@
 #
 # A variety of argument styles are supported:
 #
-#     $ rpg-parse-package-list rdiscount -v '>=1.8.7' sinatra/1.0
+#     $ rpg-package-list rdiscount -v '>=1.8.7' sinatra/1.0
 #     rdiscount >= 1.8.7
 #     sinatra = 1.0
 #
@@ -17,7 +17,7 @@
 # When a `~>` version specifier is given, it's converted into two specifiers
 # in output:
 #
-#     $ rpg-parse-package-list rails '~> 2.2.4'
+#     $ rpg-package-list rails '~> 2.2.4'
 #     rails >= 2.2.4
 #     rails < 2.3
 #

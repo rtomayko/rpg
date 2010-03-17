@@ -35,7 +35,7 @@ do echo "$arg"
 done > "$sessiondir"/argv
 
 notice "writing user package-list"
-rpg-parse-package-list "$@"  |
+rpg-package-list "$@"        |
 sed "s/^/@user /"            > "$packlist"
 
 # see if we need to sync the index
