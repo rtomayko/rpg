@@ -32,7 +32,8 @@ SOURCES = \
 	rpg-build.sh rpg-env.sh rpg-sync.sh rpg-resolve.sh rpg-upgrade.sh \
 	rpg-steal.sh rpg-fsck.sh rpg-status.sh rpg-outdated.sh \
 	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh \
-	rpg-package-spec.rb rpg-parse-index.rb rpg-shit-list.sh rpg-prepare.sh
+	rpg-package-spec.rb rpg-parse-index.rb rpg-shit-list.sh rpg-prepare.sh \
+	rpg-help.sh
 
 USERPROGRAMS = rpg rpg-sh-setup
 
@@ -43,7 +44,7 @@ PROGRAMPROGRAMS = \
 	rpg-steal rpg-fsck rpg-status rpg-outdated rpg-parse-package-list \
 	rpg-package-register rpg-package-install rpg-solve rpg-unpack \
 	rpg-package-spec rpg-parse-index rpg-shit-list rpg-prepare \
-	rpg-complete
+	rpg-complete rpg-help
 
 PROGRAMS = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 
