@@ -15,10 +15,16 @@ version="${2:->=0}"
 # Find the best (most recent) version of the package matching the
 # supplied version spec. Bail out with a failure status if nothing is
 # found satisfying the requested version.
-bestver=$(rpg-resolve -n 1 "$package" "$version") || {
-    warn "$package $version not found."
-    exit 1
-}
+#
+# When a concrete version is given (e.g. `=0.5.3` or `1.2`), the version is
+# not resolved against the index.
+if expr "$version" : '.*[><~]' >/dev/null
+then bestver=$(rpg-resolve -n 1 "$package" "$version") || {
+        warn "$package $version not found."
+        exit 1
+     }
+else bestver="${version#=}"
+fi
 
 gemfile="${package}-${bestver}.gem"
 if test -f "$RPGCACHE/$gemfile"
