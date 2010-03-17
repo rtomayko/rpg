@@ -87,7 +87,7 @@ notice "$package $version"
 # Fetch the gem into the cache and unpack into the packs area if
 # its not already there.
 if ! $force && test -d "$RPGPACKS/$package-$version"
-then notice "sources already exist. bypassing fetch and unpack."
+then notice "$package $version sources exist. bypassing fetch / unpack."
 else rm -rf "$RPGPACKS/$package-$version"
      gemfile=$(rpg-fetch "$package" "$version")
      notice "unpacking $gemfile into $RPGPACKS"

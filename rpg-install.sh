@@ -29,10 +29,10 @@ sessiondir="$RPGSESSION/@$session"
 packlist="$sessiondir/package-list"
 solved="$sessiondir/solved"
 
-if test -f "$sessiondir"
+if test -d "$sessiondir"
 then numpacks=$(lc "$solved")
      heed "$numpacks package(s):
-     $(cat "$solved")"
+$(cat "$solved")"
 else trap "rm -rf '$sessiondir'" 0
      rpg-prepare -s "$session" "$@"
 fi
