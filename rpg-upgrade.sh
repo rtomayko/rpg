@@ -18,9 +18,9 @@ then  rpg-sync
 else  rpg-sync -s
 fi
 
-# Let rpg-list do the heavy lifting. We get back a list of matching
-# gems and their current versions.
-rpg list -x "$@" |
+# Let `rpg-package-list` do the heavy lifting. We get back a list of
+# matching gems and their current versions.
+rpg-package-list -x "$@" |
 while read package vers
 do
     if test "$vers" = "X"

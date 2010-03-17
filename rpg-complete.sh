@@ -18,7 +18,7 @@ commands () {
 }
 
 installed () {
-    rpg list $1\* | cut -d ' ' -f 1
+    rpg-package-list $1\* | cut -d ' ' -f 1
 }
 
 available () {

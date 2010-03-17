@@ -72,7 +72,7 @@ fi
 [ "$*" ] || set -- '*'
 
 # Build glob BREs for filtering the remote package list. The local package
-# list is filtered by `rpg-list` so we don't need to worry about that
+# list is filtered by `rpg-package-list` so we don't need to worry about that
 # side.
 #
 # If there's only one glob and it's `*`, don't do any `grep` nonsense,
@@ -96,7 +96,7 @@ notice "remote filter: $remotefilter"
 # -------------
 
 # Kick off a pipeline by listing installed packages. The output from
-# `rpg list` looks something like this:
+# `rpg-package-list` looks something like this:
 #
 #
 #     RedCloth                       4.2.3
@@ -114,7 +114,7 @@ notice "remote filter: $remotefilter"
 #
 # So we have the `<package> <version>` pairs separated by whitespace,
 # basically.
-rpg list -x "$@"                                 |
+rpg-package-list -x "$@"                           |
 
 # Okay ...
 #
