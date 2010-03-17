@@ -108,7 +108,7 @@ uninstall:
 		echo "rm -f $(bindir)/$$f"; \
 		rm "$(bindir)/$$f"; \
 	done
-	for f in $(PROGRAMPROGRAMS) rpg-update; do \
+	for f in $(PROGRAMPROGRAMS) rpg-update rpg-status rpg-parse-package-list; do \
 		test -e "$(libexecdir)/$$f" || continue; \
 		echo "rm -f $(libexecdir)/$$f"; \
 		rm "$(libexecdir)/$$f"; \
