@@ -28,12 +28,12 @@ shift $(( $OPTIND - 1 ))
 package="$1"; shift
 [ "$*" ] || helpthem
 
-# Use the default release index with no `-f` option, and update it if it
+# Use the default release index with no `-f` option, and sync it if it
 # doesn't exist. If we were given an explicit index file, exit with failure
 # if it doesn't exist.
 if test -z "$index"
 then index="$RPGINDEX/release"
-     test -f "$index" || rpg-update -s
+     test -f "$index" || rpg-sync -s
 else test -f "$index"
 fi
 

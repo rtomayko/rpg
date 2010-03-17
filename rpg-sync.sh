@@ -1,27 +1,27 @@
 #!/bin/sh
-# The `rpg-update` program is responsible for building the remote package
+# The `rpg-sync` program is responsible for building the remote package
 # index and keeping it up to date. The package index is a set of simple text
 # files kept under the `RPGINDEX` directory. They include basic information
 # on all gems available at [rubygems.org](http://rubygems.org) and are
 # optimized for use with utilities like `grep(1)`, `sed(1)`, and `join(1)`.
 #
-# `rpg-update` has two modes of operation:
+# `rpg-sync` has two modes of operation:
 #
-#   1. Someone runs `rpg-update` directly to bring the package index in sync
+#   1. Someone runs `rpg-sync` directly to bring the package index in sync
 #      with the remote repository. If the command completes successfully,
 #      the index is guaranteed to be up to date with the repository.
 #
 #   2. Some other rpg program (like `rpg-upgrade` or `rpg-status`) executes
-#      `rpg-update -s` before performing an operation on the index. In this
-#      mode, `rpg-update` attempts to determine if the index is overly stale
+#      `rpg-sync -s` before performing an operation on the index. In this
+#      mode, `rpg-sync` attempts to determine if the index is overly stale
 #      (based on the `RPGSTALETIME` option) and may or may not perform an
-#      update.
+#      sync.
 #
-# Philosophy on Automatic Index Updates
-# -------------------------------------
+# Philosophy on Automatic Index Sync
+# ----------------------------------
 #
 # Generally speaking, rpg's philosophy is that the user should control
-# when the package index is updated. The primary reason for this is that
+# when the package index is synchronized. The primary reason for this is that
 # rpg should be *fast* *fast* *fast* -- *fast* like a rocket missile -- unless
 # specifically told not to be. Network operations destroy any chance at
 # predictable performance.
@@ -39,22 +39,22 @@
 #
 # rpg attempts to strike a balance between these two extremes in its default
 # configuration and can be customize to get any behavior along the spectrum.
-# By default, the package index is automatically updated when it's more than
-# one day old:
+# By default, the package index is automatically synchronized when it's more
+# than one day old:
 #
-#     # auto update the package index when it's more than 1 day old
+#     # auto sync the package index when it's more than 1 day old
 #     RPGSTALETIME=1d
 #
-# Setting the stale time to `0`, causes the index to be updated before
+# Setting the stale time to `0`, causes the index to be synchronized before
 # performing any operation that involves remote packages. This is closest to
 # the `gem` commands behavior:
 #
 #     # keep the package index in sync
 #     RPGSTALETIME=0
 #
-# Finally, automatic updates can be disabled completely with:
+# Finally, automatic sync can be disabled completely with:
 #
-#     # never auto update the package index
+#     # never auto sync the package index
 #     PGSTALETIME=never
 #
 # See the stale time code below for more information on acceptable values.
@@ -64,7 +64,7 @@ set -e
 
 ARGV="$@"
 USAGE '${PROGNAME} [-v] [-m <mins>|-d <days>|-s]
-Create or update the remote package index. Maybe.
+Create or sync the remote package index. Maybe.
 
 Options
   -d <days>             Do nothing if db is less than <days> days old
@@ -72,8 +72,8 @@ Options
   -s                    Do nothing if db is less than $RPGSTALETIME old
   -v                    Write newly available packages to stdout after updating
 
-The -s option is used by various rpg commands when an update may be
-neccassary. Its default stale time can be configured by setting the
+The -s option is used by various rpg commands when a sync may be
+necessary. Its default stale time can be configured by setting the
 RPGSTALETIME option in ~/.rpgrc or /etc/rpgrc.'
 
 verbose=false
@@ -107,17 +107,17 @@ release="$RPGINDEX/release"
 # Maybe bail out if a stale time was given. `RPGSTALETIME` values can be
 # stuff like `10 days` or `10d`, `30 minutes` or `30m`. A number with no
 # time designator is considered in days. When the value is `never`,
-# don't update the index due to staleness in the course of running
+# don't sync the index due to staleness in the course of running
 # other programs.
 if test "$staletime"
 then
     case "$staletime" in
-    never|none) notice "index is in never auto update mode"
+    never|none) notice "index is in never auto sync mode"
                 exit 0;;
     [0-9]*m*)   fargs="-mmin -${staletime%%[!0-9]*}";;
     [0-9]*)     fargs="-mtime -${staletime%%[!0-9]*}";;
     *)          fargs=""
-                warn "bad PGSTALETIME value: '$staletime'. ignoring.";;
+                warn "bad RPGSTALETIME value: '$staletime'. ignoring.";;
     esac
 
     if test -z "$(find "$release" -maxdepth 0 $fargs 2>/dev/null)"
@@ -191,10 +191,10 @@ fi
 
 # We wrote the new index to a separate file, so we can take a quick diff
 # now. We can show the diff directly, which is awesome, but this could also
-# be used to roll back and update (`patch -R`) if something goes wrong.
+# be used to roll back an update (`patch -R`) if something goes wrong.
 #
 # We also don't care that much if this doesn't work due to, e.g.
-# `diff(1)` not being availble.
+# `diff(1)` not being available.
 notice "building release diff [$release-diff+]"
 
 (diff -u "$release" "$release+" 2>&1 && true) > "$release-diff+"
@@ -232,12 +232,12 @@ do mv "$file+" "$file"
 done
 notice "index rebuild complete"
 
-# Write some stats on the number of packages available, both total and newly
-# updated.
+# Write some stats on the number of packages available, both total and
+# newly available since the last sync.
 packs="$(lc "$release-recent")"
 new="$(grep -e '^+[^+]' "$release-diff" | lc)"
 message="complete. $packs packages available."
-test "$new" -gt 0 && message="$message +$new since last update."
+test "$new" -gt 0 && message="$message +$new since last sync."
 heed "$message"
 
 # Careful now.

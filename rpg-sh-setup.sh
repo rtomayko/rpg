@@ -204,7 +204,7 @@ fi
 : ${RPGDB:=$RPGPATH/db}
 
 # `RPGINDEX` is where the index of available gems is kept. It's a
-# directory. The `rpg-update(1)` program manages the files under it.
+# directory. The `rpg-sync(1)` program manages the files under it.
 #
 #   * `release`:
 #     All available packages and all versions of all packages. Each line is a
@@ -238,10 +238,10 @@ fi
 # Show extconf.rb and make output when building extensions.
 : ${RPGSHOWBUILD:=false}
 
-# Default stale time for use with `rpg-update -s`. Values can be stuff
+# Default stale time for use with `rpg-sync -s`. Values can be stuff
 # like `10 days` or `10d`, `30 minutes` or `30m`. A number with no time
 # designator is considered in days. This value can also be `never`, in
-# which case the database will never be automatically updated in the
+# which case the database will never be automatically sync'd in the
 # course of running other programs.
 : ${RPGSTALETIME:=1 day}
 

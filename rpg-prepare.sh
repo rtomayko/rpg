@@ -38,8 +38,8 @@ notice "writing user package-list"
 rpg-parse-package-list "$@"  |
 sed "s/^/@user /"            > "$packlist"
 
-# see if we need to update the index
-rpg-update -s
+# see if we need to sync the index
+rpg-sync -s
 
 # Tell the user we're about to begin.
 numpacks=$(lc "$packlist")

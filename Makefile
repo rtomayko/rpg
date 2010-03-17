@@ -29,7 +29,7 @@ all:: build
 SOURCES = \
 	rpg-sh-setup.sh rpg.sh rpg-config.sh rpg-fetch.sh \
 	rpg-install.sh rpg-list.sh rpg-version-test.sh rpg-uninstall.sh \
-	rpg-build.sh rpg-env.sh rpg-update.sh rpg-resolve.sh rpg-upgrade.sh \
+	rpg-build.sh rpg-env.sh rpg-sync.sh rpg-resolve.sh rpg-upgrade.sh \
 	rpg-steal.sh rpg-fsck.sh rpg-status.sh rpg-outdated.sh \
 	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh \
 	rpg-package-spec.rb rpg-parse-index.rb rpg-shit-list.sh rpg-prepare.sh
@@ -39,7 +39,7 @@ USERPROGRAMS = rpg rpg-sh-setup
 PROGRAMPROGRAMS = \
 	rpg-config rpg-fetch \
 	rpg-install rpg-list rpg-version-test rpg-uninstall \
-	rpg-build rpg-env rpg-update rpg-resolve rpg-upgrade \
+	rpg-build rpg-env rpg-sync rpg-resolve rpg-upgrade \
 	rpg-steal rpg-fsck rpg-status rpg-outdated rpg-parse-package-list \
 	rpg-package-register rpg-package-install rpg-solve rpg-unpack \
 	rpg-package-spec rpg-parse-index rpg-shit-list rpg-prepare \
@@ -50,7 +50,7 @@ PROGRAMS = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 DOCHTML = \
 	rpg-sh-setup.html rpg.html rpg-config.html rpg-fetch.html \
 	rpg-install.html rpg-list.html rpg-version-test.html rpg-uninstall.html \
-	rpg-build.html rpg-env.html rpg-update.html rpg-resolve.html \
+	rpg-build.html rpg-env.html rpg-sync.html rpg-resolve.html \
 	rpg-upgrade.html rpg-steal.html rpg-fsck.html rpg-status.html \
 	rpg-outdated.html rpg-package-register.html rpg-package-install.html \
 	rpg-solve.html rpg-package-spec.html rpg-parse-index.html \
@@ -113,7 +113,7 @@ uninstall:
 		echo "rm -f $(bindir)/$$f"; \
 		rm "$(bindir)/$$f"; \
 	done
-	for f in $(PROGRAMPROGRAMS); do \
+	for f in $(PROGRAMPROGRAMS) rpg-update; do \
 		test -e "$(libexecdir)/$$f" || continue; \
 		echo "rm -f $(libexecdir)/$$f"; \
 		rm "$(libexecdir)/$$f"; \

@@ -17,19 +17,19 @@ Show status of installed packages vs available packages.
 
 Options
   -a               Include all packages, not just installed, packages
-  -u               Update the available package index before running
+  -u               Sync the available package index before running
   -p               Generate more parseable output
 
 Passing one or more <glob>s filters the list to matching packages.'
 
-update=false
+sync=false
 parsey=false
 joiner=
 while getopts apu opt
 do
     case $opt in
     a)   joiner="-a2";;
-    u)   update=true;;
+    u)   sync=true;;
     p)   parsey=true;;
     ?)   helpthem;
          exit 2;;
@@ -37,13 +37,12 @@ do
 done
 shift $(( $OPTIND - 1 ))
 
-# Update the package index. Force the update right now if we were given
+# Sync the package index. Force the sync right now if we were given
 # the `-u` arg; otherwise, maybe update it based on the configured stale
 # time.
-if $update
-then  rpg-update
-      shift
-else  rpg-update -s
+if $sync
+then  rpg-sync
+else  rpg-sync -s
 fi
 
 # Parsey Mode

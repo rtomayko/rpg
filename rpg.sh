@@ -9,9 +9,9 @@ The most commonly used rpg commands are:
   install          Install a package from file or remote repository
   status           Show status of local packages vs. respository
   steal            Transplant packages from Rubygems into rpg environment
+  sync             Sync the package index with repository
   outdated         List packages with a newer version
   uninstall        Uninstall packages from local system
-  update           Update the package index
   upgrade          Upgrade installed packages to latest version
 
 Options
