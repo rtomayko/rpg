@@ -35,7 +35,7 @@ then notice "rm'ing crusty session dir: $sessiondir"
 fi
 
 if test -d "$sessiondir"
-then numpacks=$(lc "$solved")
+then numpacks=$(sed -n '$=' <"$solved")
      heed "$numpacks package(s):
 $(cat "$solved")"
 else trap "rm -rf '$sessiondir'" 0

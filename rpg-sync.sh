@@ -234,8 +234,8 @@ notice "index rebuild complete"
 
 # Write some stats on the number of packages available, both total and
 # newly available since the last sync.
-packs="$(lc "$release-recent")"
-new="$(grep -e '^+[^+]' "$release-diff" | lc)"
+packs="$(sed -n '$=' <"$release-recent")"
+new="$(grep -e '^+[^+]' "$release-diff" | sed -n '$=')"
 message="complete. $packs packages available."
 test "$new" -gt 0 && message="$message +$new since last sync."
 heed "$message"

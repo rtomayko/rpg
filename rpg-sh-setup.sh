@@ -390,9 +390,6 @@ readlink () {
     }
 }
 
-# Count lines in a file. This is here because I mess it up so often.
-lc () { sed -n '$='; }
-
 # Alias `yes`, `no`, `1`, `0` to `true` and `false` so options can be
 # set to any of those values.
 yes () { true; }

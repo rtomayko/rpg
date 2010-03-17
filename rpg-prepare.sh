@@ -42,7 +42,7 @@ sed "s/^/@user /"            > "$packlist"
 rpg-sync -s
 
 # Tell the user we're about to begin.
-numpacks=$(lc "$packlist")
+numpacks=$(sed -n '$=' <"$packlist")
 if test $numpacks -eq 1
 then packname=$(head -1 "$packlist" | cut -d ' ' -f 2)
      heed "calculating dependencies for $packname ..."
@@ -91,6 +91,6 @@ do
 done
 
 # Tell the user we're about to begin.
-numpacks=$(lc "$packlist")
+numpacks=$(sed -n '$=' <"$packlist")
 heed "$numpacks package(s) ready for installation:
 $(cat "$sessiondir"/solved)"
