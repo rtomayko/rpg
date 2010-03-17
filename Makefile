@@ -42,7 +42,8 @@ PROGRAMPROGRAMS = \
 	rpg-build rpg-env rpg-update rpg-resolve rpg-upgrade \
 	rpg-steal rpg-fsck rpg-status rpg-outdated rpg-parse-package-list \
 	rpg-package-register rpg-package-install rpg-solve rpg-unpack \
-	rpg-package-spec rpg-parse-index rpg-shit-list rpg-prepare
+	rpg-package-spec rpg-parse-index rpg-shit-list rpg-prepare \
+	rpg-complete
 
 PROGRAMS = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 
