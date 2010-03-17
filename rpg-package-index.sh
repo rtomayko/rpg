@@ -1,5 +1,5 @@
 #!/bin/sh
-# The `rpg-package-list` program walks over the installed package database
+# The `rpg-package-index` program walks over the installed package database
 # and writes a line with the `<package> <version>` to standard output for
 # each installed package.
 set -e

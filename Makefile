@@ -32,7 +32,7 @@ SOURCES = \
 	rpg-resolve.sh rpg-upgrade.sh rpg-steal.sh rpg-fsck.sh rpg-outdated.sh \
 	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh \
 	rpg-package-spec.rb rpg-parse-index.rb rpg-shit-list.sh rpg-prepare.sh \
-	rpg-help.sh rpg-package-list.sh rpg-list.sh
+	rpg-help.sh rpg-package-index.sh rpg-list.sh
 
 DOCHTML = \
 	rpg-sh-setup.html rpg.html rpg-fetch.html rpg-version-test.html \
@@ -45,7 +45,7 @@ PROGRAMPROGRAMS = \
 	rpg-env rpg-sync rpg-resolve rpg-upgrade rpg-steal rpg-fsck rpg-status \
 	rpg-outdated rpg-parse-package-list rpg-package-register rpg-package-install \
 	rpg-solve rpg-unpack rpg-package-spec rpg-parse-index rpg-shit-list \
-	rpg-prepare rpg-complete rpg-help rpg-package-list rpg-list
+	rpg-prepare rpg-complete rpg-help rpg-package-index rpg-list
 
 USERPROGRAMS = rpg rpg-sh-setup
 
