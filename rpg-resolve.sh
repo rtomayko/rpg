@@ -10,8 +10,7 @@ Options
   -f <file>        Package index to resolve versions against; the main
                    release index is used when not specified.
   -n <max>         Write no more than <max> versions.
-  -p               Write output in rpg package list format.'
-
+  -p               Include package name in output.'
 
 max=100
 packagelist=false
@@ -49,7 +48,7 @@ versions=$(
 if test -n "$versions"
 then notice "hit $package $* in ${index##*/}"
      if $packagelist
-     then echo "$versions" | sed "s/^/$package = /"
+     then echo "$versions" | sed "s/^/$package /"
      else echo "$versions"
      fi
 else notice "miss $package $* in ${index##*/}"
