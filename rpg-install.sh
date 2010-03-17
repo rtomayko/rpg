@@ -43,19 +43,23 @@ heed "calculating dependencies for $numpacks package(s) ..."
 
 notice "entering dep solve loop"
 changed=true
+runcount=0
 while $changed
 do
-    </dev/null >"$packlist+"
+    runcount=$(( runcount + 1 ))
+    notice "this is depsolve run #$runcount"
+    cat </dev/null >"$packlist+"
 
-    notice "solving deplist"
     cut -d ' ' -f 2- "$packlist"                      |
-    rpg-solve -u                                      |
-    tee "$sessiondir/solved"                          |
+    rpg-solve -u "$sessiondir/solved"                 |
     cut -f 1,3 -d ' '                                 |
+    sort -b                                           |
+    tee "$sessiondir/solved+"                         |
     xargs -P 4 -n 2 rpg-fetch >/dev/null
+    mv "$sessiondir/solved+" "$sessiondir/solved"
 
     cat "$sessiondir/solved"                          |
-    while read package op version
+    while read package version
     do
         gemfile=$(rpg-fetch "$package" "$version")
         packagedir=$(rpg-package-register "$gemfile")
@@ -92,7 +96,7 @@ $(cat "$sessiondir"/solved)"
 # cat "$sessiondir"/solved
 
 cat "$sessiondir"/solved |
-xargs -n 3 rpg-package-install $packageinstallargs
+xargs -n 2 rpg-package-install $packageinstallargs
 
 heed "installation complete"
 

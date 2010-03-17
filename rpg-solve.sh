@@ -1,20 +1,21 @@
 #!/bin/sh
 # The `rpg-solve` program finds the best version of packages
-# 
+#
 # The input must be a valid `<package> <operator> <version>` package list.
 #
 # The input must be sorted.
-set -e 
+set -e
 . rpg-sh-setup
 
 ARGV="$@"
-USAGE '${PROGNAME}
-Reads a package list on stdin and outputs a concrete package list
+USAGE '${PROGNAME} [-u] [<index>]...
+Reads a package list on standard input and resolves to a list of concrete
+versions using the <index> specified. Multiple <index> arguments are
+allowed. The main release index is used by default.
 
 Options
-  -u               Write the best match for each package, instead of all
-                   matching versions.
-'
+  -u               Write only the best match for each package instead
+                   of all matching versions.'
 
 # Run ourself and then `sort | uniq` the output down to the best
 # match if the `-u` option was given.
@@ -24,9 +25,10 @@ maxvers=
     maxvers='-n 1'
 }
 
-# Done parsing args.
-[ "$*" ] && { helpthem; exit 2; }
-
+# Add the main release index at the end of the list of indexes to resolve
+# against. We always fall back to release index currently. It might be nice
+# to provide an option that disables this.
+set -- "$@" "$RPGINDEX/release"
 
 current=
 expression=
@@ -36,31 +38,41 @@ failedpacks=
 resolve () {
     if test -n "$current"
     then
-        rpg-resolve -p $maxvers "$current" "$expression" || {
-            failed=$(( $failed + 1 ))
-            echo "$current != *"
-            notice "failed to resolve $current $expression"
-        }
+        found=false
+        for index in "$@"
+        do
+           if rpg-resolve -f "$index" -p $maxvers "$current" "$expression"
+           then found=true
+                break
+           else continue
+           fi
+        done
+
+        if ! $found
+        then failed=$(( $failed + 1 ))
+             failedpacks="$failedpacks, $current"
+             echo "$current != *"
+             notice "failed to resolve $current $expression"
+        fi
         current=
         expression=
-     fi
-     return 0
+    fi
+    return 0
 }
 
 while read package op version
 do
     if test "$current" != "$package"
-    then
-        resolve
-        current="$package"
-        expression="$op$version"
-    else
-        expression="$expression,$op$version"
+    then resolve "$@"
+         current="$package"
+         expression="$op$version"
+    else expression="$expression,$op$version"
     fi
 done
 
-resolve
+resolve "$@"
 
-notice "failed to resolve $failed package(s): $failedpacks"
+test $failed -gt 0 &&
+notice "failed to resolve $failed package(s): ${failedpacks#,}"
 
 :

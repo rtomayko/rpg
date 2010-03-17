@@ -3,18 +3,21 @@ set -e
 . rpg-sh-setup
 
 [ "$*" ] || set -- "--help"; ARGV="$@"
-USAGE '${PROGNAME} [-n <max>] [-p] <package> <expression>...
+USAGE '${PROGNAME} [-f <file>] [-n <max>] [-p] <package> <expression>...
 Write available package versions matching version <expression>s.
 
 Options
-  -n <max>         Write no more than <max> versions
-  -p               Write output in rpg package list format'
+  -f <file>        Package index to resolve versions against; the main
+                   release index is used when not specified.
+  -n <max>         Write no more than <max> versions.
+  -p               Write output in rpg package list format.'
 
 
 max=100
 packagelist=false
-while getopts p1n: opt
+while getopts p1f:n: opt
 do case $opt in
+   f)   index="$OPTARG";;
    n)   max="$OPTARG";;
    1)   max=1;;
    p)   packagelist=true;;
@@ -26,8 +29,14 @@ shift $(( $OPTIND - 1 ))
 package="$1"; shift
 [ "$*" ] || helpthem
 
-index="$RPGINDEX/release"
-test -f "$index" || rpg-update -s
+# Use the default release index with no `-f` option, and update it if it
+# doesn't exist. If we were given an explicit index file, exit with failure
+# if it doesn't exist.
+if test -z "$index"
+then index="$RPGINDEX/release"
+     test -f "$index" || rpg-update -s
+else test -f "$index"
+fi
 
 versions=$(
     grep "^$package " < "$index"    |
@@ -38,10 +47,11 @@ versions=$(
 
 # Exit with success if we found at least one version, failure otherwise.
 if test -n "$versions"
-then if $packagelist
+then notice "hit $package $* in ${index##*/}"
+     if $packagelist
      then echo "$versions" | sed "s/^/$package = /"
      else echo "$versions"
      fi
-else notice "$package did not match: $*"
+else notice "miss $package $* in ${index##*/}"
      exit 1
 fi

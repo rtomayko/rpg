@@ -74,7 +74,7 @@ rpg_install_dir () {
 # out now since something isn't right.
 package="$1";shift
 version="$1";shift
-test "$version" = '=' && version="$1";shift
+test "$version" = '=' && { version="$1";shift; }
 packagedir="$RPGDB/$package"
 
 test -d "$packagedir/$version" || {
