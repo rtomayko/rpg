@@ -29,6 +29,11 @@ sessiondir="$RPGSESSION/@$session"
 packlist="$sessiondir/package-list"
 solved="$sessiondir/solved"
 
+if test "$session" = "session" -a -d "$sessiondir"
+then notice "rm'ing crusty session dir: $sessiondir"
+     rm -rf "$sessiondir"
+fi
+
 if test -d "$sessiondir"
 then numpacks=$(lc "$solved")
      heed "$numpacks package(s):
