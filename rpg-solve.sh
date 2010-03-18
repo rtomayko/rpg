@@ -10,7 +10,7 @@ set -e
 ARGV="$@"
 USAGE '${PROGNAME} [-u] [<index>]...
 Reads a package list on standard input and resolves to a list of concrete
-versions using the <index> specified. Multiple <index> arguments are
+versions using the <index>(es) specified. Multiple <index> arguments are
 allowed. The main release index is used by default.
 
 Options
@@ -51,7 +51,7 @@ resolve () {
         if ! $found
         then failed=$(( $failed + 1 ))
              failedpacks="$failedpacks, $current"
-             echo "$current != *"
+             echo "$current -"
              notice "failed to resolve $current $expression"
         fi
         current=
