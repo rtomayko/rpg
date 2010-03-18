@@ -1,0 +1,59 @@
+rpg-solve(1) -- rpg package dependency and version solver
+=========================================================
+
+## SYNOPSIS
+
+`rpg solve` [`-u`] [<INDEX>]...
+
+## DESCRIPTION
+
+Reads a _package list_ from standard input, resolves version expressions
+to concrete package versions against <index>, and writes a _package
+index_ of resolved packages to standard output. Packages that cannot be
+resolved to concrete versions have a '-' version field.
+
+## OPTIONS
+
+  * `-u`:
+    By default, all matching package versions listed in <index> are written
+    to standard output. This option causes only the best match for each package
+    to be written instead.
+
+## INPUT FORMAT
+
+`rpg-solve` expects a *package list* on standard input. A package list
+is a simple text file where each line specifies a package matching rule.
+It looks like this:
+
+    <source> <SP> <package> <SP> <verspec> <SP> <version> <NL>
+
+The `<package>` is the package name, `<version>` is the package version, and
+`<verspec>` is one of: `<`, `<=`, `=`, `>=`, or `>`. The `<source>` field
+specifies where the requirement originated. This can be a package name (in case
+of dependencies), `~user` (in case of user install), or `-` to denote the
+requirement has no source or the source is unimportant.
+
+An example package list:
+
+    ~user rails > 2.2
+    ~user sinatra >= 0
+    rails activesupport = 2.2
+    rails activerecord = 2.2
+    sinatra rack >= 1.0
+    rails rack >= 1.0.1
+
+## OUTPUT FORMAT
+
+`rpg-solve` writes a *package index* on standard output.  A package
+index is a simple text file where each line specifies a concrete package
+name and version. It looks like this:
+
+    <package> <SP> <version> <NL>
+
+Package indexes are usually sorted, first by `<package>` and then in
+reverse by `<version>`. This allows efficient lookups for many packages
+in a single pass over a file.
+
+## SEE ALSO
+
+rpg-package-list(1), rpg-prepare(1), rpg-install(1)

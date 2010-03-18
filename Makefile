@@ -48,8 +48,7 @@ PROGRAMPROGRAMS = \
 	rpg-prepare rpg-complete rpg-help rpg-package-index
 
 USERPROGRAMS = rpg rpg-sh-setup
-
-PROGRAMS = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
+PROGRAMS     = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 
 .SUFFIXES: .sh .rb .html
 
@@ -88,6 +87,9 @@ build: $(PROGRAMS)
 auto:
 	while true; do $(MAKE) ; sleep 1; done
 
+man:
+	$(MAKE) -C doc man
+
 doc: $(DOCHTML)
 
 install:
@@ -123,6 +125,7 @@ install-local:
 
 clean:
 	rm -vf $(PROGRAMS) $(DOCHTML)
+	$(MAKE) -C doc clean
 
 .SILENT:
 
