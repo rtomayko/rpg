@@ -110,7 +110,7 @@ warn () { echo "$PROGNAME:" "$@" 1>&2; }
 # Write an informationational message to stderr prefixed with the name
 # of the current script. Don't use this, use `notice`.
 heed () {
-    printf "%20s %s\n" "${PROGNAME#rpg-}:" "$*" |
+    printf "%17s %s\n" "${PROGNAME#rpg-}:" "$*" |
     sed 's/^\([^ ]\)/                     \1/'  1>&2
 }
 
