@@ -24,13 +24,18 @@ longarg () { echo "$1" | sed "s/^$2=//"; }
 
 sourcedir="$(cd "$(dirname $0)" && pwd)"
 develmode=false
+tiedown=false
 
 while test $# -gt 0
 do
     case "$1" in
     # Options
-    --with-ruby)       RUBY="ruby";shift;;
-    --with-ruby=*)     RUBY=$(longarg "$1" --with-ruby);shift;;
+    --with-ruby)       RUBY="ruby"
+                       tiedown=true
+                       shift;;
+    --with-ruby=*)     RUBY=$(longarg "$1" --with-ruby)
+                       tiedown=true
+                       shift;;
     --develop|--development)
                        prefix="$sourcedir/work"
                        bindir="$sourcedir"
@@ -45,21 +50,21 @@ do
                        ;;
 
     # Installation locations:
-    --prefix)          prefix="$2";shift;shift;;
+    --prefix)          prefix="$2";shift 2;;
     --prefix=*)        prefix="$(longarg "$1" --prefix)";shift;;
-    --bindir)          bindir="$2";shift;shift;;
+    --bindir)          bindir="$2";shift 2;;
     --bindir=*)        bindir="$(longarg "$1" --bindir)";shift;;
-    --libexecdir)      libexecdir="$2";shift;shift;;
+    --libexecdir)      libexecdir="$2";shift 2;;
     --libexecdir=*)    libexecdir="$(longarg "$1" --libexecdir)";shift;;
-    --localstatedir)   localstatedir="$2";shift;shift;;
+    --localstatedir)   localstatedir="$2";shift 2;;
     --localstatedir=*) localstatedir="$(longarg "$1" --localstatedir)";shift;;
-    --sysconfdir)      sysconfdir="$2";shift;shift;;
+    --sysconfdir)      sysconfdir="$2";shift 2;;
     --sysconfdir=*)    sysconfdir="$(longarg "$1" --sysconfdir)";shift;;
-    --datarootdir)     datarootdir="$2";shift;shift;;
+    --datarootdir)     datarootdir="$2";shift 2;;
     --datarootdir=*)   datarootdir="$(longarg "$1" --datarootdir)";shift;;
-    --datadir)         datadir="$2";shift;shift;;
+    --datadir)         datadir="$2";shift 2;;
     --datadir=*)       datadir="$(longarg "$1" --datadir)";shift;;
-    --mandir)          mandir="$2";shift;shift;;
+    --mandir)          mandir="$2";shift 2;;
     --mandir=*)        mandir="$(longarg "$1" --mandir)";shift;;
 
     # Environment variables passed on command line:
@@ -77,17 +82,9 @@ done
 # Finding Stuff Functions
 # -----------------------
 
-looking () {
-    printf "looking $(echo $@)"
-}
-
-ok () {
-    printf " OK\n"
-}
-
-missing () {
-    printf " (missing)\n"
-}
+looking () { printf "looking %s" "$*"; }
+ok ()      { printf " OK\n"; }
+missing () { printf " (missing)\n"; }
 
 found () {
     printf " (${1:-found})"
@@ -168,7 +165,6 @@ stdutil bash      BASH       /bin/bash /usr/bin/bash bash
 stdutil dash      DASH       /bin/dash /usr/bin/dash dash
 stdutil sed       SED        /bin/sed /usr/bin/sed sed gsed
 stdutil perl      PERL       perl
-
 stdutil ruby      RUBY       "$RUBY" ruby ruby18
 stdutil install   INSTALL    "$(rbconfig INSTALL)" /usr/bin/install install ginstall
 stdutil egrep     EGREP      "$(rbconfig EGREP)" egrep
@@ -214,18 +210,50 @@ test -z "$TAR" && {
 test -z "$DIFF" &&
     warn "warn: no diff(1) found on PATH. some features will be disabled."
 
+RUBYFRAMEWORK=false
+if test "$UNAME" = "Darwin"
+then
+    RUBYFRAMEWORKPATH="/System/Library/Frameworks/Ruby.framework"
+    printf "checking if ruby is system framework"
+    if expr -- "$(rbconfig prefix)" : "$RUBYFRAMEWORKPATH" >/dev/null
+    then printf " (yep)\n"
+        RUBYFRAMEWORK=true
+    else
+        printf " (nope)\n"
+    fi
+fi
+
 echo "okay, looks like you have everything we need. generating config files."
 
+# Try to pick a default configuration
 
-MAC_RUBY_FRAMEWORK="/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr"
-
-# Be sure all config variables are set to something. Try to get defaults
-# from currently active ruby unless its the crazy ass mac framework, then
-# fall back to /usr/local.
-if test "$(rbconfig prefix)" = "$MAC_RUBY_FRAMEWORK" \
-     -o -z "$(rbconfig prefix)" \
-     -o -n "$prefix"
+if $tiedown
 then
+    if $RUBYFRAMEWORK
+    then
+        : ${prefix:="/Library/Ruby/RPG"}
+        : ${exec_prefix:="/usr"}
+        : ${bindir:="$exec_prefix/bin"}
+        : ${libexecdir:="$exec_prefix/libexec"}
+        : ${localstatedir:="$prefix"}
+        : ${sysconfdir:="/etc"}
+        : ${datarootdir:="$exec_prefix/share"}
+        : ${datadir:="$datarootdir"}
+        : ${mandir:="$datadir/man"}
+        : ${docdir:="$datadir/doc"}
+    else
+        : ${prefix:=$(rbconfig prefix "/usr/local")}
+        : ${exec_prefix:=$(rbconfig exec_prefix "$prefix")}
+        : ${bindir:=$(rbconfig bindir "$exec_prefix/bin")}
+        : ${libexecdir:=$(rbconfig libexecdir "$exec_prefix/libexec")}
+        : ${localstatedir:=$(rbconfig localstatedir "$prefix/var")}
+        : ${sysconfdir:=$(rbconfig sysconfdir "$prefix/etc")}
+        : ${datarootdir:=$(rbconfig datarootdir "$prefix/share")}
+        : ${datadir:=$(rbconfig datadir "$datarootdir")}
+        : ${mandir:=$(rbconfig mandir "$datadir/man")}
+        : ${docdir:=$(rbconfig docdir "$datadir/doc")}
+    fi
+else
     : ${prefix:="/usr/local"}
     : ${exec_prefix:="$prefix"}
     : ${bindir:="$exec_prefix/bin"}
@@ -236,17 +264,6 @@ then
     : ${datadir:="$datarootdir"}
     : ${mandir:="$datadir/man"}
     : ${docdir:="$datadir/doc"}
-else
-    : ${prefix:=$(rbconfig prefix "/usr/local")}
-    : ${exec_prefix:=$(rbconfig exec_prefix "$prefix")}
-    : ${bindir:=$(rbconfig bindir "$exec_prefix/bin")}
-    : ${libexecdir:=$(rbconfig libexecdir "$exec_prefix/libexec")}
-    : ${localstatedir:=$(rbconfig localstatedir "$prefix/var")}
-    : ${sysconfdir:=$(rbconfig sysconfdir "$prefix/etc")}
-    : ${datarootdir:=$(rbconfig datarootdir "$prefix/share")}
-    : ${datadir:=$(rbconfig datadir "$datarootdir")}
-    : ${mandir:=$(rbconfig mandir "$datadir/man")}
-    : ${docdir:=$(rbconfig docdir "$datadir/doc")}
 fi
 
 recordconfig prefix        "$prefix"
@@ -260,23 +277,6 @@ recordconfig datadir       "$datadir"
 recordconfig mandir        "$mandir"
 recordconfig develmode     "$develmode"
 
-# Establish RPGPATHS from active Ruby install
-
-# : ${CONF_RPGBIN:=$(rbconfig bindir)}
-# : ${CONF_RPGMAN:=$(rbconfig mandir)}
-# : ${CONF_RPGLIB:=$(rbconfig vendorlibdir)}
-# : ${CONF_RPGLIB:=$(rbconfig sitelibdir)}
-#
-# : ${CONF_RPGPATH:="$(rbconfig localstatedir)/rpg"}
-# : ${CONF_RPGSYSCONF:=$(rbconfig sysconfdir)}
-
-# recordconfig RPGBIN     "$CONF_RPGBIN"
-# recordconfig RPGLIB     "$CONF_RPGLIB"
-# recordconfig RPGMAN     "$CONF_RPGMAN"
-# recordconfig RPGPATH    "$CONF_RPGPATH"
-# recordconfig RPGSYSCONF "$CONF_RPGSYSCONF"
-# recordconfig RPGLIB     "$CONF_RPGLIB"
-
 echo writing config.mk...
 cat <<EOF > config.mk
 $MAKECONFIG
@@ -288,17 +288,15 @@ cat <<EOF > config.sh
 $SHCONFIG
 EOF
 
-cat <<MESSAGE
-configuration:
-  ruby:          $RUBY
-  bindir:        $bindir
-  libexecdir:    $libexecdir
-  sysconfdir:    $sysconfdir
-  localstatedir: $localstatedir
-  mandir:        $mandir
-MESSAGE
+$develmode && {
+    echo "ready for development. run \`make' or \`make auto' to build."
+    exit 0
+}
 
-if $develmode
-then echo "okay. ready for development. run \`make' or \`make auto' to build."
-else echo "okay. run \`make' to build and \`make install' to install."
-fi
+echo "rpg configured to install at the following locations:"
+printf "  bindir:        %-20s (%s)\n" "$bindir" "main rpg user executable"
+printf "  libexecdir:    %-20s (%s)\n" "$libexecdir" "rpg program executables"
+printf "  sysconfdir:    %-20s (%s)\n" "$sysconfdir" "rpgrc config file"
+printf "  localstatedir: %-20s (%s)\n" "$localstatedir" "package db, index, and gem cache"
+printf "  mandir:        %-20s (%s)\n" "$mandir" "unix manpages"
+echo "run \`make' to build and then \`make install' to install."
