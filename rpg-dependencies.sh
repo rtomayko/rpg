@@ -3,23 +3,23 @@ set -e
 . rpg-sh-setup
 
 test "$*" || set -- --help; ARGV="$@"
-USAGE '${PROGNAME} [-rt] <package> [<version>]
+USAGE '${PROGNAME} [-r] [-t] [-p] <package> [<version>]
        ${PROGNAME} -a
 Show package dependency information.
 
 Options
   -a          Write dependency information for all installed packages
   -r          List dependencies recursively
-  -t          List dependencies recursively in a tree'
+  -t          List dependencies recursively in a tree
+  -p          Include <package> name in output (default with -a)'
 
-showall=false
-recursive=false;
-tree=false
-while getopts art opt
+showall=false;recursive=false;tree=false;prefix=false
+while getopts arpt opt
 do
     case $opt in
     a) showall=true;;
     r) recursive=true;;
+    p) prefix=true;;
     t) tree=true;;
     ?) helpthem
        exit 2;;
@@ -67,7 +67,6 @@ test -d "$packagedir/$version" || {
     exit 1
 }
 
-# 
 sed -n 's|^runtime ||p' <"$packagedir/$version/dependencies" |
 if $tree
 then
@@ -80,10 +79,18 @@ then
         '
     done
 else
+    if $recursive
+    then recurse="$0 -r"
+         $prefix && recurse="$recurse -p"
+    else recurse="true"
+    fi
+
     while read pack spec vers
     do
-        echo "$pack $spec $vers"
-        $recursive && "$0" -r "$pack"
+        output="$pack $spec $vers"
+        $prefix && output="$package $output"
+        echo "$output"
+        $recurse "$pack"
     done |
     sort -u
 fi

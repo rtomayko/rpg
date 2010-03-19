@@ -18,6 +18,7 @@ set -e
 
 [ "$*" ] || set -- '--help'; ARGV="$@"
 USAGE '${PROGNAME} [-f] <file>...
+       ${PROGNAME} [-f] <package> <version>
 Register a gem in the package database and write location stdout.'
 
 force=false
@@ -25,6 +26,15 @@ test "$1" = '-f' && {
     force=true
     shift
 }
+
+# Under the second synopsis form, we first perform a `rpg-fetch` on the
+# `<package>` and `<version>` given and then continue with the resulting
+# filename.
+if test $# -eq 2 && ! expr -- "$1" : '.*\.gem'
+then
+    gemfile=$(rpg-fetch "$1" "$2")
+    set -- "$gemfile"
+fi
 
 for file in "$@"
 do
