@@ -38,7 +38,7 @@ RPGSESSION="$RPGDB"
 sessiondir="$RPGSESSION/@$session"
 packlist="$sessiondir/package-list"
 solved="$sessiondir/solved"
-existing="$sessiondir/pre-existing"
+existing="$sessiondir/existing"
 
 # Get rid of any crusty session directory and then create a new one. It might be
 # cool to add an `-e` option so that sessions could be edited to add or
@@ -73,6 +73,12 @@ sed "s/^/@user /"     > "$packlist"
 notice "writing pre-existing package index"
 rpg-package-index > "$existing"
 
+# Create the existing dependencies package list from all dependencies of
+# all existing installed packages but exclude dependencies of packages specified
+# in master package list for this session.
+notice "gathering existing dependencies"
+alldeps=$(rpg-dependencies -a)
+
 # Grab some stats and let 'em know we're about to begin.
 numpacks=$(sed -n '$=' <"$packlist")
 if test $numpacks -eq 1
@@ -99,10 +105,32 @@ do
     runcount=$(( runcount + 1 ))
     notice "this is depsolve run #$runcount"
 
+    # Prune packages we're installing now from the existing dependencies list.
+    # Since these packages are being installed, we don't want the already
+    # installed package versions's dependencies to come into play during
+    # solving. The `-v` option `join(1)` causes only lines from our existing
+    # dependencies list that cannot be paired with the master package list to be
+    # included in the output.
+    alldeps=$(
+        echo "$alldeps" |sort                 |
+        join -1 1 -2 2 -v 1                   \
+             -o 1.1,1.2,1.3,1.4               \
+             - "$packlist"                    |
+        sort -b -k2,4
+    )
+
+    # Now take all dependencies for all existing packages that *aren't* being
+    # installed here and add them to the master package list, retaining the
+    # proper sort order.
+    echo "$alldeps"                          |
+    join -1 2 -2 2 -o 1.1,1.2,1.3,1.4        \
+         - "$packlist"                       |
+    sort -mbu -k 2,4 -k 1,1 "$packlist" -    >"$packlist+"
+
     # Solve all packages in the master package list and write the resulting
     # package index to the newly solved file (`solved+`). The solved file is
     # a sorted package index in `<name> <version>` format.
-    cut -d ' ' -f 2- "$packlist"             |
+    cut -d ' ' -f 2- "$packlist+"            |
     uniq                                     |
     rpg-solve -u "$solved" "$existing"       >"$solved+"
 
