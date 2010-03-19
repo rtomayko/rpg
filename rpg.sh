@@ -10,9 +10,10 @@ usage="Usage: ${PROGNAME} [-vx] [-c <path>] <command> [<args>...]
 Manage gem packages, quickly.
 
 The most commonly used rpg commands are:
-  config           Write rpg configuration to stdout
+  config           Show or edit rpg configuration
+  dependencies     Show dependency information for a package or all packages
   install          Install a package from file or remote repository
-  status           Show status of local packages vs. respository
+  list             Show status of local packages vs. respository
   steal            Transplant packages from Rubygems into rpg environment
   sync             Sync the package index with repository
   outdated         List packages with a newer version
