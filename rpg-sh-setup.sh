@@ -20,71 +20,8 @@
 # That will handle `--help` usage messages and load the RPG environment.
 
 # Guard against sourcing this file multiple times
-test $__rpg_sh_setup_included && return
-__rpg_sh_setup_included=true
-
-# This is replaced with the `config.sh` file that's generated when the
-# `./configure` script is run. It includes a bunch of environment variables
-# for program paths and defaults for the `RPGPATH`, `RPGBIN`, `RPGLIB`, etc.
-# options.
-: __RPGCONFIG__
-
-# rpg's default installation and database locations are based on the
-# currently active ruby environment. We use Ruby's `rbconfig` module to
-# load the `bin`, `lib`, `man`, and `var` directories then set and export
-# the `__RPGENV__` variable so that we only do this once per rpg
-# process hierarchy.
-#
-# Any of the variables exported below may be used in `rpgrc` config files to
-# determine the best locations for various RPG paths.
-if test -z "$__RPGENV__"
-then
-    PATH="${libexecdir}:$PATH"
-    RUBY="$(command -v ruby 2>/dev/null || echo "${RUBY:-ruby}")"
-    __RPGENV__="$RUBY"
-
-    eval "$(
-    $RUBY <<__RUBY__
-        require 'rbconfig'
-        conf = RbConfig::CONFIG
-        puts "
-        RUBYPREFIX='#{conf['prefix']}'
-        RUBYDLEXT='#{conf['DLEXT']}'
-        RUBYSITEDIR='#{conf['sitelibdir']}'
-        RUBYVENDORDIR='#{conf['vendorlibdir']}'
-        RUBYMANDIR='#{conf['mandir']}'
-        RUBYBINDIR='#{conf['bindir']}'
-        RUBYSTATEDIR='#{conf['localstatedir']}'
-        RUBYVERSION='#{conf['ruby_version']}'
-        RUBYLIBDIR='#{File.dirname(conf['rubylibdir'])}'
-        "
-__RUBY__
-    )"
-
-    # Determine if this is the MacOS Ruby framework
-    RUBYMACFRAMEWORK=false
-    expr -- "$RUBYPREFIX" : "/System/Library/Frameworks" >/dev/null && {
-        RUBYMACFRAMEWORK=true
-        RUBYBINDIR=/usr/bin
-        RUBYLIBDIR=/usr/lib/ruby/1.8
-        RUBYSTATEDIR=/var
-        RUBYSITEDIR=/usr/lib/ruby/site_ruby
-        RUBYPREFIX=/usr
-    }
-
-    export __RPGENV__ RUBY
-    export RUBYPREFIX RUBYDLEXT RUBYSITEDIR RUBYVENDORDIR RUBYMANDIR RUBYBINDIR
-    export RUBYSTATEDIR RUBYLIBDIR RUBYVERSION RUBYMACFRAMEWORK
-
-    # With `configure --development`, set all paths to be inside a work dir.
-    if $develmode
-    then
-        : ${RPGPATH:="./work"}
-        : ${RPGLIB:="$RPGPATH/lib"}
-        : ${RPGMAN:="$RPGPATH/man"}
-        : ${RPGBIN:="$RPGPATH/bin"}
-    fi
-fi
+test $__rpg_sh_setup_sourced && return 0
+__rpg_sh_setup_sourced=true
 
 # Constants
 # ---------
@@ -219,8 +156,78 @@ no () { false; }
 alias 1=true
 alias 0=false
 
-# Config Files
-# ------------
+# Turn on the shell's built in tracing facilities if RPGTRACE is enabled.
+rpg_init () {
+    ${RPGTRACE:-false} && set -x
+
+    ${RPGVERBOSE:-false} && {
+        notice () { heed "$@"; }
+    }
+
+    true
+}
+
+# This is replaced with the `config.sh` file that's generated when the
+# `./configure` script is run. It includes a bunch of environment variables
+# for program paths and defaults for the `RPGPATH`, `RPGBIN`, `RPGLIB`, etc.
+# options.
+: __RPGCONFIG__
+
+# rpg's default installation and database locations are based on the
+# currently active ruby environment. We use Ruby's `rbconfig` module to
+# load the `bin`, `lib`, `man`, and `var` directories then set and export
+# the `__RPGENV__` variable so that we only do this once per rpg
+# process hierarchy.
+#
+# Any of the variables exported below may be used in `rpgrc` config files to
+# determine the best locations for various RPG paths.
+test -n "$__RPGENV__" && { rpg_init; return 0; }
+
+PATH="${libexecdir}:$PATH"
+RUBY="$(command -v ruby 2>/dev/null || echo "${RUBY:-ruby}")"
+__RPGENV__="$RUBY"
+
+eval "$(
+$RUBY <<__RUBY__
+    require 'rbconfig'
+    conf = RbConfig::CONFIG
+    puts "
+    RUBYPREFIX='#{conf['prefix']}'
+    RUBYDLEXT='#{conf['DLEXT']}'
+    RUBYSITEDIR='#{conf['sitelibdir']}'
+    RUBYVENDORDIR='#{conf['vendorlibdir']}'
+    RUBYMANDIR='#{conf['mandir']}'
+    RUBYBINDIR='#{conf['bindir']}'
+    RUBYSTATEDIR='#{conf['localstatedir']}'
+    RUBYVERSION='#{conf['ruby_version']}'
+    RUBYLIBDIR='#{File.dirname(conf['rubylibdir'])}'
+    "
+__RUBY__
+)"
+
+# Determine if this is the MacOS Ruby framework
+RUBYMACFRAMEWORK=false
+expr -- "$RUBYPREFIX" : "/System/Library/Frameworks" >/dev/null && {
+    RUBYMACFRAMEWORK=true
+    RUBYBINDIR=/usr/bin
+    RUBYLIBDIR=/usr/lib/ruby/1.8
+    RUBYSTATEDIR=/var
+    RUBYSITEDIR=/usr/lib/ruby/site_ruby
+    RUBYPREFIX=/usr
+}
+
+export __RPGENV__ RUBY
+export RUBYPREFIX RUBYDLEXT RUBYSITEDIR RUBYVENDORDIR RUBYMANDIR RUBYBINDIR
+export RUBYSTATEDIR RUBYLIBDIR RUBYVERSION RUBYMACFRAMEWORK
+
+# With `configure --development`, set all paths to be inside a work dir.
+if $develmode
+then
+    : ${RPGPATH:="./work"}
+    : ${RPGLIB:="$RPGPATH/lib"}
+    : ${RPGMAN:="$RPGPATH/man"}
+    : ${RPGBIN:="$RPGPATH/bin"}
+fi
 
 # Source the system `/etc/rpgrc` file.
 test -f "$RPGSYSCONF" && . "$RPGSYSCONF"
@@ -414,18 +421,13 @@ test -f "$RPGUSERCONF" && . "$RPGUSERCONF"
 # configuration file.
 : ${RPGUSERCONF:=~/.rpgrc}
 
-# export all RPG variables
+# Export all RPG variables.
 export RPGPATH RPGLIB RPGBIN RPGMAN RPGCACHE RPGPACKS RPGDB RPGINDEX
 export RPGTRACE RPGSHOWBUILD RPGSTALETIME RPGSPECSURL
 export RPGSYSCONF RPGUSERCONF
 
-# Turn on the shell's built in tracing facilities
-# if RPGTRACE is enabled.
-${RPGTRACE:-false} && set -x
-
-${RPGVERBOSE:-false} && {
-    notice () { heed "$@"; }
-}
+# Setup logging and other stuff like that now that our variables are set.
+rpg_init
 
 # make sure we don't accidentally exit with a non-zero status
 :
