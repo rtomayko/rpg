@@ -39,6 +39,7 @@ sessiondir="$RPGSESSION/@$session"
 packlist="$sessiondir/package-list"
 solved="$sessiondir/solved"
 existing="$sessiondir/existing"
+delta="$sessiondir/delta"
 
 # Get rid of any crusty session directory and then create a new one. It might be
 # cool to add an `-e` option so that sessions could be edited to add or
@@ -80,7 +81,7 @@ notice "gathering existing dependencies"
 alldeps=$(rpg-dependencies -a)
 
 # Grab some stats and let 'em know we're about to begin.
-numpacks=$(sed -n '$=' <"$packlist")
+numpacks=$(<"$packlist" sort -u -k2,2 |grep -c .)
 if test $numpacks -eq 1
 then packname=$(head -1 "$packlist" |cut -d ' ' -f 2)
      heed "calculating dependencies for $packname ..."
@@ -168,14 +169,31 @@ do
     mv "$solved+" "$solved"
 done
 
+# Build a package list with only solved packages that are not already installed.
+# This is our package install manifest and includes only packages that aren't
+# already installed.
+comm -13 "$existing" "$solved" >"$delta"
+
+# Figure out how many packages were involved and how many packages need to be
+# installed.
+totalpacks=$(grep -c . <"$solved")
+deltapacks=$(grep -c . <"$delta") || {
+    heed "$totalpacks packages already installed and up to date."
+    exit 0
+}
+
+# Calculate the total number of packages that are already installed.
+freshpacks=$(( totalpacks - deltapacks ))
+heed "$freshpacks of $totalpacks packages already installed up to date"
+
 # Check for unsolved packages in our solved list. Unsolved packages have
 # a dash "-" in their version field.
-if badpacks=$(grep ' -$' "$solved")
-then heed "$(echo "$badpacks" |sed -n '$=') package(s) failed to resolve:
+if badpacks=$(grep ' -$' "$delta")
+then heed "$(echo "$badpacks" |grep -c .) packages failed to resolve:
 $badpacks"
 fi
 
 # Note the number of packages that are now queued up for installation.
-goodpacks=$(grep -v ' -$' "$solved")
-heed "$(echo "$goodpacks" |sed -n '$=') package(s) ready for installation:
+goodpacks=$(grep -v ' -$' "$delta")
+heed "$(echo "$goodpacks" |grep -c .) packages ready for installation:
 $goodpacks"
