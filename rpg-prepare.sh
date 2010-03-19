@@ -189,9 +189,9 @@ heed "$freshpacks of $totalpacks packages already installed and up to date"
 
 # Check for unsolved packages in our solved list. Unsolved packages have
 # a dash "-" in their version field.
-if badpacks=$(grep ' -$' "$delta" | cut -f 1 -d ' ')
+if badpacks=$(grep ' -$' "$delta")
 then heed "$(echo "$badpacks" |grep -c .) packages failed to resolve:
-$badpacks"
+$(echo "$badpacks" | cut -d ' ' -f 1)"
      exit 1
 fi
 
