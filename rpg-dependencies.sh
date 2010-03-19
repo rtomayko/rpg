@@ -37,15 +37,10 @@ shift $(( $OPTIND - 1 ))
 # `<`, `<=`, `=`, `>=`, `>`, or `~>`.
 $showall && {
     test "$*" && { helpthem; exit 2; }
-    for file in "$RPGDB"/*/active/dependencies
-    do
-        package="${file%/active/dependencies}"
-        package="${package##*/}"
-        sed -n "s|^runtime |$package |p" <"$file"
-    done 2>/dev/null || true
+    grep '^runtime ' "$RPGDB"/*/active/dependencies 2>/dev/null |
+    sed -e 's|^.*/\(.*\)/active/dependencies:runtime |\1 |'
     exit 0
 }
-
 
 # Find the package and write its dependencies in this format:
 #
