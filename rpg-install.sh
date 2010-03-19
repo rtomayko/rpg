@@ -24,16 +24,15 @@ do case $opt in
 done
 shift $(( $OPTIND - 1 ))
 
-RPGSESSION="$RPGDB"
 sessiondir="$RPGSESSION/@$session"
 packlist="$sessiondir/package-list"
 delta="$sessiondir/delta"
 solved="$sessiondir/solved"
 
-if test "$session" = "session" -a -d "$sessiondir"
-then notice "rm'ing crusty session dir: $sessiondir"
-     rm -rf "$sessiondir"
-fi
+test "$session" = "session" -a -d "$sessiondir" && {
+    notice "rm'ing crusty session dir: $sessiondir"
+    rm -rf "$sessiondir"
+}
 
 if $force
 then packageinstallargs=-f

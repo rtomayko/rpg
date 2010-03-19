@@ -34,7 +34,8 @@ rpg-sync -s
 
 # Session directories are stored under `RPGDB` prefixed with an "@" for now. This
 # should probably be moved to its own top-level directory.
-RPGSESSION="$RPGDB"
+: ${RPGSESSION:?'not configured'}
+mkdir -p "$RPGSESSION"
 sessiondir="$RPGSESSION/@$session"
 packlist="$sessiondir/package-list"
 solved="$sessiondir/solved"

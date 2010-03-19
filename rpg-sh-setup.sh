@@ -394,6 +394,11 @@ test -f "$RPGUSERCONF" && . "$RPGUSERCONF"
 #
 : ${RPGINDEX:=$RPGPATH/index}
 
+# Path where installation session data is stored. The `rpg-prepare(1)` and
+# `rpg-install(1)` programs store information about the packages being
+# installed in subdirectories of this path.
+: ${RPGSESSION:=$RPGPATH/session}
+
 # Enable verbose logging to stderr.
 : ${RPGVERBOSE:=false}
 
@@ -422,7 +427,8 @@ test -f "$RPGUSERCONF" && . "$RPGUSERCONF"
 : ${RPGUSERCONF:=~/.rpgrc}
 
 # Export all RPG variables.
-export RPGPATH RPGLIB RPGBIN RPGMAN RPGCACHE RPGPACKS RPGDB RPGINDEX
+export RPGLIB RPGBIN RPGMAN
+export RPGPATH RPGCACHE RPGPACKS RPGDB RPGINDEX RPGSESSION
 export RPGTRACE RPGSHOWBUILD RPGSTALETIME RPGSPECSURL
 export RPGSYSCONF RPGUSERCONF
 
