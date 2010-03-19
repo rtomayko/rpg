@@ -37,7 +37,7 @@ INSTALLING
         make
         make install
 
-    You may need to add the "<prefix>/bin" to your PATH if its not there
+    You may need to add the "<prefix>/bin" to your PATH if it isn't there
     already:
 
         PATH="$PATH:<prefix>/bin"

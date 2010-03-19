@@ -2,11 +2,11 @@ HACKING
 
 This is a quick guide to hacking on the rpg source code.
 
-rpg is really a bunch of separate, composeable programs, each in the
-unix style of doing one specific thing. Most of these programs are
-written in POSIX shell (rpg-*.sh files), a small few are written in Ruby
-(rpg-*.rb files). In either case, the programs are built as "rpg-<name>"
-(i.e., without file extension) so that any program may be rewritten in a
+rpg is really a bunch of separate composeable programs, each in the unix
+style of doing one specific thing. Most of these programs are written in
+POSIX shell (rpg-*.sh files), a small few are written in Ruby (rpg-*.rb
+files). In either case, the programs are built as "rpg-<name>" (i.e.,
+without file extension) so that any program may be rewritten in a
 different source language and not effect the programs that rely on it.
 In the future, some of these may be ported to ANSI C.
 
@@ -34,9 +34,11 @@ of your PATH and you should be all set:
 
     PATH="$(pwd):$PATH"
 
-With the source directory on your PATH and RPGPATH set, the general
-workflow is to edit the "rpg-<name>.sh" and "rpg-<name>.rb" files, then
-run `make' to build "rpg-<name>".  Then just execute them:
+With the source directory on your PATH, the general workflow is to edit
+the "rpg-<name>.sh" and "rpg-<name>.rb" files, then run `make' to build
+"rpg-<name>".
+
+Then just execute them:
 
     make
     rpg --help
