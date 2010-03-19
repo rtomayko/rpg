@@ -29,7 +29,6 @@ __rpg_sh_setup_included=true
 # options.
 : __RPGCONFIG__
 
-
 # rpg's default installation and database locations are based on the
 # currently active ruby environment. We use Ruby's `rbconfig` module to
 # load the `bin`, `lib`, `man`, and `var` directories then set and export
@@ -62,9 +61,20 @@ then
 __RUBY__
     )"
 
+    # Determine if this is the MacOS Ruby framework
+    RUBYMACFRAMEWORK=false
+    expr -- "$RUBYPREFIX" : "/System/Library/Frameworks" >/dev/null && {
+        RUBYMACFRAMEWORK=true
+        RUBYBINDIR=/usr/bin
+        RUBYLIBDIR=/usr/lib/ruby/1.8
+        RUBYSTATEDIR=/var
+        RUBYSITEDIR=/usr/lib/ruby/site_ruby
+        RUBYPREFIX=/usr
+    }
+
     export __RPGENV__ RUBY
     export RUBYPREFIX RUBYDLEXT RUBYSITEDIR RUBYVENDORDIR RUBYMANDIR RUBYBINDIR
-    export RUBYSTATEDIR RUBYLIBDIR RUBYVERSION
+    export RUBYSTATEDIR RUBYLIBDIR RUBYVERSION RUBYMACFRAMEWORK
 
     # With `configure --development`, set all paths to be inside a work dir.
     if $develmode
@@ -76,29 +86,177 @@ __RUBY__
     fi
 fi
 
+# Constants
+# ---------
+
+# Useful BRE patterns for matching various gem stuffs.
+GEMNAME_BRE='[0-9A-Za-z_.-]\{1,\}'
+GEMVERS_BRE='[0-9][0-9.]*'
+GEMPRES_BRE='[0-9A-Za-z][0-9A-Za-z.]*'
+
+# This seems to be the most portable way of getting a variable with
+# embedded newline. `$'\n'` is POSIX but doesn't work in my version of
+# `dash(1)`. This works in `bash` and `dash` at least.
+#
+# The `ENEWLINE` is just an escaped version, useful for `sed` patterns.
+NEWLINE='
+'
+ENEWLINE="\\$NEWLINE"
+
+# Usage Messages, Logging, and Stuff Like That
+# --------------------------------------------
+
+# The program name used in usage messages, log output, and other places
+# probably. You can set this before sourcing rpg-sh-setup to override
+# the default `$(basename $0)` value but it's probably what you want.
+: ${PROGNAME:=$(basename $0)}
+
+# The progam's usage message. See the documentation for the `USAGE`
+# function for information on setting this and how it plays with the
+# other usage related functions.
+: ${__USAGE__:='${PROGNAME} <args>'}
+
+# This is the main usage setting thingy. Scripts should start as
+# follows to take advantage of it:
+#
+#     set -e           # always
+#     . rpg-sh-setup   # bring in support lib
+#
+#     ARGV="$@"
+#     USAGE '${PROGNAME} <options> ...
+#     A short, preferably < 50 char description of the script.
+#
+#     Options:
+#       -b               Booooyaaahhh.'
+#
+# That will automatically trigger option parsing for a `--help`
+# argument and whatnot.
+#
+# Note that the string passed in is single-quote escape. The string will
+# evaluated at help time so you can do wild/expensive interpolations if
+# that's your thing.
+#
+# One more quick usage tip. Some scripts want to show usage when `$@` is
+# empty and others don't. These `USAGE` routines default to *not*
+# showing the usage message when no arguments were passed. If you want
+# to show usage when no arguments are passed, put this immediately
+# before setting the `ARGV` variable:
+#
+#     [ "$*" ] || set -- --help
+#     ARGV="$@"
+#     USAGE ...
+#
+# That'll cause empty arg invocations to show the help message.
+USAGE () {
+    __USAGE__="${1:-$(cat)}"
+    case "$ARGV" in
+    *--h|*--he|*--hel|*--help|*-h|*-\?)
+        helpthem 0
+        exit 0;;  # just in case
+    esac
+}
+
+# Show usage message defined in USAGE environment variable. The usage message
+# is first evaluated as a string so interpolations can be performed if
+# necessary.
+helpthem () {
+    : ${REAL_USAGE:=$(eval "echo \"$__USAGE__\"")}
+    echo "Usage: $REAL_USAGE"
+    exit ${1:-2}
+}
+
+
+# Write a warning to stderr. The message is prefixed with the
+# program's basename.
+warn () { echo "$PROGNAME:" "$@" 1>&2; }
+
+# Write an informationational message to stderr prefixed with the name
+# of the current script. Don't use this, use `notice`.
+heed () {
+    printf "%20s %s\n" "${PROGNAME#rpg-}:" "$*" |
+    sed 's/^\([^ ]\)/                     \1/'  1>&2
+}
+
+# We rewite the `notice` function to `head` if `RPGVERBOSE` is enabled
+# after sourcing config files.
+notice () { true; }
+
+# Ruby Related Utility Functions
+# ------------------------------
+
+# Retrieve a rbconfig value.
+rbconfig () { $RUBY -rrbconfig -e "puts RbConfig::CONFIG['$1']"; }
+
+# The file extension for dynamic libraries on this operating system.
+# e.g., `so` on Linux, `dylib` on MacOS.
+ruby_dlext() { echo "$RUBYDLEXT"; }
+
+# The command that should be executed to run `ruby`. This is used to
+# rewrite shebang lines.
+#
+# TODO this is only used in rpg-build, which should be changed.
+ruby_command () {
+    command -v ruby 2>/dev/null ||
+    echo "/usr/bin/env ruby"
+}
+
+# Misc Utility Functions
+# ----------------------
+
+# `readlink(1)` for systems that don't have it.
+readlink () {
+    test -L "$1"
+    command readlink "$1" 2>/dev/null || {
+        _p=$(ls -l "$1")
+        echo ${_p##* -> }
+    }
+}
+
+# Alias `yes`, `no`, `1`, `0` to `true` and `false` so options can be
+# set to any of those values.
+yes () { true; }
+no () { false; }
+alias 1=true
+alias 0=false
+
+# Config Files
+# ------------
+
+# Source the system `/etc/rpgrc` file.
+test -f "$RPGSYSCONF" && . "$RPGSYSCONF"
+
+# Source the user `~/.rpgrc` file.
+test -f "$RPGUSERCONF" && . "$RPGUSERCONF"
+
 # Install Paths
 # -------------
 
 # This is the psuedo root directory where `rpg` keeps all its stuff. The
-# default locations of all other rpg paths use this as a base.
-# *HOWEVER*, no rpg utility targets this directory -- every significant
-# location must have a separate path variable so that things stay
-# flexible in configuration.
-: ${RPGPATH:=${RUBYLIBDIR:-/var/lib}/rpg}
+# default locations of other rpg paths use this as a base.  *HOWEVER*,
+# no rpg utility targets this directory -- every significant location must
+# have a separate path variable so that things stay flexible in
+# configuration.
+: ${RPGPATH:=$(
+    if $RUBYMACFRAMEWORK
+    then echo "/Library/RPG"
+    else echo "${RUBYLIBDIR:-/var/lib}/rpg"
+    fi
+)}
 
 # `RPGLIB` is the shared Ruby `lib` directory where library files are
-# installed. You can set this to the current Ruby's site packages with:
-#
-#     RPGLIB=$(ruby_sitelibdir)
-: ${RPGLIB:="${RUBYVENDORDIR:-${RPGSITEDIR:-$RPGPATH/lib}}"}
+# installed. It defaults to the currently active ruby's `vendor_ruby`
+# directory (or `site_ruby` when Ruby < 1.8.7). If neither of those
+# locations be determined for some reason, `RPGPATH/lib` is assumed.
+: ${RPGLIB:="${RUBYVENDORDIR:-${RUBYSITEDIR:-$RPGPATH/lib}}"}
 
 # `RPGBIN` is where executable scripts included in packages are installed.
+# It defaults to the currently active ruby's `bindir` and falls back to
+# `RPGPATH/bin` if no ruby `bindir` can be determined.
 : ${RPGBIN:="${RUBYBINDIR:-$RPGPATH/bin}"}
 
 # `RPGMAN` is where manpages included with packages are installed. This
 # is basically the whole reason `rpg` was written in the first place.
 : ${RPGMAN:="${RUBYMANDIR:-$RPGPATH/man}"}
-
 
 # RPG Paths
 # ---------
@@ -260,152 +418,6 @@ fi
 export RPGPATH RPGLIB RPGBIN RPGMAN RPGCACHE RPGPACKS RPGDB RPGINDEX
 export RPGTRACE RPGSHOWBUILD RPGSTALETIME RPGSPECSURL
 export RPGSYSCONF RPGUSERCONF
-
-# Constants
-# ---------
-
-# Useful BRE patterns for matching various gem stuffs.
-GEMNAME_BRE='[0-9A-Za-z_.-]\{1,\}'
-GEMVERS_BRE='[0-9][0-9.]*'
-GEMPRES_BRE='[0-9A-Za-z][0-9A-Za-z.]*'
-
-# This seems to be the most portable way of getting a variable with
-# embedded newline. `$'\n'` is POSIX but doesn't work in my version of
-# `dash(1)`. This works in `bash` and `dash` at least.
-#
-# The `ENEWLINE` is just an escaped version, useful for `sed` patterns.
-NEWLINE='
-'
-ENEWLINE="\\$NEWLINE"
-
-# Usage Messages, Logging, and Stuff Like That
-# --------------------------------------------
-
-# The program name used in usage messages, log output, and other places
-# probably. You can set this before sourcing rpg-sh-setup to override
-# the default `$(basename $0)` value but it's probably what you want.
-: ${PROGNAME:=$(basename $0)}
-
-# The progam's usage message. See the documentation for the `USAGE`
-# function for information on setting this and how it plays with the
-# other usage related functions.
-: ${__USAGE__:='${PROGNAME} <args>'}
-
-# This is the main usage setting thingy. Scripts should start as
-# follows to take advantage of it:
-#
-#     set -e           # always
-#     . rpg-sh-setup   # bring in support lib
-#
-#     ARGV="$@"
-#     USAGE '${PROGNAME} <options> ...
-#     A short, preferably < 50 char description of the script.
-#
-#     Options:
-#       -b               Booooyaaahhh.'
-#
-# That will automatically trigger option parsing for a `--help`
-# argument and whatnot.
-#
-# Note that the string passed in is single-quote escape. The string will
-# evaluated at help time so you can do wild/expensive interpolations if
-# that's your thing.
-#
-# One more quick usage tip. Some scripts want to show usage when `$@` is
-# empty and others don't. These `USAGE` routines default to *not*
-# showing the usage message when no arguments were passed. If you want
-# to show usage when no arguments are passed, put this immediately
-# before setting the `ARGV` variable:
-#
-#     [ "$*" ] || set -- --help
-#     ARGV="$@"
-#     USAGE ...
-#
-# That'll cause empty arg invocations to show the help message.
-USAGE () {
-    __USAGE__="${1:-$(cat)}"
-    case "$ARGV" in
-    *--h|*--he|*--hel|*--help|*-h|*-\?)
-        helpthem 0
-        exit 0;;  # just in case
-    esac
-}
-
-# Show usage message defined in USAGE environment variable. The usage message
-# is first evaluated as a string so interpolations can be performed if
-# necessary.
-helpthem () {
-    : ${REAL_USAGE:=$(eval "echo \"$__USAGE__\"")}
-    echo "Usage: $REAL_USAGE"
-    exit ${1:-2}
-}
-
-
-# Write a warning to stderr. The message is prefixed with the
-# program's basename.
-warn () { echo "$PROGNAME:" "$@" 1>&2; }
-
-# Write an informationational message to stderr prefixed with the name
-# of the current script. Don't use this, use `notice`.
-heed () {
-    printf "%20s %s\n" "${PROGNAME#rpg-}:" "$*" |
-    sed 's/^\([^ ]\)/                     \1/'  1>&2
-}
-
-# We rewite the `notice` function to `head` if `RPGVERBOSE` is enabled
-# after sourcing config files.
-notice () { true; }
-
-# Ruby Related Utility Functions
-# ------------------------------
-
-# The command that should be executed to run `ruby`. This is used to
-# rewrite shebang lines.
-#
-# TODO this is only used in rpg-build and should be updated to use something
-# else.
-ruby_command () {
-    command -v ruby 2>/dev/null ||
-    echo "/usr/bin/env ruby"
-}
-
-# Retrieve a rbconfig value.
-rbconfig () {
-    $RUBY -rrbconfig -e "puts RbConfig::CONFIG['$1']"
-}
-
-# The file extension for dynamic libraries on this operating system.
-# e.g., `so` on Linux, `dylib` on MacOS.
-ruby_dlext() { echo "$RUBYDLEXT"; }
-
-# Misc Utility Functions
-# ----------------------
-
-# `readlink(1)` for systems that don't have it.
-readlink () {
-    test -L "$1"
-    command readlink "$1" 2>/dev/null || {
-        _p=$(ls -l "$1")
-        echo ${_p##* -> }
-    }
-}
-
-# Alias `yes`, `no`, `1`, `0` to `true` and `false` so options can be
-# set to any of those values.
-yes () { true; }
-no () { false; }
-alias 1=true
-alias 0=false
-
-
-# Config Files
-# ------------
-
-# Source the system `/etc/rpgrc` file.
-test -f "$RPGSYSCONF" && . "$RPGSYSCONF"
-
-# Source the user `~/.rpgrc` file.
-test -f "$RPGUSERCONF" && . "$RPGUSERCONF"
 
 # Turn on the shell's built in tracing facilities
 # if RPGTRACE is enabled.
