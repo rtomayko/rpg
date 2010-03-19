@@ -94,7 +94,7 @@ _rpg() {
     resolve)
         _rpg_complete available "$cur";;
 
-    uninstall|list|upgrade)
+    uninstall|list|upgrade|dependencies)
         _rpg_complete installed "$cur";;
 
     esac
