@@ -14,11 +14,11 @@ Options
   -s <name>   Install from a session created with rpg-prepare'
 
 session=session
-packageinstallargs=
+force=false
 while getopts fs: opt
 do case $opt in
    s)   session="$OPTARG";;
-   f)   packageinstallargs=-f;;
+   f)   force=true;;
    ?)   helpthem;;
    esac
 done
@@ -27,6 +27,7 @@ shift $(( $OPTIND - 1 ))
 RPGSESSION="$RPGDB"
 sessiondir="$RPGSESSION/@$session"
 packlist="$sessiondir/package-list"
+delta="$sessiondir/delta"
 solved="$sessiondir/solved"
 
 if test "$session" = "session" -a -d "$sessiondir"
@@ -34,16 +35,25 @@ then notice "rm'ing crusty session dir: $sessiondir"
      rm -rf "$sessiondir"
 fi
 
-if test -d "$sessiondir"
-then numpacks=$(sed -n '$=' <"$solved")
-     heed "$numpacks package(s):
-$(cat "$solved")"
-else trap "rm -rf '$sessiondir'" 0
-     rpg-prepare -s "$session" "$@"
+if $force
+then packageinstallargs=-f
+     installfrom="$solved"
+else packageinstallargs=
+     installfrom="$delta"
 fi
 
-cat "$solved" |
-xargs -n 2 rpg-package-install $packageinstallargs
+test -d "$sessiondir" || {
+    trap "rm -rf '$sessiondir'" 0
+    rpg-prepare -s "$session" "$@"
+}
+
+numpacks=$(grep -c . <"$installfrom")
+if $force
+then heed "installing $numpacks packages (forced)"
+else heed "installing $numpacks packages"
+fi
+
+<"$installfrom" xargs -n 2 rpg-package-install $packageinstallargs
 
 heed "installation complete"
 

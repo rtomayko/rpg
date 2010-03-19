@@ -82,7 +82,7 @@ test -d "$packagedir/$version" || {
     exit 1
 }
 
-notice "$package $version"
+heed "$package $version"
 
 # Fetch the gem into the cache and unpack into the packs area if
 # its not already there.
