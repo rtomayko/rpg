@@ -179,19 +179,20 @@ comm -13 "$existing" "$solved" >"$delta"
 # installed.
 totalpacks=$(grep -c . <"$solved")
 deltapacks=$(grep -c . <"$delta") || {
-    heed "$totalpacks packages already installed and up to date."
+    heed "$totalpacks packages already installed and up to date"
     exit 0
 }
 
 # Calculate the total number of packages that are already installed.
 freshpacks=$(( totalpacks - deltapacks ))
-heed "$freshpacks of $totalpacks packages already installed up to date"
+heed "$freshpacks of $totalpacks packages already installed and up to date"
 
 # Check for unsolved packages in our solved list. Unsolved packages have
 # a dash "-" in their version field.
-if badpacks=$(grep ' -$' "$delta")
+if badpacks=$(grep ' -$' "$delta" | cut -f 1 -d ' ')
 then heed "$(echo "$badpacks" |grep -c .) packages failed to resolve:
 $badpacks"
+     exit 1
 fi
 
 # Note the number of packages that are now queued up for installation.
