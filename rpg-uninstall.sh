@@ -2,41 +2,45 @@
 set -e
 . rpg-sh-setup
 
-ARGV="$@"
-USAGE '${PROGNAME} <name>
-Uninstall package from rpg environment.'
+[ "$*" ] || set -- --help; ARGV="$@"
+USAGE '${PROGNAME} <package>...
+Uninstall packages from local system.'
 
+# If more than one package was given, re-exec for each package:
 test $# -gt 1 && {
-    echo "$@" |
-    xargs -n 1 rpg uninstall
-    exit
+    echo "$@" | xargs -n 1 rpg-uninstall
+    exit $?
 }
 
-name="$1"
-
-# Get the manifest file going.
-dbdir="$RPGDB/$name"
-manifest="$dbdir/active/manifest"
+package="$1"
+packagedir="$RPGDB/$package"
+manifest="$packagedir/active/manifest"
 
 # Bail out if the db doesn't have this package or the package
 # isn't active.
-test -d "$dbdir" -a -f "$manifest" || {
+test -d "$packagedir" -a -f "$manifest" || {
     warn "$name is not installed"
     exit 1
 }
 
 # Grab the currently installed version from the active symlink.
-vers=$(readlink "$dbdir/active")
+version=$(readlink "$packagedir/active")
+notice "$package $version"
 
 # Remove all files installed by this package
-cat "$dbdir/active/manifest" |
-grep -v '^#'                 |
-xargs -n 1 unlink
+grep -v '^#' <"$packagedir/active/manifest" |
+if $RPGVERBOSE
+then
+    while read file
+    do notice "$file [unlink]"
+       echo "$file"
+    done
+else
+    cat
+fi |
+xargs -P 4 -n 1 unlink
 
 # Unlink the active symlink
-unlink "$dbdir/active"
+unlink "$packagedir/active"
 
-notice "$name $vers"
-
-# Better safe than sorry.
-:
+true

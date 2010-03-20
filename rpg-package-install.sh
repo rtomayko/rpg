@@ -78,7 +78,7 @@ test "$version" = '=' && { version="$1"; shift; }
 packagedir="$RPGDB/$package"
 
 test -d "$packagedir/$version" || {
-    warn "package not registered: $package/$version"
+    warn "package not registered: $package $version"
     exit 1
 }
 
@@ -96,23 +96,21 @@ else rm -rf "$RPGPACKS/$package-$version"
      rpg-shit-list "$package" "$version" "$RPGPACKS/$package-$version"
 fi
 
-# If the package already has an active/installed version, check if its
+# If the package already has an active/installed version, check if it's
 # the same as the one we're installing and bail if so. Otherwise unlink
 # the active version and install over it for now.
-#
-# TODO handle uninstalling previous package version or fail or something.
 test -e "$packagedir/active" && {
     activevers=$(readlink $packagedir/active)
     if test "$activevers" = "$version"
     then
         if $force
-        then notice "$package $version is current. reinstalling due to -f"
+        then notice "$package $version is current; reinstalling due to -f"
              unlink "$packagedir/active"
-        else notice "$package $version is current. not reinstalling."
+        else notice "$package $version is current; skipping package install"
              exit 0
         fi
     else notice "$package $activevers is installed but $version requested"
-         unlink "$packagedir/active"
+         rpg-uninstall "$package"
     fi
 }
 
