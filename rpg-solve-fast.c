@@ -1,7 +1,6 @@
 /* Fast package list solver.
  *
  * TODO:
- * [ ] use strnatcmp instead of strcmp
  * [ ] support squiggly comparison
  * [ ] support rpg-solve -u 1
  * [ ] usage message
@@ -11,6 +10,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include "strnatcmp.h"
 
 enum OPER { lt, le, eq, ge, gt, st, err };
 
@@ -87,7 +87,7 @@ plparse(FILE * stream)
 static inline int
 verscmp(char const * v1, char const * v2)
 {
-    return strcmp(v1, v2);
+    return strnatcmp(v1, v2);
 }
 
 /* Test if versions compare according to oper. */
