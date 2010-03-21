@@ -1,8 +1,8 @@
 /* Fast package list solver.
  *
+ * THIS IS A MESS. SORRY. I STILL NEED TO CLEAN IT UP.
+ *
  * TODO:
- * [ ] support squiggly comparison
- * [ ] support rpg-solve -u 1
  * [ ] usage message
  * [ ] default to release index file
  */
@@ -50,9 +50,48 @@ operparse (char * oper)
     return res;
 }
 
+/* Replace vers with its next successive version. */
+inline void
+versucc (char * vers) {
+    char *pdot = strrchr(vers, '.');
+    char *pend = NULL;
+
+    if ( pdot == NULL ) {
+        pdot = strrchr(vers, '\0');
+        *pdot = '.';
+    }
+
+    pdot++;
+    for (pend = pdot + 10; pdot < pend; pdot++)
+        *pdot = '9';
+    *pdot = '\0';
+}
+
+/* Expand squiggly comparisons into separate ge and lt comparisons. e.g.,
+ * foo ~> 0.2.3 would become foo >= 0.2.3 and foo < 0.3.*/
+static void
+plsquig (struct plent * pe)
+{
+    struct plent * pnew;
+    while (pe) {
+        if (pe->oper != st) {
+            pe = pe->next;
+            continue;
+        }
+
+        pe->oper = ge;
+        pnew = malloc(sizeof(struct plent));
+        memcpy(pnew, pe, sizeof(struct plent));
+        pnew->oper = lt;
+        versucc(pnew->vers);
+        pe->next = pnew;
+        pe = pnew->next;
+    }
+}
+
 /* Parse a package list from the stream. */
 static struct plent *
-plparse(FILE * stream)
+plparse (FILE * stream)
 {
     int res = 0, lineno = 0;
     struct plent *pe, *ppe = NULL, *pfe = NULL;
@@ -80,6 +119,7 @@ plparse(FILE * stream)
         ppe = pe;
     }
 
+    plsquig(pfe);
     return pfe;
 }
 
@@ -95,11 +135,17 @@ static inline int
 verstest(enum OPER oper, char const * v1, char const * v2)
 {
     int res = 0;
-    int cmp = verscmp(v1, v2);
-    if ((cmp == 0 && (oper == eq || oper == le || oper == ge)) ||
-        (cmp  < 0 && (oper == lt || oper == le))              ||
-        (cmp  > 0 && (oper == gt || oper == ge)))
-        res = 1;
+    int cmp;
+    if (oper == eq) {
+        cmp = strcmp(v1, v2);
+        if (cmp == 0) res = 1;
+    } else {
+        cmp = verscmp(v1, v2);
+        if ((cmp == 0 && (oper == le || oper == ge)) ||
+            (cmp  < 0 && (oper == lt || oper == le)) ||
+            (cmp  > 0 && (oper == gt || oper == ge)))
+            res = 1;
+    }
     return res;
 }
 
