@@ -39,10 +39,13 @@ PROGRAMPROGRAMS = \
 	rpg-prepare rpg-complete rpg-help rpg-package-index rpg-dependencies \
 	rpg-leaves rpg-solve-fast
 
+OBJECTS = \
+	strnatcmp.o rpg-solve-fast.o
+
 USERPROGRAMS = rpg rpg-sh-setup
 PROGRAMS     = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 
-.SUFFIXES: .sh .rb .html .c
+.SUFFIXES: .sh .rb .html .c .o
 
 .sh:
 	printf "%13s  %-30s" "[SH]" "$@"
@@ -71,13 +74,21 @@ PROGRAMS     = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 	rocco $< >/dev/null
 	printf "       OK\n"
 
-.c:
+.c.o:
 	printf "%13s  %-30s" "[CC]" "$@"
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $<
 	printf "       OK\n"
 
 rpg-sh-setup: config.sh munge.rb
 rpg: config.sh munge.rb
+
+rpg-solve-fast: rpg-solve-fast.o strnatcmp.o
+	printf "%13s  %-30s" "[LD]" "$@"
+	$(CC) $(CFLAGS) $(LDFLAGS) rpg-solve-fast.o strnatcmp.o -o $@
+	printf "       OK\n"
+
+rpg-solve-fast.o: rpg-solve-fast.c strnatcmp.h
+strnatcmp.o: strnatcmp.c strnatcmp.h
 
 build: $(PROGRAMS)
 
@@ -121,7 +132,7 @@ install-local:
 	./configure --development
 
 clean:
-	rm -vf $(PROGRAMS) $(DOCHTML)
+	rm -vf $(PROGRAMS) $(DOCHTML) $(OBJECTS)
 	$(MAKE) -C doc clean
 
 .SILENT:
