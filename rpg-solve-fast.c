@@ -16,6 +16,7 @@ enum OPER { lt, le, eq, ge, gt, st, err };
 
 /* A package list entry. */
 struct plent {
+    int found;
     enum OPER oper;
     char pack[100];
     char vers[50];
@@ -101,6 +102,8 @@ plparse (FILE * stream)
     while (1) {
         lineno++;
         pe = malloc(sizeof(struct plent));
+        pe->found = 0;
+        pe->next = NULL;
 
         res = fscanf(stream, format, pe->pack, stroper, pe->vers);
         if ( res == 3 ) {
@@ -110,17 +113,52 @@ plparse (FILE * stream)
             break;
         }
 
-        pe->next = NULL;
-        if ( ppe ) {
-            ppe->next = pe;
-        } else {
-            pfe = pe;
-        }
+        if ( ppe ) ppe->next = pe;
+        else pfe = pe;
         ppe = pe;
     }
 
     plsquig(pfe);
     return pfe;
+}
+
+
+/* Mark all package list entries whose package name matches pack as found. */
+static inline void
+plmark (struct plent * pe, char * pack)
+{
+    int cmp;
+    for (; pe != NULL; pe = pe->next) {
+        cmp = strcmp(pe->pack, pack);
+        if (cmp == 0) {
+            pe->found = 1;
+        } else if (cmp < 0) {
+            continue;
+        } else {
+            break;
+        }
+    }
+}
+
+/* Remove entries marked as found from the list. */
+static struct plent *
+plpurge (struct plent * pe) {
+    struct plent * ptail = NULL,
+                 * phead = NULL;
+
+    for (;pe != NULL; pe = pe->next) {
+        if ( pe->found ) continue;
+
+        if ( ptail )
+            ptail->next = pe;
+        else
+            phead = pe;
+
+        ptail = pe;
+        ptail->next = NULL;
+    }
+
+    return phead;
 }
 
 /* Compare two versions. */
@@ -184,10 +222,13 @@ pdxscan(FILE * stream, struct plent * pe)
             if (pe == NULL) return;
         }
 
-        if (cmp == 0) {
-            pvers = strsep(&pvers, " \n");
-            if( pdxrun(ppack, pvers, pe) )
-                printf("%s %s\n", ppack, pvers);
+        if (cmp > 0) continue;
+
+        pvers = strsep(&pvers, " \n");
+        if (pdxrun(ppack, pvers, pe)) {
+            if ( pe->found == 0 )
+                plmark(pe, ppack);
+            printf("%s %s\n", ppack, pvers);
         }
     }
 }
@@ -199,10 +240,24 @@ int main (int argc, char *argv[])
     int i;
 
     for (i=1; i < argc; i++) {
+        if (pe == NULL)
+            break;
+
         if ((fidx = fopen(argv[i], "r"))) {
             pdxscan(fidx, pe);
             fclose(fidx);
         }
+
+        pe = plpurge(pe);
+    }
+
+    /* some packages were not found */
+    if ( pe ) {
+        while ( pe ) {
+            printf("%s -\n", pe->pack);
+            pe = pe->next;
+        }
+        return 1;
     }
 
     return 0;

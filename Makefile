@@ -83,7 +83,7 @@ rpg-sh-setup: config.sh munge.rb
 rpg: config.sh munge.rb
 
 rpg-solve-fast: rpg-solve-fast.o strnatcmp.o
-	printf "%13s  %-30s" "[LD]" "$@"
+	printf "%13s  %-30s" "[LINK]" "$@"
 	$(CC) $(CFLAGS) $(LDFLAGS) rpg-solve-fast.o strnatcmp.o -o $@
 	printf "       OK\n"
 
