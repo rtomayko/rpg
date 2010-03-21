@@ -30,7 +30,7 @@ test "$1" = '-q' && {
 # Like `expr(1)` but ignore stdout.
 compare () { expr "$1" "$2" "$3" >/dev/null; }
 
-#/ Usage: rpg_version_eval <ver1> <op> <ver2>
+#/ Usage: version_compare <ver1> <op> <ver2>
 #/ Compare <ver1> with <ver2> using operator <op>.
 #/ Return zero if <ver1> matches <ver2>, non-zero otherwise.
 version_compare () {

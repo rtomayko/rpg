@@ -17,8 +17,6 @@ Options
   -u               Write only the best match for each package instead
                    of all matching versions.'
 
-# Run ourself and then `sort | uniq` the output down to the best
-# match if the `-u` option was given.
 maxvers=
 [ "$1" = '-u' ] && {
     shift
