@@ -4,23 +4,13 @@
 # Default make target
 all::
 
-# XXX include isn't POSIX but I don't feel like dealing with it right now.
-# we'll move to a separate Makefile.in eventually.
 include config.mk
 
 NAME = rpg
 TARNAME = $(NAME)
 SHELL = /bin/sh
 
-# srcdir      = .
-# prefix      = /usr/local
-# exec_prefix = ${prefix}
-# bindir      = ${exec_prefix}/bin
-# libexecdir  = ${exec_prefix}/libexec
-# datarootdir = ${prefix}/share
-# datadir     = ${datarootdir}
-# mandir      = ${datarootdir}/man
-# docdir      = $(datadir)/doc/$(TARNAME)
+CFLAGS = -Wall -pedantic
 
 # ---- END OF CONFIGURATION ----
 
@@ -33,7 +23,7 @@ SOURCES = \
 	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh \
 	rpg-package-spec.rb rpg-parse-index.rb rpg-shit-list.sh rpg-prepare.sh \
 	rpg-help.sh rpg-package-index.sh rpg-list.sh rpg-dependencies.sh \
-	rpg-leaves.sh
+	rpg-leaves.sh rpg-solve-fast.c
 
 DOCHTML = \
 	rpg-sh-setup.html rpg.html rpg-fetch.html rpg-version-test.html \
@@ -47,12 +37,12 @@ PROGRAMPROGRAMS = \
 	rpg-outdated rpg-package-list rpg-package-register rpg-package-install \
 	rpg-solve rpg-unpack rpg-package-spec rpg-parse-index rpg-shit-list \
 	rpg-prepare rpg-complete rpg-help rpg-package-index rpg-dependencies \
-	rpg-leaves
+	rpg-leaves rpg-solve-fast
 
 USERPROGRAMS = rpg rpg-sh-setup
 PROGRAMS     = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 
-.SUFFIXES: .sh .rb .html
+.SUFFIXES: .sh .rb .html .c
 
 .sh:
 	printf "%13s  %-30s" "[SH]" "$@"
@@ -79,6 +69,11 @@ PROGRAMS     = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 .rb.html:
 	printf "%13s  %-30s" "[ROCCO]" "$@"
 	rocco $< >/dev/null
+	printf "       OK\n"
+
+.c:
+	printf "%13s  %-30s" "[CC]" "$@"
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 	printf "       OK\n"
 
 rpg-sh-setup: config.sh munge.rb
