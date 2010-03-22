@@ -38,7 +38,7 @@ PROGRAMPROGRAMS = \
 	rpg-outdated rpg-package-list rpg-package-register rpg-package-install \
 	rpg-solve rpg-unpack rpg-package-spec rpg-parse-index rpg-shit-list \
 	rpg-prepare rpg-complete rpg-help rpg-package-index rpg-dependencies \
-	rpg-leaves
+	rpg-leaves rpg-manifest
 
 USERPROGRAMS = rpg rpg-sh-setup
 PROGRAMS     = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
