@@ -61,3 +61,6 @@ strnatcmp.o
 rpg-solve-fast.o
 rpg-solve-fast
 rpg-leaves
+rpg-diff
+rpg-manifest
+*.o
