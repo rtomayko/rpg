@@ -18,7 +18,7 @@ all:: build
 
 SOURCES = \
 	rpg-sh-setup.sh rpg.sh rpg-config.sh rpg-fetch.sh rpg-install.sh \
-	rpg-version-test.sh rpg-uninstall.sh rpg-build.sh rpg-env.sh rpg-sync.sh \
+	rpg-uninstall.sh rpg-build.sh rpg-env.sh rpg-sync.sh \
 	rpg-resolve.sh rpg-upgrade.sh rpg-steal.sh rpg-fsck.sh rpg-outdated.sh \
 	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh \
 	rpg-package-spec.rb rpg-parse-index.rb rpg-shit-list.sh rpg-prepare.sh \
@@ -26,18 +26,21 @@ SOURCES = \
 	rpg-leaves.sh rpg-solve-fast.c
 
 DOCHTML = \
-	rpg-sh-setup.html rpg.html rpg-fetch.html rpg-version-test.html \
+	rpg-sh-setup.html rpg.html rpg-fetch.html \
 	rpg-sync.html rpg-upgrade.html rpg-outdated.html \
 	rpg-package-install.html rpg-package-spec.html rpg-parse-index.html \
 	rpg-list.html
 
 PROGRAMPROGRAMS = \
-	rpg-config rpg-fetch rpg-install rpg-version-test rpg-uninstall rpg-build \
+	rpg-config rpg-fetch rpg-install rpg-uninstall rpg-build \
 	rpg-env rpg-sync rpg-resolve rpg-upgrade rpg-steal rpg-fsck rpg-list \
 	rpg-outdated rpg-package-list rpg-package-register rpg-package-install \
 	rpg-solve rpg-unpack rpg-package-spec rpg-parse-index rpg-shit-list \
 	rpg-prepare rpg-complete rpg-help rpg-package-index rpg-dependencies \
 	rpg-leaves rpg-solve-fast
+
+DEADPROGRAMS = \
+	rpg-update rpg-status rpg-parse-package-list rpg-version-test
 
 OBJECTS = \
 	strnatcmp.o rpg-solve-fast.o
@@ -118,7 +121,7 @@ uninstall:
 		echo "rm -f $(bindir)/$$f"; \
 		rm "$(bindir)/$$f"; \
 	done
-	for f in $(PROGRAMPROGRAMS) rpg-update rpg-status rpg-parse-package-list; do \
+	for f in $(PROGRAMPROGRAMS) $(DEADPROGRAMS); do \
 		test -e "$(libexecdir)/$$f" || continue; \
 		echo "rm -f $(libexecdir)/$$f"; \
 		rm "$(libexecdir)/$$f"; \
