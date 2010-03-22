@@ -37,12 +37,13 @@ then index="$RPGINDEX/release"
 else test -f "$index"
 fi
 
-
 versions=$(
     rpg-package-list "$package" "$@" |
     rpg-solve "$index"               |
-    head -$max
-) || true
+    head -$max                       |
+    cut -d ' ' -f 2                  |
+    grep -v '^-$'
+)
 
 # Exit with success if we found at least one version, failure otherwise.
 if test -n "$versions"
