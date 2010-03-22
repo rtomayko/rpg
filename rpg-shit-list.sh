@@ -54,6 +54,11 @@ memcached)
     sedi "s/VERSION = File.read.*/VERSION = '$version'/" lib/memcached.rb
     ;;
 
+capistrano)
+    fixable "capistrano/version.rb reads VERSION file from package root"
+    cd "$path"
+    sedi "s/CURRENT = /CURRENT = '$version' #/" lib/capistrano/version.rb
+    ;;
 esac
 
 # Make sure we exit with success.
