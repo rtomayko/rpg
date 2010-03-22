@@ -40,7 +40,7 @@ fi
 
 versions=$(
     rpg-package-list "$package" "$@" |
-    rpg-solve-fast "$index"          |
+    rpg-solve "$index"               |
     head -$max
 ) || true
 

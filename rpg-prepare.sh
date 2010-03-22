@@ -41,6 +41,7 @@ packlist="$sessiondir/package-list"
 solved="$sessiondir/solved"
 existing="$sessiondir/existing"
 delta="$sessiondir/delta"
+release="$RPGINDEX/release"
 
 # Get rid of any crusty session directory and then create a new one. It might be
 # cool to add an `-e` option so that sessions could be edited to add or
@@ -114,27 +115,28 @@ do
     # dependencies list that cannot be paired with the master package list to be
     # included in the output.
     alldeps=$(
-        echo "$alldeps" |sort                 |
-        join -1 1 -2 2 -v 1                   \
-             -o 1.1,1.2,1.3,1.4               \
-             - "$packlist"                    |
-        sort -b -k2,4
+        echo "$alldeps" |sort                      |
+        join -1 1 -2 2 -v 1                        \
+             -o 1.1,1.2,1.3,1.4                    \
+             - "$packlist"                         |
+        sort -b -k 2,4
     )
 
     # Now take all dependencies for all existing packages that *aren't* being
     # installed here and add them to the master package list, retaining the
     # proper sort order.
-    echo "$alldeps"                          |
-    join -1 2 -2 2 -o 1.1,1.2,1.3,1.4        \
-         - "$packlist"                       |
-    sort -mbu -k 2,4 -k 1,1 "$packlist" -    >"$packlist+"
+    echo "$alldeps"                               |
+    join -1 2 -2 2 -o 1.1,1.2,1.3,1.4             \
+         - "$packlist"                            |
+    sort -mbu -k 2,4 -k 1,1 "$packlist" -         >"$packlist+"
 
     # Solve all packages in the master package list and write the resulting
     # package index to the newly solved file (`solved+`). The solved file is
     # a sorted package index in `<name> <version>` format.
-    cut -d ' ' -f 2- "$packlist+"            |
-    uniq                                     |
-    rpg-solve -u "$solved" "$existing"       >"$solved+"
+    cut -d ' ' -f 2- "$packlist+"                 |
+    uniq                                          |
+    rpg-solve "$solved" "$existing" "$release"    |
+    sort -u -k 1,1                                >"$solved+"
 
     # Use `comm(1)` to select only those lines in the newly solved file that
     # were not present on the previous iteration, exclude packages that could
@@ -142,9 +144,9 @@ do
     # package/version combos into `rpg-package-register` to fetch and enter
     # the package into the database. Using `xargs -P 8` allows as many as eight
     # concurrent fetch/register operations to run in parallel.
-    comm -13 "$solved" "$solved+"            |
-    grep -v ' -$'                            |
-    xargs -P 8 -n 2 rpg-package-register     >/dev/null
+    comm -13 "$solved" "$solved+"                 |
+    grep -v ' -$'                                 |
+    xargs -P 8 -n 2 rpg-package-register          >/dev/null
 
     # Rebuild the master package list by concatenating the original user-
     # specified packages with all dependencies of all packages solved so far.
@@ -152,9 +154,9 @@ do
     # the `uniq` in the `rpg-solve` pipeline above relies on this.
     {
         grep '^@user' "$packlist"
-        grep -v ' -$' "$solved+"             |
+        grep -v ' -$' "$solved+"                  |
         xargs -P 4 -n 2 rpg-dependencies -p
-    }  |sort -b -k 2,4                       >"$packlist+"
+    }  |sort -b -k 2,4                            >"$packlist+"
 
     # Check whether the package list has changed at all. If so, new rules were
     # added to the package list by dependencies. If not, we're done and can

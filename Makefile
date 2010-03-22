@@ -20,10 +20,10 @@ SOURCES = \
 	rpg-sh-setup.sh rpg.sh rpg-config.sh rpg-fetch.sh rpg-install.sh \
 	rpg-uninstall.sh rpg-build.sh rpg-env.sh rpg-sync.sh \
 	rpg-resolve.sh rpg-upgrade.sh rpg-steal.sh rpg-fsck.sh rpg-outdated.sh \
-	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh \
+	rpg-package-register.sh rpg-package-install.sh rpg-unpack.sh \
 	rpg-package-spec.rb rpg-parse-index.rb rpg-shit-list.sh rpg-prepare.sh \
 	rpg-help.sh rpg-package-index.sh rpg-list.sh rpg-dependencies.sh \
-	rpg-leaves.sh rpg-solve-fast.c
+	rpg-leaves.sh rpg-solve.c
 
 DOCHTML = \
 	rpg-sh-setup.html rpg.html rpg-fetch.html \
@@ -35,15 +35,15 @@ PROGRAMPROGRAMS = \
 	rpg-config rpg-fetch rpg-install rpg-uninstall rpg-build \
 	rpg-env rpg-sync rpg-resolve rpg-upgrade rpg-steal rpg-fsck rpg-list \
 	rpg-outdated rpg-package-list rpg-package-register rpg-package-install \
-	rpg-solve rpg-unpack rpg-package-spec rpg-parse-index rpg-shit-list \
+	rpg-unpack rpg-package-spec rpg-parse-index rpg-shit-list \
 	rpg-prepare rpg-complete rpg-help rpg-package-index rpg-dependencies \
-	rpg-leaves rpg-solve-fast
+	rpg-leaves rpg-solve
 
 DEADPROGRAMS = \
 	rpg-update rpg-status rpg-parse-package-list rpg-version-test
 
 OBJECTS = \
-	strnatcmp.o rpg-solve-fast.o
+	strnatcmp.o rpg-solve.o
 
 USERPROGRAMS = rpg rpg-sh-setup
 PROGRAMS     = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
@@ -85,12 +85,12 @@ PROGRAMS     = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 rpg-sh-setup: config.sh munge.rb
 rpg: config.sh munge.rb
 
-rpg-solve-fast: rpg-solve-fast.o strnatcmp.o
+rpg-solve: rpg-solve.o strnatcmp.o
 	printf "%13s  %-30s" "[LINK]" "$@"
-	$(CC) $(CFLAGS) $(LDFLAGS) rpg-solve-fast.o strnatcmp.o -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) rpg-solve.o strnatcmp.o -o $@
 	printf "       OK\n"
 
-rpg-solve-fast.o: rpg-solve-fast.c strnatcmp.h
+rpg-solve-fast.o: rpg-solve.c strnatcmp.h
 strnatcmp.o: strnatcmp.c strnatcmp.h
 
 build: $(PROGRAMS)
