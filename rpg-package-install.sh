@@ -92,7 +92,7 @@ else rm -rf "$RPGPACKS/$package-$version"
      gemfile=$(rpg-fetch "$package" "$version")
      notice "unpacking $gemfile into $RPGPACKS"
      mkdir -p "$RPGPACKS"
-     rpg-unpack -p "$RPGPACKS" "$gemfile"
+     rpg-unpack -p "$RPGPACKS" "$gemfile" >/dev/null
      rpg-shit-list "$package" "$version" "$RPGPACKS/$package-$version"
 fi
 
