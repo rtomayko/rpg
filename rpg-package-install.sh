@@ -130,7 +130,7 @@ ln -sf "$version" "$packagedir/installing"
 # all files installed
 manifest="$packagedir/$version/manifest"
 {
-    echo "# $(date)"
+    echo "# $package $version ($(date))"
 
     # Extension Libraries
     # -------------------
