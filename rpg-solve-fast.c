@@ -155,8 +155,9 @@ plpurge (struct plent * pe) {
             phead = pe;
 
         ptail = pe;
-        ptail->next = NULL;
     }
+
+    if (ptail) ptail->next = NULL;
 
     return phead;
 }
@@ -233,6 +234,18 @@ pdxscan(FILE * stream, struct plent * pe)
     }
 }
 
+#ifdef DEBUG
+static void
+pldump (FILE * stream, struct plent * pe)
+{
+    fprintf(stream, "dumping package list entries:\n");
+    while (pe) {
+        fprintf(stream, "plent: %s %d %s\n", pe->pack, pe->oper, pe->vers);
+        pe = pe->next;
+    }
+}
+#endif
+
 int main (int argc, char *argv[])
 {
     struct plent * pe = plparse(stdin);
@@ -240,12 +253,17 @@ int main (int argc, char *argv[])
     int i;
 
     for (i=1; i < argc; i++) {
+        /* pldump(stderr, pe) */
+
         if (pe == NULL)
             break;
 
         if ((fidx = fopen(argv[i], "r"))) {
             pdxscan(fidx, pe);
             fclose(fidx);
+        } else {
+            fprintf(stderr, "%s: could not open: %s", argv[0], argv[i]);
+            exit(1);
         }
 
         pe = plpurge(pe);
