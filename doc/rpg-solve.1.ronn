@@ -1,59 +1,119 @@
-rpg-solve(1) -- rpg package dependency and version solver
-=========================================================
+rpg-solve(1) -- package version solver
+======================================
 
 ## SYNOPSIS
 
-`rpg solve` [`-u`] [<INDEX>]...
+`rpg solve` [<index>]...
 
 ## DESCRIPTION
 
-Reads a _package list_ from standard input, resolves version expressions
-to concrete package versions against <index>, and writes a _package
-index_ of resolved packages to standard output. Packages that cannot be
-resolved to concrete versions have a '-' version field.
+The `rpg-solve` program finds versions of packages matching specifications on
+standard input and writes concrete package versions on standard output.
+Available package versions are determined by one or more sorted <index> files.
+When a package cannot be located that matches all version specifiers given on
+standard input, a line of output is written with the package version: '-'.
 
-## OPTIONS
+The `rpg-install(1)`, `rpg-upgrade(1)`, and `rpg-fetch(1)` programs use
+`rpg-solve` to determine optimal package versions for each of their respective
+operations.
 
-  * `-u`:
-    By default, all matching package versions listed in <index> are written
-    to standard output. This option causes only the best match for each package
-    to be written instead.
+## STDIN
 
-## INPUT FORMAT
+The standard input is a *package list*. A package list is a simple text stream
+where each line specifies a package matching rule in the following format:
 
-`rpg-solve` expects a *package list* on standard input. A package list
-is a simple text file where each line specifies a package matching rule.
-It looks like this:
+    <package> <verspec> <version>
 
-    <source> <SP> <package> <SP> <verspec> <SP> <version> <NL>
+Fields are separated by a single space character and each line must be
+terminated with a new line (`\n`) character.
 
-The `<package>` is the package name, `<version>` is the package version, and
-`<verspec>` is one of: `<`, `<=`, `=`, `>=`, or `>`. The `<source>` field
-specifies where the requirement originated. This can be a package name (in case
-of dependencies), `~user` (in case of user install), or `-` to denote the
-requirement has no source or the source is unimportant.
+  * `<package>`:
+    The package name. This can be any combination of alphanumerics, the
+    underscore, or dash.
 
-An example package list:
+  * `<verspec>`:
+    A package version comparator specifying the basic matching criteria for the
+    `<version>`. Any of `<`, `<=`, `=`, `>=`, `>`, or `~>` are allowed.
 
-    ~user rails > 2.2
-    ~user sinatra >= 0
-    rails activesupport = 2.2
-    rails activerecord = 2.2
-    sinatra rack >= 1.0
-    rails rack >= 1.0.1
+  * `<version>`:
+    The package version.
+
+The package list may contain multiple rules for a single package. Only those
+versions matching all rules are considered *matching* and written to standard
+output.
+
+## INPUT FILES
+
+The <index> files given as operands to the `rpg-solve` program are plain text
+*package index* files with the following format:
+
+    <package> <version>
+
+Fields are separated by a single space character and each line must be
+terminated with a new line (`\n`) character. Fields have the same meaning as
+defined above in the *STDIN* section.
+
+Package index files must be sorted in ascending alphabetical order by
+`<package>` then descending natural order by `<version>`. When the index files
+are not sorted properly, the resulting behavior from `rpg-solve` is undefined.
 
 ## OUTPUT FORMAT
 
-`rpg-solve` writes a *package index* on standard output.  A package
-index is a simple text file where each line specifies a concrete package
-name and version. It looks like this:
+`rpg-solve` writes a *package index* on standard output.
 
-    <package> <SP> <version> <NL>
+## EXAMPLES
 
-Package indexes are usually sorted, first by `<package>` and then in
-reverse by `<version>`. This allows efficient lookups for many packages
-in a single pass over a file.
+The following is in a file named `some-index`:
+
+    rack 1.2
+    rack 1.1
+    rack 1.0
+    rack 0.9.7
+    rails 2.3.1
+    rails 2.3.0
+    rails 2.1.0
+    sinatra 0.9.6
+    sinatra 0.9.4
+    sinatra 0.9.3
+
+Pipe a package list into `rpg-solve` using `some-index` for lookups:
+
+    $ cat <<EOF | rpg-solve some-index
+    rails > 2.2
+    sinatra >= 0.9.6
+    rack >= 1.0
+    rack >= 1.0.1
+    mustache >= 3.0
+    EOF
+
+The `rpg-solve` standard output is:
+
+    mustache -
+    rack 1.2
+    rack 1.1
+    rails 2.3.1
+    rails 2.3.0
+    sinatra 0.9.6
+
+Note that all matching versions are written to standard output. The list can be
+narrowed down to only the best match for each package with `sort(1)`:
+
+    $ cat <<EOF | rpg-solve some-index | sort -u -k 1,1
+    ...
+
+The output would then be:
+
+    mustache -
+    rack 1.2
+    rails 2.3.1
+    sinatra 0.9.6
+
+The `rpg-solve` program requires strict formatting of the input package list.
+The `rpg-package-list(1)` program can be used to generate an input package list
+given package/versions on the command line and is much more forgiving.
+
+    $ rpg-package-list rack '>1.2' sinatra 0.9.6 | rpg-solve
 
 ## SEE ALSO
 
-rpg-package-list(1), rpg-prepare(1), rpg-install(1)
+`rpg-package-list(1)`, `rpg-prepare(1)`, `rpg-install(1)`

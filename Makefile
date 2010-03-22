@@ -4,46 +4,42 @@
 # Default make target
 all::
 
-# XXX include isn't POSIX but I don't feel like dealing with it right now.
-# we'll move to a separate Makefile.in eventually.
 include config.mk
 
 NAME = rpg
 TARNAME = $(NAME)
 SHELL = /bin/sh
 
-# srcdir      = .
-# prefix      = /usr/local
-# exec_prefix = ${prefix}
-# bindir      = ${exec_prefix}/bin
-# libexecdir  = ${exec_prefix}/libexec
-# datarootdir = ${prefix}/share
-# datadir     = ${datarootdir}
-# mandir      = ${datarootdir}/man
-# docdir      = $(datadir)/doc/$(TARNAME)
+CFLAGS = -Wall -pedantic
 
 # ---- END OF CONFIGURATION ----
 
 all:: build
 
 DOCHTML = \
-	rpg-sh-setup.html rpg.html rpg-fetch.html rpg-version-test.html \
+	rpg-sh-setup.html rpg.html rpg-fetch.html \
 	rpg-sync.html rpg-upgrade.html rpg-outdated.html \
 	rpg-package-install.html rpg-package-spec.html rpg-parse-index.html \
 	rpg-list.html
 
 PROGRAMPROGRAMS = \
-	rpg-config rpg-fetch rpg-install rpg-version-test rpg-uninstall rpg-build \
+	rpg-config rpg-fetch rpg-install rpg-uninstall rpg-build \
 	rpg-env rpg-sync rpg-resolve rpg-upgrade rpg-steal rpg-fsck rpg-list \
 	rpg-outdated rpg-package-list rpg-package-register rpg-package-install \
-	rpg-solve rpg-unpack rpg-package-spec rpg-parse-index rpg-shit-list \
+	rpg-unpack rpg-package-spec rpg-parse-index rpg-shit-list \
 	rpg-prepare rpg-complete rpg-help rpg-package-index rpg-dependencies \
-	rpg-leaves rpg-manifest
+	rpg-leaves rpg-manifest rpg-solve
+
+DEADPROGRAMS = \
+	rpg-update rpg-status rpg-parse-package-list rpg-version-test
+
+OBJECTS = \
+	strnatcmp.o rpg-solve.o
 
 USERPROGRAMS = rpg rpg-sh-setup
 PROGRAMS     = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 
-.SUFFIXES: .sh .rb .html
+.SUFFIXES: .sh .rb .html .c .o
 
 .sh:
 	printf "%13s  %-30s" "[SH]" "$@"
@@ -72,8 +68,21 @@ PROGRAMS     = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 	rocco $< >/dev/null
 	printf "       OK\n"
 
+.c.o:
+	printf "%13s  %-30s" "[CC]" "$@"
+	$(CC) -c $(CFLAGS) $<
+	printf "       OK\n"
+
 rpg-sh-setup: config.sh munge.rb
 rpg: config.sh munge.rb
+
+rpg-solve: rpg-solve.o strnatcmp.o
+	printf "%13s  %-30s" "[LINK]" "$@"
+	$(CC) $(CFLAGS) $(LDFLAGS) rpg-solve.o strnatcmp.o -o $@
+	printf "       OK\n"
+
+rpg-solve-fast.o: rpg-solve.c strnatcmp.h
+strnatcmp.o: strnatcmp.c strnatcmp.h
 
 build: $(PROGRAMS)
 
@@ -103,7 +112,7 @@ uninstall:
 		echo "rm -f $(bindir)/$$f"; \
 		rm "$(bindir)/$$f"; \
 	done
-	for f in $(PROGRAMPROGRAMS) rpg-update rpg-status rpg-parse-package-list; do \
+	for f in $(PROGRAMPROGRAMS) $(DEADPROGRAMS); do \
 		test -e "$(libexecdir)/$$f" || continue; \
 		echo "rm -f $(libexecdir)/$$f"; \
 		rm "$(libexecdir)/$$f"; \
@@ -117,7 +126,7 @@ install-local:
 	./configure --development
 
 clean:
-	rm -vf $(PROGRAMS) $(DOCHTML)
+	rm -vf $(PROGRAMS) $(DOCHTML) $(OBJECTS)
 	$(MAKE) -C doc clean
 
 .SILENT:

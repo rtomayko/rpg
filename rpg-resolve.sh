@@ -37,10 +37,10 @@ then index="$RPGINDEX/release"
 else test -f "$index"
 fi
 
+
 versions=$(
-    grep "^$package " < "$index"    |
-    cut -d ' ' -f 2                 |
-    rpg-version-test - "$@"         |
+    rpg-package-list "$package" "$@" |
+    rpg-solve "$index"               |
     head -$max
 ) || true
 

@@ -6,27 +6,22 @@
 #
 # A variety of argument styles are supported:
 #
-#     $ rpg-package-list rdiscount -v '>=1.8.7' sinatra/1.0
+#     $ rpg-package-list rdiscount '>=1.8.7' sinatra/1.0 rails \> 3
 #     rdiscount >= 1.8.7
 #     sinatra = 1.0
+#     rails > 3
 #
 # The output format is:
 #
 #     <package> <verspec> <version>
 #
-# When a `~>` version specifier is given, it's converted into two specifiers
-# in output:
-#
-#     $ rpg-package-list rails '~> 2.2.4'
-#     rails >= 2.2.4
-#     rails < 2.3
-#
 set -e
 . rpg-sh-setup
 
 ARGV="$@"
-USAGE '${PROGNAME} [<package>]
-Parse a package list and output in standard format.'
+USAGE '${PROGNAME} <package> [<version>] ...
+Parse list of packages as args or on standard input and output
+in standard package list format.'
 
 # These variables are used to keep the current package and version.
 package=
@@ -57,21 +52,16 @@ parse_packages () {
 # Write a `<package> <version>` pair to standard output and reset the
 # `package`, `verspec`, and `vers` variables.
 write_package () {
-    test "$package" || return 0
+    test -n "$package" || return 0
 
     # Use `>=0` if no version was given
-    test "$vers" || {
+    test -n "$vers" || {
         verspec='>='
         vers='0'
     }
 
-    # Replace `~> 0.3` with `>= 0.3 < 0.4`.
-    if test "$verspec" = '~>'
-    then echo "$package >= $vers"
-         echo "$package <= ${vers%.*}.99999999"
-    else
-         echo "$package ${verspec:-=} ${vers:-0}"
-    fi
+    # Write single package list line to standard output.
+    echo "$package ${verspec:-=} ${vers:-0}"
 
     # Reset variables and start over.
     package=
@@ -79,21 +69,18 @@ write_package () {
     vers=
 }
 
-
 # Massage input to make option parsing a bit easier. Substitutions are:
 #
-#   * `-v1.2.3` turns into `-v 1.2.3`
-#   * `--version=123` turns into `--version 123`
+#   * `foo -v1.2.3` turns into `foo -v 1.2.3`
 #   * `>=0.3.1` turns into `>= 0.3.1`
-#   * `rails/2.3.4` turns into `rails -v 2.3.4`
+#   * `rails/2.3.4` turns into `rails 2.3.4`
 #
 preformat () {
-    sed -e "s/[= ]\{1,\}/$ENEWLINE/g"                      |
+    sed -e "s/[ ]\{1,\}/$ENEWLINE/g"                      |
     sed -e "s/^-\([a-z]\)\([^ ]\)/-\1$ENEWLINE\2/g"        \
         -e "s@^\([a-z][a-z]*\)/\([0-9.]\)@\1$ENEWLINE\2@g" \
         -e "s/\([><=~]\)\([0-9]\)/\1$ENEWLINE\2/g"
 }
-
 
 # Read package list from stdin if - given
 test "$1" = - && {
@@ -105,4 +92,6 @@ test "$1" = - && {
 
 # Now format arguments
 notice "parsing package list items in $# arguments"
-echo "$@" | preformat | parse_packages
+echo "$@" |
+preformat |
+parse_packages
