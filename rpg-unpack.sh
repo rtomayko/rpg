@@ -22,24 +22,30 @@ USAGE '${PROGNAME} [-p <path>|-P] <package> [<version>]
 Unpack a gem file to disk or as a tar stream on standard output.
 
 Options
-  -p <path>        Unpack under <path> instead of the working directory.
-  -P               Unpack under RPGPACKS instead of the working directory.
   -c               Write gem data tar stream to stdout. Do not create any files.
+  -f               Unpack over an existing directory.
   -m               Change the behavior of the -c option. Write gem metadata
                    segment instead of the data segment.
+  -n               Do nothing if unpack directory already exists.
+  -p <path>        Unpack under <path> instead of the working directory.
+  -P               Unpack under RPGPACKS instead of the working directory.
 
 The <package> may be a package name or path to a gem file on disk. When a
 package name is given, the <version> may also be specified.'
 workdir=.
 filter=untar
 segment=data.tar.gz
-while getopts cmPp: opt
+noop=false
+force=false
+while getopts cfmnPp: opt
 do
     case $opt in
     p)   workdir="$OPTARG";;
     P)   workdir="$RPGCACHE";;
     c)   filter=cat;;
     m)   segment=metadata.gz;;
+    f)   force=true;;
+    n)   noop=true;;
     ?)   helpthem
          exit 2;;
     esac
@@ -71,11 +77,20 @@ version=${basename##*-}
 # newly created directory after the gem name. When the `-c` option is not
 # given, the gem tar stream is piped through here.
 untar () {
-    mkdir "$workdir/$package-$version"
+    if $force
+    then mkdir -p "$workdir/$package-$version"
+    else mkdir "$workdir/$package-$version"
+    fi
     tar -xom -C "$workdir/$package-$version" -f - 2>/dev/null
 }
 
-notice "$file -> $workdir/$package-$version"
+# Bail out with just the unpack directory on stdout if the -n option was
+# given.
+$noop && test "$filter" = "untar" -a -d "$workdir/$package-$version" && {
+    notice "$workdir/$package-$version already exists. noop'ing."
+    echo "$workdir/$package-$version"
+    exit 0
+}
 
 # Pipe the gem directly into `tar` and extract only the file/segment we're
 # interested in (the `-O` option causes the file to be written to stdout
