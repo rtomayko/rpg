@@ -1,18 +1,5 @@
 #!/bin/sh
-# Register a gem in the package database.
-#
-#     PGEMDB
-#        foo/
-#          0.1/
-#          0.2/
-#        bar/
-#          1.2/
-#          1.3/
-#            name
-#            version
-#            gemspec
-#            deps
-#
+# Register a gem in the local package database.
 set -e
 . rpg-sh-setup
 
@@ -30,7 +17,7 @@ test "$1" = '-f' && {
 # Under the second synopsis form, we first perform a `rpg-fetch` on the
 # `<package>` and `<version>` given and then continue with the resulting
 # filename.
-if test $# -eq 2 && ! expr -- "$1" : '.*\.gem'
+if test $# -eq 2 && ! expr -- "$1" : '.*\.gem' >/dev/null
 then
     gemfile=$(rpg-fetch "$1" "$2")
     set -- "$gemfile"
