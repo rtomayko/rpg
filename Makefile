@@ -26,15 +26,6 @@ SHELL = /bin/sh
 
 all:: build
 
-SOURCES = \
-	rpg-sh-setup.sh rpg.sh rpg-config.sh rpg-fetch.sh rpg-install.sh \
-	rpg-version-test.sh rpg-uninstall.sh rpg-build.sh rpg-env.sh rpg-sync.sh \
-	rpg-resolve.sh rpg-upgrade.sh rpg-steal.sh rpg-fsck.sh rpg-outdated.sh \
-	rpg-package-register.sh rpg-package-install.sh rpg-solve.sh rpg-unpack.sh \
-	rpg-package-spec.rb rpg-parse-index.rb rpg-shit-list.sh rpg-prepare.sh \
-	rpg-help.sh rpg-package-index.sh rpg-list.sh rpg-dependencies.sh \
-	rpg-leaves.sh
-
 DOCHTML = \
 	rpg-sh-setup.html rpg.html rpg-fetch.html rpg-version-test.html \
 	rpg-sync.html rpg-upgrade.html rpg-outdated.html \
