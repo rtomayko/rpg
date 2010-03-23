@@ -94,6 +94,9 @@ man:
 
 doc: $(DOCHTML)
 
+test: build
+	cd test && $(SHELL) test-rpg.sh
+
 install:
 	mkdir -p "$(bindir)" || true
 	for f in $(USERPROGRAMS); do \
