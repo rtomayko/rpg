@@ -40,6 +40,9 @@ else
 fi |
 xargs -P 4 -n 1 unlink
 
+# Cleanup empty directories
+find $RPGLIB -depth -type d -empty -exec rmdir {} \;
+
 # Unlink the active symlink
 unlink "$packagedir/active"
 
