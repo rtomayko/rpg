@@ -117,10 +117,6 @@ test -e "$packagedir/active" && {
 # Path to the unpacked package directory.
 pack="$RPGPACKS/$package-$version"
 
-# This is our file manifest. We record everything installed in here
-# so we know how to uninstall the package. Create/truncate it in case
-# it already exists.
-#
 # Symlink the `installing` file to the version directory. This will let us
 # detect in progress or failed installations.
 ln -sf "$version" "$packagedir/installing"
