@@ -41,7 +41,7 @@ while getopts cfmnPp: opt
 do
     case $opt in
     p)   workdir="$OPTARG";;
-    P)   workdir="$RPGCACHE";;
+    P)   workdir="$RPGPACKS";;
     c)   filter=cat;;
     m)   segment=metadata.gz;;
     f)   force=true;;
