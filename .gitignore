@@ -64,3 +64,6 @@ rpg-leaves
 rpg-diff
 rpg-manifest
 *.o
+work
+test/trash
+setup

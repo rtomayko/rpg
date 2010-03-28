@@ -132,6 +132,14 @@ clean:
 	rm -vf $(PROGRAMS) $(DOCHTML) $(OBJECTS)
 	$(MAKE) -C doc clean
 
+tags:
+	ctags --extra=+f  \
+		--totals=yes  \
+		--fields=+iaS \
+		--exclude=@.gitignore \
+		--exclude=/usr/X11    \
+		-R -f tags . /usr/include
+
 .SILENT:
 
-.PHONY: install uninstall clean
+.PHONY: install uninstall clean tags
