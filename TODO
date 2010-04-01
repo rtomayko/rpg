@@ -1,0 +1,86 @@
+NEXT
+
+[x] rpg-steal - steal current rubygems environment
+[x] rpg-status cache
+[x] rpg-status
+[x] rpg-outdated
+[x] usage message helpers in rpg-sh-setup.
+[x] fetch everything then upgrade
+[x] dep solving
+[x] RPGDB/<package>/<vers>/deps = dep list <package> <verspec>
+[x] all gemspec information in database
+[x] use tar to extract gems instead of unpack
+[x] README
+[x] HACKING
+[x] need default output
+[x] remove reliance on `gem list' for building index
+[x] install to libexec. rpg.sh knows path.
+[x] config.sh and config.mk / controlling `make install'
+[x] configure, make, make install
+[x] automatic RPGXXX configuration based on active ruby
+[x] rpg-shit-list.sh
+[x] make clean can fail on extension build
+[x] depsolver uses previous pass to resolve deps
+[x] rpg prepare - prepare an install for later
+[x] bash completion
+[x] rpg-update -> rpg-sync
+[x] rpg-help
+[x] rpg-list -> rpg-package-list
+[x] rpg-status -> rpg-list
+[x] rpg-status -s writes output in short format (package name)
+[x] default system install on mac
+[x] rpg-config groups variables with comments
+[x] rpg-config -e for editing user, ruby, system configs
+[x] rpg dep solver
+[x] rpg dep solver detects incompatible packages
+[x] rpg-deps shows gem dependency (tree)
+[x] rpg-prepare bails out with bad packages for now (until interactive)
+[x] dependencies file includes source package name (used grep instead)
+[x] rpg-solve in C - single pass over index file per run
+[x] rpg-manifest shows package manifest
+[x] uninstall before install
+[x] rpg-unpack with <name> <version> fetches
+[x] rpg-diff shows diff between two package versions
+[x] basic TAP test framework
+[ ] install from gem file
+[ ] implement rpg -q for silencing heed
+[ ] rpg list multiple available versions
+[ ] rpg-upgrade -> rpg-update. like rpg-install with installed index.
+[ ] tweak rpg-prepare/rpg-install/rpg-upgrade output in different cases
+[ ] exclude non-unix platforms when building release index
+[ ] install extensions with make install and put in sitearchdir
+[ ] rpg-sync fails with no network connection with -s.
+[ ] shitlist: mongrel_rails bad shebang
+
+LATER
+
+[ ] rpg-fetch should fetch into the current directory by default
+[ ] rpg-package-spec with <name> <version> fetches
+[ ] man pages (write program to extract usage message)
+[ ] support prelease packages
+[ ] development deps
+[ ] rpg-whatsnew shows what's new since last sync using diff
+[ ] warn when overwriting files on install
+[ ] rpg-which shows which package a file belongs to
+[ ] use gemspec defined files, executables, and extension when installing
+[ ] rpg-uninstall and dependencies
+[ ] build packages in a separate step from install
+[ ] xargs -P is non-POSIX. check with: `xargs -P 1 </dev/null'
+[ ] rpg install --interactive ;
+[ ] rpg-install puts other files in datadir
+[ ] rpg-fetch falls back on ruby fetcher when curl not available
+[ ] root and unprivileged execution
+[ ] write gem install messages (OPTIONAL)
+[ ] extensions should install with make install
+[ ] RPGGEMSEARCH=<path>:<path>:..
+[ ] pull down popular gems from gemcutter and use for completion
+[ ] rpg-list assumes -a when name given
+[ ] rpg-list -e assumes pattern is egrep re
+[ ] rpg-deps -g uses graphviz to graph dependencies
+[ ] rpg support command abbreviation (glob libexec/rpg-* if one match run it)
+[ ] logging to file of all commands w/ verbose output.
+[ ] RPGDB/<package>/<vers>/manifest = files installed (<type> <md5> <path>)
+[ ] colors!
+[ ] rpg-check verifies an installed package
+[ ] search from current directory up for .rpgrc
+[ ] ruby-specific config file based on md5 of ruby interpreter path
