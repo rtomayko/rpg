@@ -70,6 +70,7 @@ Options
   -d <days>             Do nothing if db is less than <days> days old
   -m <mins>             Do nothing if db is less than <mins> minutes old
   -s                    Do nothing if db is less than $RPGSTALETIME old
+  -F                    Strict failures when package index cannot be updated
   -v                    Write newly available packages to stdout after updating
 
 The -s option is used by various rpg commands when a sync may be
@@ -78,12 +79,14 @@ RPGSTALETIME option in ~/.rpgrc or /etc/rpgrc.'
 
 verbose=false
 staletime=
-while getopts m:d:vs opt
+strict=false
+while getopts svFm:d: opt
 do
     case $opt in
     v)   verbose=true;;
     m)   staletime="$OPTARG min";;
     d)   staletime="$OPTARG day";;
+    F)   strict=true;;
     s)   staletime="$RPGSTALETIME";;
     ?)   helpthem;;
     esac
@@ -139,10 +142,12 @@ test -d "$RPGINDEX" || {
     mkdir -p "$RPGINDEX"
 }
 
-notice "building release file [$release+]"
+notice "building release file: $release"
 
 # Fetching and Formatting The Spec Index
 # --------------------------------------
+
+{
 
 # Fetch the latest specs file from rubygems.org.
 curl -sL "$RPGSPECSURL"                     |
@@ -174,17 +179,24 @@ rpg-parse-index                             |
 # and then reverse by version.
 #
 # Write that out to our staged release file so we can pass over it a bit.
-cut -d ' ' -f 1,2 > "$release+"
+cut -d ' ' -f 1,2
+
+} > "$release+" 2>/dev/null
 
 # There's a chance that `curl` or `gzip` or something else in the above
-# pipeline failed. `set -e` won't catch that since it's not the last command
-# in the pipeline. Detect it by checking the contents of the file and bail
-# if there's nothing there.
+# pipeline will have failed. `set -e` won't catch that since it's not the
+# last command in the pipeline. Detect it by checking the contents of the
+# file and bail if there's nothing there. Exit with failure when the strict
+# option (-F) was given and also when the index doesn't already exist.
 if test -z "$(head -1 "$release+" 2>/dev/null)"
-then warn "failed to retrieve package index from remote server."
-     exit 1
+then
+    if   $strict || ! test -f "$release"
+    then heed "could not retrieve package index. failing."
+         exit 1
+    else heed "could not retrieve package index. using existing."
+         exit 0
+    fi
 fi
-
 
 # The Release Diff
 # ----------------
@@ -195,7 +207,7 @@ fi
 #
 # We also don't care that much if this doesn't work due to, e.g.
 # `diff(1)` not being available.
-notice "building release diff [$release-diff+]"
+notice "building release diff: $release-diff"
 
 (diff -u "$release" "$release+" 2>&1 && true) > "$release-diff+"
 
