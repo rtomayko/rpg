@@ -27,6 +27,13 @@ do
 done
 shift $(( $OPTIND - 1 ))
 
+# With -t and no package argument, show a tree of dependencies for all packages,
+# rooted at packages no other package depends.
+$tree && test -z "$*" && {
+    rpg leaves | xargs -n 1 -- "$0" $ARGV
+    exit
+}
+
 # With the `-a` argument, write all dependencies for all packages in the
 # following format:
 #
