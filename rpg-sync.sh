@@ -157,8 +157,12 @@ gzip -dc -                                  |
 
 # Now turn this mess of Marshal data into something we can deal with using
 # `rpg-parse-index`. See that file for more info on the `specs.gz` file
-# format.
+# format and the output from `rpg-parse-index`.
 rpg-parse-index                             |
+
+# We only want packages with a "ruby" platform. This may be too aggressive a
+# filter but seems to work fine in 99.9% of cases.
+grep ' ruby$'                               |
 
 # We don't need the platform, yet. Grab only the `<name>` and `<version>`
 # fields. After `cut`, our stream text looks like this:
