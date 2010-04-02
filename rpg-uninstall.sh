@@ -38,7 +38,7 @@ then
 else
     cat
 fi |
-xargs -P 4 -n 1 unlink
+{ xargs -P 4 -n 1 unlink || true; }
 
 # Cleanup empty directories
 find $RPGLIB -depth -type d -empty -exec rmdir {} \;
