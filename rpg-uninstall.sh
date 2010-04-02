@@ -19,7 +19,7 @@ manifest="$packagedir/active/manifest"
 # Bail out if the db doesn't have this package or the package
 # isn't active.
 test -d "$packagedir" -a -f "$manifest" || {
-    warn "$name is not installed"
+    warn "$package is not installed"
     exit 1
 }
 
