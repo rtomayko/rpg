@@ -70,6 +70,7 @@ test -d "$packagedir/$version" || {
 }
 
 sed -n 's|^runtime ||p' <"$packagedir/$version/dependencies" |
+
 if $tree
 then
     while read pack spec vers
@@ -84,7 +85,7 @@ else
     if $recursive
     then recurse="$0 -r"
          $prefix && recurse="$recurse -p"
-    else recurse="true"
+    else recurse=true
     fi
 
     while read pack spec vers

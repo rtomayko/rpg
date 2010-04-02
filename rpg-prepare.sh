@@ -12,10 +12,12 @@ Options
   -s <name>   Give this prepared installation a name'
 
 # TODO add rpg-prepare -e for editing an existing package list
-session=session
-while getopts s: opt
+session=default
+installing=false
+while getopts is: opt
 do case $opt in
    s)   session="$OPTARG";;
+   i)   installing=true;;
    ?)   helpthem;;
    esac
 done
@@ -165,9 +167,7 @@ do
     # leave the dep solve loop.
     if cmp -s "$packlist" "$packlist+"
     then changed=false
-         notice "package list did not change"
     else changed=true
-         notice "package list changed"
     fi
 
     mv "$packlist+" "$packlist"
@@ -200,6 +200,10 @@ $(echo "$badpacks" | cut -d ' ' -f 1)"
 fi
 
 # Note the number of packages that are now queued up for installation.
-goodpacks=$(grep -v ' -$' "$delta")
-heed "$(echo "$goodpacks" |grep -c .) packages ready for installation:
+! $installing && {
+    goodpacks=$(grep -v ' -$' "$delta")
+    heed "$(echo "$goodpacks" |grep -c .) packages ready for installation:
 $goodpacks"
+}
+
+true

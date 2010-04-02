@@ -43,7 +43,7 @@ fi
 
 test -d "$sessiondir" || {
     trap "rm -rf '$sessiondir'" 0
-    rpg-prepare -s "$session" "$@"
+    rpg-prepare -i -s "$session" "$@"
 }
 
 numpacks=$(grep -c . <"$installfrom")
