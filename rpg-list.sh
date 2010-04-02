@@ -19,21 +19,21 @@ Passing one or more <glob>s filters the list to matching packages.
 
 Options
   -a               Include packages available but not installed
-  -u               Sync the package index with remote repository first
+  -l               Long list format: show package status and version fields
   -p               Generate easily parseable output
-  -s               Write package names only (no versions or status)'
+  -u               Sync the package index with remote repository first'
 
 sync=false
 parsey=false
-simple=false
+long=false
 joiner=
-while getopts apus opt
+while getopts alpus opt
 do
     case $opt in
     a)   joiner="-a2";;
+    l)   long=true;;
     u)   sync=true;;
-    p)   parsey=true;;
-    s)   simple=true
+    p)   long=true;
          parsey=true;;
     ?)   helpthem;
          exit 2;;
@@ -165,13 +165,13 @@ grep -v '. - - .'                                |
 
 # All that's left is to read the output from `join` and apply some light
 # formatting.
-if $simple
+if ! $long
 then
     awk '{
         if ( $1 != "-" ) {
-            print $1;
+            print $1, $2;
         } else if ($4 != "-") {
-            print $4;
+            print $4, $3;
         }
     }'
 else
