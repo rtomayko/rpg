@@ -38,7 +38,7 @@ rpg-sync -s
 # should probably be moved to its own top-level directory.
 : ${RPGSESSION:?'not configured'}
 mkdir -p "$RPGSESSION"
-sessiondir="$RPGSESSION/@$session"
+sessiondir="$RPGSESSION/$session"
 packlist="$sessiondir/package-list"
 solved="$sessiondir/solved"
 existing="$sessiondir/existing"

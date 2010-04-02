@@ -13,7 +13,7 @@ Options
   -f          Force package installation even if already installed
   -s <name>   Install from a session created with rpg-prepare'
 
-session=session
+session=default
 force=false
 while getopts fs: opt
 do case $opt in
@@ -24,12 +24,12 @@ do case $opt in
 done
 shift $(( $OPTIND - 1 ))
 
-sessiondir="$RPGSESSION/@$session"
+sessiondir="$RPGSESSION/$session"
 packlist="$sessiondir/package-list"
 delta="$sessiondir/delta"
 solved="$sessiondir/solved"
 
-test "$session" = "session" -a -d "$sessiondir" && {
+test "$session" = "default" -a -d "$sessiondir" && {
     notice "rm'ing crusty session dir: $sessiondir"
     rm -rf "$sessiondir"
 }
