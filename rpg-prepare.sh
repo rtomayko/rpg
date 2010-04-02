@@ -144,9 +144,11 @@ do
     # package/version combos into `rpg-package-register` to fetch and enter
     # the package into the database. Using `xargs -P 8` allows as many as eight
     # concurrent fetch/register operations to run in parallel.
-    comm -13 "$solved" "$solved+"                 |
-    grep -v ' -$'                                 |
-    xargs -P 8 -n 2 rpg-package-register          >/dev/null
+    {
+        comm -13 "$solved" "$solved+"             |
+        grep -v ' -$'                             |
+        xargs -P 8 -n 2 rpg-package-register
+    } >/dev/null || die "fetch/register package failed. aborting."
 
     # Rebuild the master package list by concatenating the original user-
     # specified packages with all dependencies of all packages solved so far.

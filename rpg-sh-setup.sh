@@ -118,6 +118,9 @@ heed () {
 # after sourcing config files.
 notice () { true; }
 
+# Abort with a message and exit with failure.
+die () { warn "$@"; exit 1; }
+
 # Ruby Related Utility Functions
 # ------------------------------
 
