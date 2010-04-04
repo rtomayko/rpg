@@ -42,43 +42,41 @@ NEXT
 [x] rpg-unpack with <name> <version> fetches
 [x] rpg-diff shows diff between two package versions
 [x] basic TAP test framework
-[ ] install from gem file
-[ ] implement rpg -q for silencing heed
-[ ] rpg list multiple available versions
-[ ] rpg-upgrade -> rpg-update. like rpg-install with installed index.
-[ ] tweak rpg-prepare/rpg-install/rpg-upgrade output in different cases
-[ ] exclude non-unix platforms when building release index
-[ ] install extensions with make install and put in sitearchdir
-[ ] rpg-sync fails with no network connection with -s.
+[x] rpg-sync fails with no network connection with -s.
+[x] tweak rpg-prepare/rpg-install/rpg-upgrade output in different cases
+[x] exclude non-unix platforms when building release index
 [ ] shitlist: mongrel_rails bad shebang
+[ ] update status section in README
+[ ] update INSTALLING with note on rvm and non-system installs
 
 LATER
 
 [ ] rpg-fetch should fetch into the current directory by default
 [ ] rpg-package-spec with <name> <version> fetches
+[ ] install from gem file
+[ ] install extensions with make install and put in sitearchdir
+[ ] implement rpg -q for silencing heed
+[ ] rpg list multiple available versions
 [ ] man pages (write program to extract usage message)
-[ ] support prelease packages
+[ ] prelease packages
 [ ] development deps
 [ ] rpg-whatsnew shows what's new since last sync using diff
 [ ] warn when overwriting files on install
 [ ] rpg-which shows which package a file belongs to
 [ ] use gemspec defined files, executables, and extension when installing
 [ ] rpg-uninstall and dependencies
-[ ] build packages in a separate step from install
+[ ] build package extensions in a step separate from / prior to install
 [ ] xargs -P is non-POSIX. check with: `xargs -P 1 </dev/null'
-[ ] rpg install --interactive ;
 [ ] rpg-install puts other files in datadir
 [ ] rpg-fetch falls back on ruby fetcher when curl not available
 [ ] root and unprivileged execution
-[ ] write gem install messages (OPTIONAL)
-[ ] extensions should install with make install
+[ ] write gem install messages during prepare (OPTIONAL)
 [ ] RPGGEMSEARCH=<path>:<path>:..
-[ ] pull down popular gems from gemcutter and use for completion
 [ ] rpg-list assumes -a when name given
 [ ] rpg-list -e assumes pattern is egrep re
 [ ] rpg-deps -g uses graphviz to graph dependencies
 [ ] rpg support command abbreviation (glob libexec/rpg-* if one match run it)
-[ ] logging to file of all commands w/ verbose output.
+[ ] logging to file of all commands w/ verbose output
 [ ] RPGDB/<package>/<vers>/manifest = files installed (<type> <md5> <path>)
 [ ] colors!
 [ ] rpg-check verifies an installed package

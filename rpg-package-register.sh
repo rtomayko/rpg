@@ -6,7 +6,7 @@ set -e
 [ "$*" ] || set -- '--help'; ARGV="$@"
 USAGE '${PROGNAME} [-f] <file>...
        ${PROGNAME} [-f] <package> <version>
-Register a gem in the package database and write location stdout.'
+Register a gem in the package database.'
 
 force=false
 test "$1" = '-f' && {
