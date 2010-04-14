@@ -1,0 +1,63 @@
+These are some known issues with rpg, their causes, and notes on plans for
+addressing them. This list intentionally does not include missing features but
+rather things that you are likely to run into during the course of using rpg.
+
+- Packages with libraries or executables that assume they are installed under a
+  directory-per-package structure and attempt to read files outside of their
+  containing lib or bin directory will fail to locate those files. This
+  typically manifests with library files that attempt to read a `VERSION` file
+  from the package's root directory.
+
+  The `rpg-shit-list` program is a crappy hack that attempts to patch certain
+  popular libraries up during installation.
+
+  There is as of yet no compelling proposed solution to this issue beyond
+  requesting (preferably via patch) that package maintainers avoid making
+  assumptions about the locations of library and executable files where
+  possible.
+
+- Packages with libraries or executables that call the Rubygems
+  `gem(<name>, <version)` method to declare and load dependent packages at
+  runtime will fail to locate the package (unless the gem is installed within
+  rubygems environment). It is very rarely appropriate or beneficial for
+  libraries to make these sort of calls explicitly since rubygems handles this
+  by installing wrapper executables and also when loading packages via its
+  `Kernel#require` hooks.
+
+  There is no planned solution to this issue beyond asking package maintainers
+  to avoid the `gem` method where not truly warranted.
+
+- There is currently no (straightforward) way to manually resolve exclusive
+  version conflicts during install. The install fails with a message stating
+  that some "packages cannot be resolved". The most typical cause of exclusive
+  version conflicts is when two or more packages being installed (or already
+  installed) specify incompatible versions of package dependencies.
+
+  An interactive version resolution system is planned.
+
+- The rpg-uninstall program performs no dependency checking or recursive
+  uninstallation of packages. Uninstalling packages that other packages depend
+  on will result in an inconsistent environment.
+
+  Support for dependency aware uninstallation is planned.
+
+- Using rpg with a root-owned / system ruby requires root privileges unless
+  a great many RPGXXX variables are tuned via rpg-config. Using rpg with a
+  system ruby is not recommended at this time. Use with rvm or custom /
+  non-system ruby installations for now.
+
+  Full support for all of the following is planned: 1.) installing libraries
+  into a system ruby environment, 2.) automatic privilege-deescalation on
+  operations not requiring superuser privileges, and 3.) installing under
+  multiple custom/configurable root-owned locations.
+
+- Extension libraries that rely on the `make install` target to perform custom
+  tasks may not be installed or function properly. It is assumed that extensions
+  produce one or more shared object files; rpg installs these manually -- without
+  invoking the `make install` target -- due to issues with tracking files
+  installed.
+
+- Some really awesome features of Rubygems are not yet supported. These include:
+  installing packages with their development dependencies, installing
+  pre-release packages, and installing packages from multiple source
+  repositories. All of these features are planned and fairly high priority.
