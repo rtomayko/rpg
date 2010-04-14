@@ -1,39 +1,41 @@
-                                      RPG
-                         manages gem packages. quickly.
+RPG - manages gem packages. quickly.
+====================================
 
-This is rpg, a package management utility for unix based on Rubygems. rpg
-manages Ruby libraries packaged as gems and distributed from rubygems.org in a
-way that's natural on unix systems.
+This is rpg, a package management utility for unix based on the Rubygems package
+format and repository protocol. rpg installs Ruby packages distributed from
+rubygems.org with full support for dependency resolution, native extension
+compilation, and package upgrades.
 
-It's also fast.
-
-rpg can be thought of as a non-compatible alternative to the gem command that's
-shipped with Rubygems. Most common gem operations are implemented in rpg, often
-in ways that are a bit different from Rubygems, both in interface and
-implementation.
+rpg can be thought of as a non-compatible alternative to the gem command shipped
+with Rubygems. Most commonly used gem operations are available in rpg, often in
+ways that are a bit different from the gem command, both in interface and
+implementation. See the *VERSUS RUBYGEMS* section below for details on these
+differences.
 
 rpg and Rubygems can co-exist on a system, though Rubygems is not required for
-rpg to operate. rpg installed packages typically override gem installed
-packages.
+rpg to operate. Packages installed with rpg override packages installed with the
+gem command.
 
 STATUS
 ------
 
-Experimental.
+Experimental. Using rpg with system rubys is not yet recommended. Suggested use
+is with rvm or custom, non-system ruby builds. See the KNOWN-ISSUES file for a
+list of potential gotchas and general annoyances.
 
-Warning: rpg installs library files under the active Ruby interpreter's
-`vendor_ruby` or `site_ruby` directory by default. The `rpg config` command
-includes configured installation paths in its output -- use it to verify the
-active configuration before performing destructive operations.
+IMPORTANT: In its default configuration, rpg installs library files under the
+active Ruby interpreter's `vendor_ruby` or `site_ruby` directory. The `rpg
+config` command outputs the current destination installation paths -- use it to
+verify the active configuration before performing destructive operations.
 
 INSTALLING
 ----------
 
-To install rpg under the default location (/usr/local):
+To install rpg under the default location (`/usr/local`):
 
     ./configure
     make
-    sudo make install
+    [sudo] make install
 
 To install rpg into a self-contained directory off your home:
 
@@ -45,6 +47,10 @@ You may need to add `<prefix>/bin` to your `PATH` if it isn't there already:
 
     PATH="$PATH:<prefix>/bin"
 
+The installation puts files under the `bin`, `libexec`, and `share/man`
+directories of the configured `<prefix>`. See `configure --help` for
+information on tuning these default locations.
+
 See `rpg --help` once installed for a list of available commands and general
 program usage.
 
@@ -53,7 +59,7 @@ VERSUS RUBYGEMS
 
   * Like gem, rpg uses rubygems.org as its package repository and gem
     files as its package format. Installing from other sources is not yet
-    supported, but is likely to be added in the future.
+    supported, but is likely to be added in the near future.
 
   * Like gem, rpg supports dependency resolution using the information
     included in a gem's specification metadata.
@@ -68,18 +74,19 @@ VERSUS RUBYGEMS
 
   * Like gem, rpg is made up of exactly three characters.
 
-  * Unlike gem, rpg organizes the files it installs by type, not by package.
-    For instance, Ruby library files are placed directly under a single
-    lib directory (the currently active site_ruby directory by default),
-    executables under /usr/local/bin (configurable), manpages under
-    /usr/local/share/man, etc.
+  * Unlike gem, rpg organizes the files it installs by file type, not by
+    package. For instance, Ruby library files are placed directly under a
+    single `lib` directory (the currently active `site_ruby` directory by
+    default), executables under `/usr/local/bin` (configurable), manpages
+    under `/usr/local/share/man`, etc.
 
   * Unlike gem, rpg is not capable of installing multiple versions of the
-    same package into a rpg environment -- they would overwrite each other.
-    Version conflicts are resolved at install time.
+    same package into a single rpg environment -- the package's files would
+    overwrite each other. All version conflicts must be resolved at install
+    time.
 
   * Unlike gem, rpg has no runtime component (e.g., `require 'rubygems'`).
-    Because all library files are placed under a common lib directory, and
+    Because all library files are placed under a common `lib` directory, and
     because package versions are sussed at install time, there's no need for
     a component to select which packages are active at runtime.
  
@@ -96,8 +103,8 @@ VERSUS RUBYGEMS
     and resolve dependencies, and 2.) install package contents. This allows
     for staged/later installs and conflict detection before install.
 
-  * Unlike gem, rpg is fast. Most compareable operations complete in an
-    order of magnitude less time performant.
+  * rpg outperforms the gem command in many ways. Most comparable
+    operations complete in at least one order of magnitude less time.
 
 ABOUT
 -----
@@ -119,10 +126,10 @@ release indexes and gemspecs could be useful at least.
 Debian's apt and dpkg, FreeBSD's ports system, and Redhat/Fedora's yum all
 influenced rpg's design in various ways.
 
-Git's overall design influenced rpg signficantly. Git's internal project
-organization provides a roadmap for writing largish systems using many small
-specialized programs. Its granular use of the filesystem as a database (the
-.git/refs and .git/objects hierarchies, especially) informed much of rpg's
+Git's overall design influenced rpg significantly. Git's internal project
+organization provides a roadmap for writing moderate sized systems using many
+small specialized programs. Its granular use of the filesystem as a database
+(the .git/refs and .git/objects hierarchies, especially) informed much of rpg's
 package database design.
 
 COPYING
