@@ -197,6 +197,7 @@ $RUBY <<__RUBY__
     puts "
     RUBYPREFIX='#{conf['prefix']}'
     RUBYDLEXT='#{conf['DLEXT']}'
+    RUBYARCH='#{conf['arch']}'
     RUBYSITEDIR='#{conf['sitelibdir']}'
     RUBYVENDORDIR='#{conf['vendorlibdir']}'
     RUBYMANDIR='#{conf['mandir']}'
