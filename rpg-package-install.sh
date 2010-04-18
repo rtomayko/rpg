@@ -147,8 +147,8 @@ manifest="$packagedir/$version/manifest"
         while read dl
         do
             prefix=$(sed -n 's/^target_prefix *= *//p' "$(dirname $dl)/Makefile")
-            dest="${RPGLIB}${prefix}/$(basename $dl)"
-            mkdir -p "${RPGLIB}${prefix}"
+            dest="${RPGLIB}${prefix}/${RUBYARCH}/$(basename $dl)"
+            mkdir -p "${RPGLIB}${prefix}/${RUBYARCH}"
             installfile "$dl" "$dest"
             echo "$dest"
         done
