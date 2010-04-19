@@ -45,9 +45,9 @@ NEXT
 [x] rpg-sync fails with no network connection with -s.
 [x] tweak rpg-prepare/rpg-install/rpg-upgrade output in different cases
 [x] exclude non-unix platforms when building release index
-[ ] shitlist: mongrel_rails bad shebang
-[ ] update status section in README
-[ ] update INSTALLING with note on rvm and non-system installs
+[x] update status section in README
+[x] update README with note on rvm and non-system installs
+[x] shitlist: mongrel_rails bad shebang
 
 LATER
 
