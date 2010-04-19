@@ -5,10 +5,10 @@ rather things that you are likely to run into during the course of using rpg.
 - Packages with libraries or executables that assume they are installed under a
   directory-per-package structure and attempt to read files outside of their
   containing lib or bin directory will fail to locate those files. This
-  typically manifests with library files that attempt to read a `VERSION` file
+  typically manifests with library files that attempt to read a VERSION file
   from the package's root directory.
 
-  The `rpg-shit-list` program is a crappy hack that attempts to patch certain
+  The rpg-shit-list program is a crappy hack that attempts to patch certain
   popular libraries up during installation.
 
   There is as of yet no compelling proposed solution to this issue beyond
@@ -17,12 +17,12 @@ rather things that you are likely to run into during the course of using rpg.
   possible.
 
 - Packages with libraries or executables that call the Rubygems
-  `gem(<name>, <version)` method to declare and load dependent packages at
+  'gem(<name>, <version>)' method to declare and load dependent packages at
   runtime will fail to locate the package (unless the gem is installed within
   rubygems environment). It is very rarely appropriate or beneficial for
   libraries to make these sort of calls explicitly since rubygems handles this
   by installing wrapper executables and also when loading packages via its
-  `Kernel#require` hooks.
+  Kernel#require hooks.
 
   There is no planned solution to this issue beyond asking package maintainers
   to avoid the `gem` method where not truly warranted.
@@ -51,7 +51,7 @@ rather things that you are likely to run into during the course of using rpg.
   operations not requiring superuser privileges, and 3.) installing under
   multiple custom/configurable root-owned locations.
 
-- Extension libraries that rely on the `make install` target to perform custom
+- Extension libraries that rely on the `make install' target to perform custom
   tasks may not be installed or function properly. It is assumed that extensions
   produce one or more shared object files; rpg installs these manually -- without
   invoking the `make install` target -- due to issues with tracking files
