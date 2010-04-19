@@ -24,8 +24,12 @@ rather things that you are likely to run into during the course of using rpg.
   by installing wrapper executables and also when loading packages via its
   Kernel#require hooks.
 
-  There is no planned solution to this issue beyond asking package maintainers
-  to avoid the `gem` method where not truly warranted.
+  There is no planned solution to this issue beyond asking project maintainers
+  to avoid the gem method where not truly warranted.
+
+  UPDATE: Josh Peek's gem_stub program <http://github.com/josh/gem_stub> can be
+  used to install gemspec files for rpg installed packages. This functionality
+  may make its way into the rpg codebase.
 
 - There is currently no (straightforward) way to manually resolve exclusive
   version conflicts during install. The install fails with a message stating
