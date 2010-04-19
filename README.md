@@ -40,6 +40,128 @@ See the `HACKING` file for directions on setting up a temporary working
 environment for development, or if you just want to try out rpg in a sandbox
 before installing.
 
+Basic Usage
+-----------
+
+For a list of commands and basic program usage:
+
+    $ rpg --help
+    Usage: rpg [-vx] [-c <path>] <command> [<args>...]
+    Manage gem packages, quickly.
+
+    The most commonly used rpg commands are:
+      config           Show or edit rpg configuration
+      dependencies     Show dependency information for a package or all packages
+      install          Install a package from file or remote repository
+      list             Show status of local packages vs. respository
+      steal            Transplant packages from Rubygems into rpg environment
+      sync             Sync the package index with repository
+      outdated         List packages with a newer version
+      uninstall        Uninstall packages from local system
+      upgrade          Upgrade installed packages to latest version
+
+    Options
+      -c <path>        Read rcfile at <path> instead of standard rpgrc locations
+      -v               Enable verbose logging to stderr
+      -q               Disable verbose logging to stderr
+      -x               Enable shell tracing to stderr (extremely verbose)
+
+    See `rpg help <command>' for more information on a specific command.
+
+Installing one or more packages and all package dependencies:
+
+    $ rpg install rails
+                 sync: package index not found. retrieving now.
+                 sync: complete. 11894 packages available.
+              prepare: calculating dependencies for rails ...
+                fetch: rails 2.3.5
+                fetch: activeresource 2.3.5
+                fetch: actionmailer 2.3.5
+                fetch: actionpack 2.3.5
+                fetch: activesupport 2.3.5
+                fetch: rake 0.8.7
+                fetch: activerecord 2.3.5
+                fetch: rack 1.0.1
+              prepare: 0 of 8 packages already installed and up to date
+              install: installing 8 packages
+      package-install: actionmailer 2.3.5
+      package-install: actionpack 2.3.5
+      package-install: activerecord 2.3.5
+      package-install: activeresource 2.3.5
+      package-install: activesupport 2.3.5
+      package-install: rack 1.0.1
+      package-install: rails 2.3.5
+      package-install: rake 0.8.7
+              install: installation complete
+
+Listing currently installed packages and their versions:
+
+    $ rpg list
+    actionmailer 2.3.5
+    actionpack 2.3.5
+    activerecord 2.3.5
+    activeresource 2.3.5
+    activesupport 2.3.5
+    rack 1.0.1
+    rails 2.3.5
+    rake 0.8.7
+
+Listing currently installed packages with information about available package
+versions:
+
+    $ rpg list -l
+      actionmailer                        2.3.5        2.3.5
+      actionpack                          2.3.5        2.3.5
+      activerecord                        2.3.5        2.3.5
+      activeresource                      2.3.5        2.3.5
+      activesupport                       2.3.5        2.3.5
+    * rack                                1.0.1        1.1.0
+      rails                               2.3.5        2.3.5
+      rake                                0.8.7        0.8.7
+
+Listing only outdated packages:
+
+    $ rpg outdated
+    rack                                1.0.1        1.1.0
+
+Uninstalling one or more packages:
+
+    $ rpg uninstall rails actionmailer
+
+Listing package dependencies recursively:
+
+    $ rpg dependencies -r rails
+    actionmailer = 2.3.5
+    actionpack = 2.3.5
+    activerecord = 2.3.5
+    activeresource = 2.3.5
+    activesupport = 2.3.5
+    rack ~> 1.0.0
+    rake >= 0.8.3
+
+Or, in a tree:
+
+    $ rpg dependencies -t rails
+    rake >= 0.8.3
+    activesupport = 2.3.5
+    activerecord = 2.3.5
+    |-- activesupport = 2.3.5
+    actionpack = 2.3.5
+    |-- activesupport = 2.3.5
+    |-- rack ~> 1.0.0
+    actionmailer = 2.3.5
+    |-- actionpack = 2.3.5
+    |   |-- activesupport = 2.3.5
+    |   |-- rack ~> 1.0.0
+    activeresource = 2.3.5
+    |-- activesupport = 2.3.5
+
+To get a feel for rpg performance vs. the gem command when install packages with
+complex dependency graphs:
+
+    $ time rpg install merb
+    $ time gem install merb
+
 Versus Rubygems
 ---------------
 
