@@ -53,6 +53,15 @@ capistrano)
     sedi "s/  gem 'net-ssh', \">= 2.0.10\"//" lib/capistrano/ssh.rb
     ;;
 
+mongrel)
+    fixable "mongrel_rails is missing a shebang"
+    cd "$path"
+    echo "#!$(ruby_command)" >bin/mongrel_rails+
+    cat <bin/mongrel_rails >>bin/mongrel_rails+
+    mv bin/mongrel_rails+ bin/mongrel_rails
+    chmod +x bin/mongrel_rails
+    ;;
+
 SystemTimer)
   fixable "system_timer.rb and system_timer_stub.rb requires rubygems"
   cd "$path"
