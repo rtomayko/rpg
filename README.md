@@ -17,6 +17,9 @@ rpg and Rubygems can co-exist on a system, though Rubygems is not required for
 rpg to operate. Packages installed with `rpg` override packages installed with
 the `gem` command.
 
+Please direct rpg related discussion to the rpg mailing list:
+[ruby-rpg@googlegroups.com](http://groups.google.com/group/ruby-rpg).
+
 Status
 ------
 
