@@ -39,15 +39,6 @@ haml)
     " lib/haml/version.rb
     ;;
 
-memcache-client)
-    fixable "memcache.rb reads VERSION.yml file from package root"
-    cd "$path"
-    sedi "
-        s/VERSION = begin/VERSION = '$version';0.times do/
-        s/\"#{config[:major].*//
-    " lib/memcache.rb
-    ;;
-
 memcached)
     fixable "memcached.rb reads VERSION file from package root"
     cd "$path"
