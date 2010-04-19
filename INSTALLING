@@ -1,0 +1,53 @@
+INSTALLING
+
+rpg is installed with a conventional `./configure; make; make install' process.
+This document describes where to obtain the latest release and how to customize
+the installation for different configurations.
+
+See the HACKING file for information on setting up a temporary working
+environment for development or test-driving rpg without modifying your system
+directories.
+
+OBTAINING
+---------
+
+If you have git, the easiest way to obtain the latest sources is to clone the
+repository:
+
+    git clone git://github.com/rtomayko/rpg.git
+    cd rpg
+
+Release tarballs are also available from the rpg downloads page:
+
+    http://github.com/rtomayko/rpg/downloads
+
+Start by fetching and extracting the latest rpg release into a temporary
+directory, and then switch into it:
+
+    curl -L https://github.com/rtomayko/rpg/downloads/0.1 | tar xvzf -
+    cd rpg-*
+
+INSTALLING
+----------
+
+To install rpg under the default location (`/usr/local`):
+
+    ./configure
+    make
+    sudo make install
+
+To install rpg into a self-contained directory off your home:
+
+    ./configure --prefix=~/.rpg
+    make
+    make install
+
+You may need to add <prefix>/bin to your PATH environment variable if it isn't
+there already. Add the following to your ~/.bashrc or ~/.profile to ensure rpg
+is available to all new shell sessions:
+
+    PATH="$PATH:<prefix>/bin"
+
+The installation puts files under the bin, libexec, and share/man directories of
+the configured <prefix>. See `configure --help' for information on tuning
+these default locations.
