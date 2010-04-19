@@ -1,14 +1,15 @@
-RPG - manages gem packages. quickly.
+rpg - manages gem packages. quickly.
 ====================================
 
-This is rpg, a package management utility for unix based on the Rubygems package
-format and repository protocol. rpg installs Ruby packages distributed from
-rubygems.org with full support for dependency resolution, native extension
-compilation, and package upgrades.
+This is rpg, an experimental Ruby package management utility for unix based on
+the Rubygems packaging format and repository protocol. rpg installs Ruby
+packages distributed from rubygems.org to a shared library directory with full
+support for dependency resolution, native extension compilation, and package
+upgrades.
 
 rpg can be thought of as a non-compatible alternative to the gem command shipped
-with Rubygems. Most commonly used gem operations are available in rpg, often in
-ways that are a bit different from the gem command, both in interface and
+with Rubygems. Most commonly used gem operations are available in rpg, but in
+ways that are a bit different from the gem command -- both in interface and
 implementation. See the *VERSUS RUBYGEMS* section below for details on these
 differences.
 
@@ -16,11 +17,11 @@ rpg and Rubygems can co-exist on a system, though Rubygems is not required for
 rpg to operate. Packages installed with rpg override packages installed with the
 gem command.
 
-STATUS
+Status
 ------
 
 Experimental. Using rpg with system rubys is not yet recommended. Suggested use
-is with rvm or custom, non-system ruby builds. See the KNOWN-ISSUES file for a
+is with rvm or custom, non-system ruby builds. See the `KNOWN-ISSUES` file for a
 list of potential gotchas and general annoyances.
 
 IMPORTANT: In its default configuration, rpg installs library files under the
@@ -28,33 +29,18 @@ active Ruby interpreter's `vendor_ruby` or `site_ruby` directory. The `rpg
 config` command outputs the current destination installation paths -- use it to
 verify the active configuration before performing destructive operations.
 
-INSTALLING
+Installing
 ----------
 
-To install rpg under the default location (`/usr/local`):
+rpg is installed with the conventional `./configure && make && make install`
+process. See the `INSTALLING` file for information on obtaining the latest
+release and variations on the basic installation.
 
-    ./configure
-    make
-    [sudo] make install
+See the `HACKING` file for directions on setting up a temporary working
+environment for development, or if you just want to try out rpg in a sandbox
+before installing.
 
-To install rpg into a self-contained directory off your home:
-
-    ./configure --prefix=~/.rpg
-    make
-    make install
-
-You may need to add `<prefix>/bin` to your `PATH` if it isn't there already:
-
-    PATH="$PATH:<prefix>/bin"
-
-The installation puts files under the `bin`, `libexec`, and `share/man`
-directories of the configured `<prefix>`. See `configure --help` for
-information on tuning these default locations.
-
-See `rpg --help` once installed for a list of available commands and general
-program usage.
-
-VERSUS RUBYGEMS
+Versus Rubygems
 ---------------
 
   * Like gem, rpg uses rubygems.org as its package repository and gem
@@ -89,9 +75,13 @@ VERSUS RUBYGEMS
     Because all library files are placed under a common `lib` directory, and
     because package versions are sussed at install time, there's no need for
     a component to select which packages are active at runtime.
- 
+
+  * Unlike gem, rpg installs packages in two stages: 1.) fetch package files
+    and resolve dependencies, and 2.) install package contents. This allows
+    for staged/later installs and conflict detection before install.
+
   * Unlike gem, rpg's installed package database is filesystem based,
-    documented, and built for extension.
+    (will be) documented, and is built for extension.
 
   * Unlike gem, rpg is written primarily in POSIX shell and requires a unix
     environment.
@@ -99,29 +89,25 @@ VERSUS RUBYGEMS
   * Unlike gem, rpg does not provide commands for building gems or running
     gem servers.
 
-  * Unlike gem, rpg installs packages in two stages: 1.) fetch package files
-    and resolve dependencies, and 2.) install package contents. This allows
-    for staged/later installs and conflict detection before install.
-
   * rpg outperforms the gem command in many ways. Most comparable
     operations complete in at least one order of magnitude less time.
 
-ABOUT
+About
 -----
 
 rpg's design is inspired by a variety of existing tools. Rubygems itself gets
 many things right in UI, and you can't argue with the popularity of the package
 format and repository within the Ruby community.
 
-Many of the ideas -- and maybe even some code -- were taken from Rip
-<http://defunkt.github.com/rip/>. That's understating it, really. rpg started
-out just a couple of loose shell scripts to experiment with potential ideas for
-integrating gem package and gem dependency support into rip. The plan was to
-port them over to Ruby and into Rip if they panned out. Within a few days, I had
-a more or less entire implementation of Rubygems's gem command in POSIX shell
-staring back at me and it was *fast*. I will very likely propose many of the
-ideas in rpg be taken into Rip. Surely the Ruby portions of rpg that read
-release indexes and gemspecs could be useful at least.
+Many of the ideas -- and maybe even some code -- were taken from
+[Rip](http://defunkt.github.com/rip/). That's understating it, really. rpg
+started out just a couple of loose shell scripts to experiment with potential
+ideas for integrating gem package and gem dependency support into rip. The plan
+was to port them over to Ruby and into Rip if they panned out. Within a few
+days, I had a more or less entire implementation of Rubygems's gem command in
+POSIX shell staring back at me and it was *fast*. I will very likely propose
+many of the ideas in rpg be taken into Rip. Surely the Ruby portions of rpg that
+read release indexes and gemspecs could be useful at least.
 
 Debian's apt and dpkg, FreeBSD's ports system, and Redhat/Fedora's yum all
 influenced rpg's design in various ways.
@@ -132,10 +118,10 @@ small specialized programs. Its granular use of the filesystem as a database
 (the .git/refs and .git/objects hierarchies, especially) informed much of rpg's
 package database design.
 
-COPYING
+Copying
 -------
 
-Copyright (c) 2010 by Ryan Tomayko <tomayko.com/about>
+Copyright (c) 2010 by Ryan Tomayko <http://tomayko.com/about>
 
 This is Free Software distributed under the terms of the MIT license.
-See the COPYING file for license rights and limitations.
+See the `COPYING` file for license rights and limitations.
