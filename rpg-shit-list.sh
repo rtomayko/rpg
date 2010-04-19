@@ -49,6 +49,8 @@ capistrano)
     fixable "capistrano/version.rb reads VERSION file from package root"
     cd "$path"
     sedi "s/CURRENT = /CURRENT = '$version' #/" lib/capistrano/version.rb
+    sedi "s/  require 'rubygems'//" lib/capistrano/ssh.rb
+    sedi "s/  gem 'net-ssh', \">= 2.0.10\"//" lib/capistrano/ssh.rb
     ;;
 
 SystemTimer)
