@@ -1,14 +1,15 @@
 HACKING
 
-This is a quick guide to hacking on the rpg source code.
+This is a quick guide to setting up a temporary working environment for hacking
+on the rpg source code.
 
-rpg is really a bunch of separate composeable programs, each in the unix
-style of doing one specific thing. Most of these programs are written in
-POSIX shell (rpg-*.sh files), a small few are written in Ruby (rpg-*.rb
-files). In either case, the programs are built as "rpg-<name>" (i.e.,
-without file extension) so that any program may be rewritten in a
-different source language and not effect the programs that rely on it.
-In the future, some of these may be ported to ANSI C.
+rpg is really a bunch of separate composeable programs, each in the unix style
+of doing one specific thing. Most of these programs are written in POSIX shell
+(rpg-*.sh files), a small few are written in Ruby (rpg-*.rb files), and one or
+two are written in ANSI C (rpg-*.c files). In any case, the programs are built
+as "rpg-<name>" (i.e., without file extension) so that any program may be
+rewritten in a different source language and not effect the programs that rely
+on it.
 
 Grabbing the code
 -----------------
@@ -21,22 +22,19 @@ If you haven't already:
 Working out of a source directory
 ---------------------------------
 
-There's a special configure option for working out of a source
-directory:
+There's a special configure option for working out of a source directory:
 
     ./configure --development
 
-This generates default config.sh and config.mk files that cause the rpg
-programs run out of the current directory to use a temporary work area
-(<sourcedir>/work) for keep the database and installing files. Once
-`configure --development' is complete, add source dir at the beginning
-of your PATH and you should be all set:
+This generates default config.sh and config.mk files that cause the rpg programs
+to use a temporary work area (<sourcedir>/work) for keeping the various package
+databases and installing files. Once `configure --development' is complete, add
+the source dir at the beginning of your PATH and you should be all set:
 
     PATH="$(pwd):$PATH"
 
-With the source directory on your PATH, the general workflow is to edit
-the "rpg-<name>.sh" and "rpg-<name>.rb" files, then run `make' to build
-"rpg-<name>".
+With the source directory on your PATH, the general workflow is to edit the
+rpg-<name>.sh and rpg-<name>.rb files, then run `make' to build rpg-<name>.
 
 Then just execute them:
 
@@ -49,56 +47,52 @@ Then just execute them:
     rpg-fetch sinatra 0.9.6
     rpg-install sinatra 0.9.6
 
-There's a `make auto' target that sits in a loop and constantly looks
-for stuff to rebuild so you don't have to do so manually after every
-edit:
+There's also a `make auto' target that sits in a loop and constantly looks for
+stuff to rebuild so you don't have to do so manually after every edit:
 
     make auto
 
-The way I work is with a screen(1) session horizontally split such that
-I have a normal shell prompt up top and a `make auto' session down below
-at ~15% height.  Then I have vim going to the left of the terminal so
-that I can see the output from `make auto' while I'm editing. The make
-targets run syntax checks on the sh and ruby source so this is great for
-catching syntax errors early on.
+The way I work is with a screen(1) session horizontally split such that I have a
+normal shell prompt up top and a `make auto' session down below at ~15% height.
+Then I have vim going to the left of the terminal so that I can see the output
+from `make auto' while I'm editing. The make targets run syntax checks on the sh
+and ruby source so this is great for catching syntax errors early on.
 
 New programs
 ------------
 
-To add a new program, create a "rpg-<name>.sh" or "rpg-<name>.rb" file
-and then open the Makefile and add the filename to the SOURCES and
-PROGRAMS variables.  The program will be built like the others the next
-time you run `make'.
+To add a new program, create a rpg-<name>.sh, rpg-<name>.rb, or rpg-<name>.c
+file and then open the Makefile and add the filename to the SOURCES and PROGRAMS
+variables. The program will be built like the others the next time you run `make'.
 
 POSIX shell
 -----------
 
-The rpg shell sources should conform to "The Standard" where possible.
-Any shell language features, utility programs, or arguments to utility
-programs not documented here should be avoided:
+The rpg shell sources should conform to "The Standard" where possible.  Any
+shell language features, utility programs, or arguments to utility programs not
+documented here should be avoided:
 
 http://www.opengroup.org/onlinepubs/009695399/utilities/contents.html
 
-This isn't really about portability (although that's a nice feature).
-The main reason for conforming to the POSIX defined portions of the
-shell and tool usage is that it's a well-defined, functional, and fairly
-simple subset of the unix/shell universe that's known to work
-predictably in a wide-enough range of environments. It just keeps things
-simple so they can fit in your head.
+This isn't really about portability (although that's a nice feature). The main
+reason for conforming to the SUS defined portions of the shell and tool usage is
+that it's a well-defined, functional, and fairly simple subset of the unix/shell
+universe that's known to work predictably in a wide-enough range of
+environments. It just keeps things simple so they can fit in your head.
 
-POSIX shell and shell utility man pages can be found at man.cx.  It's a
-bit easier to read than the opengroup.org documentation for my eyes.
-HOWEVER, make sure you're looking at a 1posix section manpage. You can
-tell because there'll be "(1posix)" in the URL. Some examples:
+POSIX shell and shell utility man pages can be found at man.cx.  It's a bit
+easier to read than the opengroup.org documentation for my eyes.  HOWEVER, make
+sure you're looking at a 1posix section manpage. You can tell because there'll
+be "(1posix)" in the URL. Some examples:
 
     http://man.cx/sh(1posix)
     http://man.cx/sort(1posix)
     http://man.cx/join(1posix)
     http://man.cx/sed(1posix)
 
-Lastly, shell programs should be tested under dash if possible.  This is
-the default /bin/sh on recent Debian versions and can be easily
-installed on MacOS X using homebrew: `brew install dash'.
+Lastly, shell programs should be tested under dash if possible. This is the
+default /bin/sh on recent Debian versions and can be easily installed on MacOS X
+using homebrew: `brew install dash'.
 
 POSIX make
 ----------
@@ -112,9 +106,9 @@ There's no reason to use the advanced features of non-POSIX makes.
 Docco-Mentation
 ---------------
 
-The shell and Ruby sources are commented with Docco
-literate-programming-style documentation. If you have Rocco and shocco
-installed locally, you can build docs for all source files with:
+The shell and Ruby sources are commented with Docco literate-programming-style
+documentation. If you have Rocco and shocco installed locally, you can build
+docs for all source files with:
 
     make doc
 
@@ -135,13 +129,13 @@ For more information on Docco, Rocco, and shocco:
 Manpages
 --------
 
-Each program will eventually have a unix manual page. I plan to write a
-tool to generate the initial set from comments at some point in the not
-too distant future. For now, try to include any information useful in a
-manpage in comments and make sure USAGE messages document all options.
+Each program will eventually have a unix manual page. I plan to write a tool to
+generate the initial set from comments at some point in the not too distant
+future. For now, try to include any information useful in a manpage in source
+file comments and make sure USAGE messages document all options.
 
 And that should do it.
 
 Have fun!
 
-Ryan Tomayko < http://tomayko.com/about >
+Ryan Tomayko <http://tomayko.com/about>
