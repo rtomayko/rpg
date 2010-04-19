@@ -7,10 +7,10 @@ packages distributed from rubygems.org to a shared library directory with full
 support for dependency resolution, native extension compilation, and package
 upgrades. It's quite fast.
 
-rpg can be thought of as a non-compatible alternative to the gem command shipped
-with Rubygems. Most commonly used gem operations are available in rpg, but in
-ways that are a bit different from the gem command -- both in interface and
-implementation. See the *VERSUS RUBYGEMS* section below for details on these
+`rpg` can be thought of as a non-compatible alternative to the `gem` command
+shipped with Rubygems. Most commonly used gem operations are available in `rpg`,
+but in ways that are a bit different from the `gem` command -- both in interface
+and implementation. See the *VERSUS RUBYGEMS* section below for details on these
 differences.
 
 rpg and Rubygems can co-exist on a system, though Rubygems is not required for
@@ -244,7 +244,7 @@ package database design.
 Copying
 -------
 
-Copyright (c) 2010 by Ryan Tomayko <http://tomayko.com/about>
+Copyright (c) 2010 by [Ryan Tomayko](http://tomayko.com/about)
 
 This is Free Software distributed under the terms of the MIT license.
 See the `COPYING` file for license rights and limitations.
