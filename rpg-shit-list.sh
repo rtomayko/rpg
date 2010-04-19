@@ -59,6 +59,14 @@ capistrano)
     cd "$path"
     sedi "s/CURRENT = /CURRENT = '$version' #/" lib/capistrano/version.rb
     ;;
+
+SystemTimer)
+  fixable "system_timer.rb and system_timer_stub.rb requires rubygems"
+  cd "$path"
+  sedi "s/require 'rubygems'//" lib/system_timer.rb
+  sedi "s/require 'rubygems'//" lib/system_timer_stub.rb
+  ;;
+
 esac
 
 # Make sure we exit with success.
