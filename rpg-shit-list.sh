@@ -39,6 +39,13 @@ haml)
     " lib/haml/version.rb
     ;;
 
+json)
+  fixable "json ext makefile target prefix is incorrect"
+  cd "$path"
+  sedi "s/create_makefile 'generator'/create_makefile 'json\/ext\/generator'/" ext/json/ext/generator/extconf.rb
+  sedi "s/create_makefile 'parser'/create_makefile 'json\/ext\/parser'/" ext/json/ext/parser/extconf.rb
+  ;;
+
 memcached)
     fixable "memcached.rb reads VERSION file from package root"
     cd "$path"
