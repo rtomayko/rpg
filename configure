@@ -292,6 +292,8 @@ $develmode && {
     echo "RPGSYSCONF=/dev/nothing"  >> config.sh
     echo "RPGUSERCONF=/dev/nothing" >> config.sh
     echo "ready for development. run \`make' or \`make auto' to build."
+    echo "you may also want to put . on PATH; in your current shell:"
+    echo "  PATH=$(pwd):\$PATH"
     exit 0
 }
 
