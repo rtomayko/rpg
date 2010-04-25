@@ -289,6 +289,8 @@ $SHCONFIG
 EOF
 
 $develmode && {
+    echo "RPGSYSCONF=/dev/nothing"  >> config.sh
+    echo "RPGUSERCONF=/dev/nothing" >> config.sh
     echo "ready for development. run \`make' or \`make auto' to build."
     exit 0
 }
