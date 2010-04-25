@@ -20,9 +20,9 @@ fi
 
 # Put RUBYLIB on PATH if it isn't there already.
 if   test -z "$RUBYLIB"
-then RUBYLIB="$RPGLIB"
+then RUBYLIB="$RPGLIB:$RPGLIB/$RUBYARCH"
 elif ! echo "$RUBYLIB" | tr ':' '\n' | grep -e "^$RPGLIB$" >/dev/null
-then RUBYLIB="$RPGLIB:$RUBYLIB"
+then RUBYLIB="$RPGLIB:$RPGLIB/$RUBYARCH:$RUBYLIB"
 fi
 
 export RUBYLIB PATH
