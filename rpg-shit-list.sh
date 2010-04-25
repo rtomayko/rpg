@@ -61,12 +61,18 @@ capistrano)
     ;;
 
 mongrel)
-    fixable "mongrel_rails is missing a shebang"
-    cd "$path"
-    echo "#!$(ruby_command)" >bin/mongrel_rails+
-    cat <bin/mongrel_rails >>bin/mongrel_rails+
-    mv bin/mongrel_rails+ bin/mongrel_rails
-    chmod +x bin/mongrel_rails
+    # The mongrel_rails executable acts more like a library. Rails and other
+    # commands require it to be on the load path. It also doesn't have a shebang
+    # so is executed with /bin/sh by default. We move it over to the lib
+    # directory -- sub'ing some LOAD_PATH modifications on the way -- and then
+    # write simple executable wrapper.
+    test -f "$path/lib/mongrel_rails" || {
+        fixable "mongrel_rails is more library than executable"
+        cd "$path"
+        sed 's/\($LOAD_PATH.unshift\)/# \1/' <bin/mongrel_rails >lib/mongrel_rails
+        printf "#!$(ruby_command)\nload 'mongrel_rails'" >bin/mongrel_rails
+        chmod +x bin/mongrel_rails
+    }
     ;;
 
 SystemTimer)
