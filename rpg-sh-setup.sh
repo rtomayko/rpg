@@ -233,11 +233,22 @@ then
     : ${RPGBIN:="$RPGPATH/bin"}
 fi
 
+# Configuration Files
+# -------------------
+
+# The system configuration file. Sourced near the end of this script. This
+# is one of the variables that the configure script overrides.
+: ${RPGSYSCONF:=/etc/rpgrc}
+
+# The user configuration file. Sourced immediately after the system
+# configuration file.
+: ${RPGUSERCONF:=~/.rpgrc}
+
 # Source the system `/etc/rpgrc` file.
-test -f "$RPGSYSCONF" && . "$RPGSYSCONF"
+test -r "$RPGSYSCONF" && . "$RPGSYSCONF"
 
 # Source the user `~/.rpgrc` file.
-test -f "$RPGUSERCONF" && . "$RPGUSERCONF"
+test -r "$RPGUSERCONF" && . "$RPGUSERCONF"
 
 # Install Paths
 # -------------
@@ -421,14 +432,6 @@ test -f "$RPGUSERCONF" && . "$RPGUSERCONF"
 
 # URL to the specs file used to build the package index.
 : ${RPGSPECSURL:='http://rubygems.org/specs.4.8.gz'}
-
-# The system configuration file. Sourced near the end of this script. This
-# is one of the variables that the configure script overrides.
-: ${RPGSYSCONF:=/etc/rpgrc}
-
-# The user configuration file. Sourced immediately after the system
-# configuration file.
-: ${RPGUSERCONF:=~/.rpgrc}
 
 # Export all RPG variables.
 export RPGLIB RPGBIN RPGMAN
