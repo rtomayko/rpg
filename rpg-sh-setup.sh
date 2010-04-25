@@ -227,7 +227,7 @@ export RUBYSTATEDIR RUBYLIBDIR RUBYVERSION RUBYMACFRAMEWORK
 # With `configure --development`, set all paths to be inside a work dir.
 if $develmode
 then
-    : ${RPGPATH:="./work"}
+    : ${RPGPATH:="$prefix"}
     : ${RPGLIB:="$RPGPATH/lib"}
     : ${RPGMAN:="$RPGPATH/man"}
     : ${RPGBIN:="$RPGPATH/bin"}
