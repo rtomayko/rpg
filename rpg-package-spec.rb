@@ -101,8 +101,6 @@ ARGV.each do |file|
 
     %w[authors files extensions executables test_files require_paths].each do |key|
       next if spec[key].nil?
-      label = 'tests' if key == 'test_files'
-      label = 'libs' if key == 'require_paths'
       package_write.call key, spec[key].join("\n")
     end
 
