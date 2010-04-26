@@ -87,7 +87,7 @@ ENEWLINE="\\$NEWLINE"
 USAGE () {
     __USAGE__="${1:-$(cat)}"
     case "$ARGV" in
-    *--h|*--he|*--hel|*--help|*-h|*-\?)
+    *--h|*--he|*--hel|*--help*|*-h|*-\?*)
         helpthem 0
         exit 0;;  # just in case
     esac
