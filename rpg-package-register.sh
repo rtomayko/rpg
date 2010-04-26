@@ -17,10 +17,14 @@ test "$1" = '-f' && {
 # Under the second synopsis form, we first perform a `rpg-fetch` on the
 # `<package>` and `<version>` given and then continue with the resulting
 # filename.
-if test $# -eq 2 && ! expr -- "$1" : '.*\.gem' >/dev/null
+if ! expr -- "$1" : '.*\.gem' >/dev/null
 then
-    gemfile=$(rpg-fetch "$1" "$2")
-    set -- "$gemfile"
+    if test $# -eq 2
+    then gemfile=$(rpg-fetch "$1" "$2")
+         set -- "$gemfile"
+    else echo "$PROGNAME: '$1' package version required"
+         exit 2
+    fi
 fi
 
 for file in "$@"
