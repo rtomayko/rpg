@@ -27,6 +27,15 @@ fixable () {
 
 # Master list of shit list packages with hacks.
 case "$package" in
+facets)
+  fixable "facets does not use lib/ as the standard load path"
+  cd "$path/lib"
+  cp -R core/* .
+  rm -rf core
+  cp -R more/* .
+  rm -rf more
+  ;;
+
 haml)
     fixable "haml reads VERSION, VERSION_NAME, REVISION files from package root"
     cd "$path"
