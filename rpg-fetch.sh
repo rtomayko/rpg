@@ -41,12 +41,9 @@ else
 
     # Grab the gem with `curl(1)` and write to a temporary file just
     # in case something goes wrong during transfer.
-    curl -s -L "http://rubygems.org/downloads/${gemfile}" > "${gemfile}+"
-
-    if [[ $(head -n 1 "${gemfile}+") =~ "This gem does not currently live at Gemcutter" ]]; then
-      rm "${gemfile}+"
-      warn "$package $version not found."
-      exit 1
+    if ! curl --fail -s -L "http://rubygems.org/downloads/${gemfile}" > "${gemfile}+"
+    then warn "$package $version not found."
+         exit 1
     fi
 
     mv "${gemfile}+" "$gemfile"
