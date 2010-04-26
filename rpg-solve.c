@@ -68,6 +68,27 @@ versucc (char * vers) {
     *pdot = '\0';
 }
 
+
+/* Normalize a version string by removing any trailing ".0" parts. This is
+ * required to for proper behavior when comparing versions like: "3.1 >= 3.1.0". */
+static void
+versnorm (char * vers)
+{
+    char * pe = vers + strlen(vers) - 1;
+    while (pe > vers) {
+        if (*pe == '.') {
+            *pe = '\0';
+            pe--;
+        } else if (*pe == '0') {
+            pe--;
+        } else {
+            break;
+        }
+    }
+
+    return;
+}
+
 /* Expand squiggly comparisons into separate ge and lt comparisons. e.g.,
  * foo ~> 0.2.3 would become foo >= 0.2.3 and foo < 0.3.*/
 static void
@@ -85,6 +106,8 @@ plsquig (struct plent * pe)
         memcpy(pnew, pe, sizeof(struct plent));
         pnew->oper = lt;
         versucc(pnew->vers);
+
+        versnorm(pe->vers);
         pe->next = pnew;
         pe = pnew->next;
     }
