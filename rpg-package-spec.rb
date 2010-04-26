@@ -58,7 +58,7 @@ ARGV.each do |file|
       vars = dep.ivars
       [
         vars['name'],
-        vars['type'],
+        vars['type'] || 'runtime',
         vars['version_requirements'].ivars['requirements'].map do |op,vers|
           vers = vers.ivars['version']
           [op, vers]
