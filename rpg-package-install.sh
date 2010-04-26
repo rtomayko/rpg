@@ -158,10 +158,28 @@ manifest="$packagedir/$version/manifest"
     # ------------------
 
     # Recursively install all library files into `RPGLIB`.
-    test -d "$pack/lib" && {
-        mkdir -p "$RPGLIB"
-        installdir "$pack/lib" "$RPGLIB"
-    }
+    #
+    # A big majority of packages have a single lib directory but some use an
+    # alternative libdir (ruby-debug) and it's also possible to have multiple
+    # lib directories. Use the `require_paths` gemspec value to determine lib
+    # sub-directories, ignoring certain incorrect values (`test`, `ext`, `spec`,
+    # etc.).
+
+    libdirs=$(cat "$packagedir/$version/require_paths" 2>&1)
+    : ${libdirs:=lib}
+
+    for libdir in $libdirs
+    do
+        test "$libdir" = "ext"  && continue
+        test "$libdir" = "test" && continue
+        test "$libdir" = "spec" && continue
+
+        if test -d "$pack/$libdir"
+        then mkdir -p "$RPGLIB"
+             installdir "$pack/$libdir" "$RPGLIB"
+        else notice "warning: $package libdir '$libdir' does not exist"
+        fi
+    done
 
     # Ruby Executables
     # ----------------
