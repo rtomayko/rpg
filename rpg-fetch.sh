@@ -41,7 +41,7 @@ else
 
     # Grab the gem with `curl(1)` and write to a temporary file just
     # in case something goes wrong during transfer.
-    if ! curl --fail -s -L "http://rubygems.org/downloads/${gemfile}" > "${gemfile}+"
+    if ! curl --fail -s -L "$RPGGEMURL/${gemfile}" > "${gemfile}+"
     then warn "$package $version not found."
          exit 1
     fi

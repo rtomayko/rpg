@@ -433,10 +433,13 @@ test -r "$RPGUSERCONF" && . "$RPGUSERCONF"
 # URL to the specs file used to build the package index.
 : ${RPGSPECSURL:='http://rubygems.org/specs.4.8.gz'}
 
+# URL to used to fetch gems.
+: ${RPGGEMURL:='http://rubygems.org/downloads'}
+
 # Export all RPG variables.
 export RPGLIB RPGBIN RPGMAN
 export RPGPATH RPGCACHE RPGPACKS RPGDB RPGINDEX RPGSESSION
-export RPGTRACE RPGSHOWBUILD RPGSTALETIME RPGSPECSURL
+export RPGTRACE RPGSHOWBUILD RPGSTALETIME RPGSPECSURL RPGGEMURL
 export RPGSYSCONF RPGUSERCONF
 
 # Setup logging and other stuff like that now that our variables are set.
