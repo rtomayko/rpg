@@ -140,6 +140,17 @@ tags:
 		--exclude=/usr/X11    \
 		-R -f tags . /usr/include
 
+dist:
+	tarname=$(TARNAME)-$$(git describe --tags); \
+	mkdir -p dist; \
+	if test -f dist/$$tarname.tar.gz; \
+	then echo "$$tarname.tar.gz already exists. not overwriting." 1>&2; \
+	     false; \
+	else git archive --format=tar --prefix=$${tarname}/ HEAD | \
+	     gzip >dist/$$tarname.tar.gz && \
+	     echo "dist/$$tarname.tar.gz"; \
+	fi
+
 .SILENT:
 
-.PHONY: install uninstall clean tags
+.PHONY: install uninstall clean tags dist
