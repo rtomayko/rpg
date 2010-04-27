@@ -1,0 +1,61 @@
+RPG Changes and Release Notes
+==============================
+
+Version 0.2 (2010 Apr 27)
+-------------------------
+
+ * The ~/.rpgrc and /etc/rpgrc files are now sourced properly and can be
+   used to control installation and internal database locations. These files
+   did not work properly in the 0.1 release, so installing to non-default
+   locations was impossible. [Ryan Tomayko]
+
+ * Added the RPGGEMURL config variable for controlling the base gem server
+   location. The default value is "http://rubygems.org/downloads" but it can
+   be set to any base URL (http: or file:) with gem files available at
+   "$RPGGEMURL/<name>-<version>.gem" [Josh Peek]
+
+ * rpg-fetch now fails with an error message and non-zero exit status when
+   the gem server returns 404 for a package. [Josh Peek]
+
+ * Dependencies are now resolved and installed properly for gems that use
+   the older gemspec format without dependency type information (runtime vs.
+   development) [Ryan Tomayko]
+
+ * rpg-list now supports globs when listing all/remote packages. e.g.,
+   `rpg list -a rack\*'. [Josh Peek, Ryan Tomayko]
+
+ * rpg-package-install now uses the gemspec defined "require_paths" value
+   instead of assuming the "lib" directory is the only source of ruby
+   library files. Multiple lib directories are also supported. This fixes a
+   variety of packages, including ruby-debug and facets. [Ryan Tomayko]
+
+ * rpg-manifest now abbreviates installed file paths using a "lib/", "bin/",
+   or "man/" prefix instead of showing absolute paths. The -a option can be
+   used to get the old behavior. [Ryan Tomayko]
+
+ * rpg-env now properly adds RPGBIN to PATH, and RPGLIB to RUBYLIB.  The
+   previous version did not, so executing commands like `rpg env rake --help'
+   or `rpg env bash' did not setup the environment properly. [Ryan Tomayko]
+
+ * Fixed a bug with `--help' not working properly when passed anywhere other
+   than the last argument. [Ryan Tomayko]
+
+ * Various development mode `configure --development' fixes. [Ryan Tomayko]
+
+Package specific fixes:
+
+ * facets: fixed to install non-standard library directories. [Josh Peek]
+
+ * json: fixed installation location of native extension library [Josh Peek]
+
+ * mongrel: shit listed to fix missing shebang in mongrel_rails executable,
+   and also to make mongrel_rails available on the load path to work around
+   issues with Rails 2.x loading it in `script/server'. [Ryan Tomayko]
+
+ * ruby-debug: fixed to install non-standard library directories and
+   dependencies. [Ryan Tomayko]
+
+Version 0.1 (2010 Apr 19)
+-------------------------
+
+ * Initial public release. Experimental.
