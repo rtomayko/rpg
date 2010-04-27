@@ -26,11 +26,13 @@ Options
 sync=false
 parsey=false
 long=false
+all=false
 joiner=
 while getopts alpus opt
 do
     case $opt in
-    a)   joiner="-a2";;
+    a)   all=true
+         joiner="-a2";;
     l)   long=true;;
     u)   sync=true;;
     p)   long=true;
@@ -166,13 +168,10 @@ grep -v '. - - .'                                |
 # formatting.
 if ! $long
 then
-    awk '{
-        if ( $1 != "-" ) {
-            print $1, $2;
-        } else if ($4 != "-") {
-            print $4, $3;
-        }
-    }'
+    if $all
+    then awk '$4 != "-" { print $4, $3; }'
+    else awk '$2 != "-" { print $1, $2; }'
+    fi
 else
     while read package curvers recvers pdup
     do
