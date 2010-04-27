@@ -24,8 +24,8 @@ Release tarballs are also available from the rpg downloads page:
 Start by fetching and extracting the latest rpg release into a temporary
 directory, and then switch into it:
 
-    curl -L https://github.com/rtomayko/rpg/downloads/0.1 | tar xvzf -
-    cd rpg-*
+    curl -L http://github.com/downloads/rtomayko/rpg/rpg-0.2.0.tar.gz | tar xvzf -
+    cd rpg-0.2.0
 
 INSTALLING
 ----------
