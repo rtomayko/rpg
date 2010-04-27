@@ -86,11 +86,10 @@ then remotefilter="cat"
 else remotefilter="grep"
      for glob in "$@"
      do  glob=$(
-           echo "$glob"              |
-           sed -e 's@\*@[^ ]*@g'     \
-               -e 's/\?/[^ ]/g'      \
+           echo "$glob" |
+           sed -e 's@\*@[^ ]*@g' -e 's/\?/[^ ]/g'
          )
-         remotefilter="$remotefilter -e '$glob '"
+         remotefilter="$remotefilter -e '^$glob ' -e ' $glob\$'"
      done
 fi
 
