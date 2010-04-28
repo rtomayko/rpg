@@ -25,7 +25,7 @@ do
         make) 1> build.log 2>&1
     then
         $RPGSHOWBUILD && cat build.log 1>&2
-        find "$path" -name "*.$(ruby_dlext)"
+        find "$(dirname "$file")" -name "*.$(ruby_dlext)"
     else
         cat build.log 1>&2
     fi
