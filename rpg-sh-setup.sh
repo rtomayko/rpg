@@ -213,11 +213,13 @@ __RUBY__
 RUBYMACFRAMEWORK=false
 expr -- "$RUBYPREFIX" : "/System/Library/Frameworks" >/dev/null && {
     RUBYMACFRAMEWORK=true
-    RUBYBINDIR=/usr/bin
-    RUBYLIBDIR=/usr/lib/ruby/1.8
-    RUBYSTATEDIR=/var
-    RUBYSITEDIR=/usr/lib/ruby/site_ruby
+    RUBYLIBDIR=/usr/lib/ruby
+    RUBYSTATEDIR=$RUBYLIBDIR
+    RUBYSITEDIR=/usr/lib/ruby/site_ruby/$RUBYVERSION
+    RUBYVENDORDIR=/usr/lib/ruby/vendor_ruby/$RUBYVERSION
     RUBYPREFIX=/usr
+    RUBYBINDIR=$RUBYPREFIX/bin
+    RUBYMANDIR=$RUBYPREFIX/share/man
 }
 
 export __RPGENV__ RUBY
@@ -260,7 +262,7 @@ test -r "$RPGUSERCONF" && . "$RPGUSERCONF"
 # configuration.
 : ${RPGPATH:=$(
     if $RUBYMACFRAMEWORK
-    then echo "/Library/RPG"
+    then echo "/Library/Ruby/RPG/$RUBYVERSION"
     else echo "${RUBYLIBDIR:-/var/lib}/rpg"
     fi
 )}
