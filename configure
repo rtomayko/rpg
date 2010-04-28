@@ -227,32 +227,18 @@ echo "okay, looks like you have everything we need. generating config files."
 
 # Try to pick a default configuration
 
-if $tiedown
+if $tiedown && ! $RUBYFRAMEWORK
 then
-    if $RUBYFRAMEWORK
-    then
-        : ${prefix:="/Library/Ruby/RPG"}
-        : ${exec_prefix:="/usr"}
-        : ${bindir:="$exec_prefix/bin"}
-        : ${libexecdir:="$exec_prefix/libexec"}
-        : ${localstatedir:="$prefix"}
-        : ${sysconfdir:="/etc"}
-        : ${datarootdir:="$exec_prefix/share"}
-        : ${datadir:="$datarootdir"}
-        : ${mandir:="$datadir/man"}
-        : ${docdir:="$datadir/doc"}
-    else
-        : ${prefix:=$(rbconfig prefix "/usr/local")}
-        : ${exec_prefix:=$(rbconfig exec_prefix "$prefix")}
-        : ${bindir:=$(rbconfig bindir "$exec_prefix/bin")}
-        : ${libexecdir:=$(rbconfig libexecdir "$exec_prefix/libexec")}
-        : ${localstatedir:=$(rbconfig localstatedir "$prefix/var")}
-        : ${sysconfdir:=$(rbconfig sysconfdir "$prefix/etc")}
-        : ${datarootdir:=$(rbconfig datarootdir "$prefix/share")}
-        : ${datadir:=$(rbconfig datadir "$datarootdir")}
-        : ${mandir:=$(rbconfig mandir "$datadir/man")}
-        : ${docdir:=$(rbconfig docdir "$datadir/doc")}
-    fi
+    : ${prefix:=$(rbconfig prefix "/usr/local")}
+    : ${exec_prefix:=$(rbconfig exec_prefix "$prefix")}
+    : ${bindir:=$(rbconfig bindir "$exec_prefix/bin")}
+    : ${libexecdir:=$(rbconfig libexecdir "$exec_prefix/libexec")}
+    : ${localstatedir:=$(rbconfig localstatedir "$prefix/var")}
+    : ${sysconfdir:=$(rbconfig sysconfdir "$prefix/etc")}
+    : ${datarootdir:=$(rbconfig datarootdir "$prefix/share")}
+    : ${datadir:=$(rbconfig datadir "$datarootdir")}
+    : ${mandir:=$(rbconfig mandir "$datadir/man")}
+    : ${docdir:=$(rbconfig docdir "$datadir/doc")}
 else
     : ${prefix:="/usr/local"}
     : ${exec_prefix:="$prefix"}
