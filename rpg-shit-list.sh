@@ -39,11 +39,9 @@ haml)
     " lib/haml/version.rb
     ;;
 
-json)
-  fixable "json ext makefile target prefix is incorrect"
-  cd "$path"
-  sedi "s/create_makefile 'generator'/create_makefile 'json\/ext\/generator'/" ext/json/ext/generator/extconf.rb
-  sedi "s/create_makefile 'parser'/create_makefile 'json\/ext\/parser'/" ext/json/ext/parser/extconf.rb
+json|json_pure)
+  fixable "json includes ext/ in require_paths"
+  echo "lib" > "$RPGDB/$package/$version/require_paths"
   ;;
 
 memcached)
