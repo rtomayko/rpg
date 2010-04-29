@@ -80,6 +80,12 @@ SystemTimer)
     sedi "s/require 'rubygems'//" lib/system_timer_stub.rb
     ;;
 
+thin)
+    fixable "thin assumes thin_parser extension is in package root"
+    cd "$path"
+    sedi 's@require "#{Thin::ROOT}/thin_parser"@require "thin_parser"@' lib/thin.rb
+    ;;
+
 esac
 
 # Make sure we exit with success.
