@@ -246,11 +246,17 @@ fi
 # configuration file.
 : ${RPGUSERCONF:=~/.rpgrc}
 
+# Store current RPG environment settings
+: oldrpgenv=$(env | grep '^RPG')
+
 # Source the system `/etc/rpgrc` file.
 test -r "$RPGSYSCONF" && . "$RPGSYSCONF"
 
 # Source the user `~/.rpgrc` file.
 test -r "$RPGUSERCONF" && . "$RPGUSERCONF"
+
+# Restore previous RPG settings
+eval "${oldrpgenv}"
 
 # Install Paths
 # -------------
