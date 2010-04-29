@@ -74,11 +74,11 @@ mongrel)
     ;;
 
 SystemTimer)
-  fixable "system_timer.rb and system_timer_stub.rb requires rubygems"
-  cd "$path"
-  sedi "s/require 'rubygems'//" lib/system_timer.rb
-  sedi "s/require 'rubygems'//" lib/system_timer_stub.rb
-  ;;
+    fixable "system_timer.rb and system_timer_stub.rb requires rubygems"
+    cd "$path"
+    sedi "s/require 'rubygems'//" lib/system_timer.rb
+    sedi "s/require 'rubygems'//" lib/system_timer_stub.rb
+    ;;
 
 esac
 
