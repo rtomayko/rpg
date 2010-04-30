@@ -250,10 +250,10 @@ fi
 : oldrpgenv=$(env | grep '^RPG')
 
 # Source the system `/etc/rpgrc` file.
-test -r "$RPGSYSCONF" && . "$RPGSYSCONF"
+test -r "$RPGSYSCONF" &&  { . "$RPGSYSCONF" || true; }
 
 # Source the user `~/.rpgrc` file.
-test -r "$RPGUSERCONF" && . "$RPGUSERCONF"
+test -r "$RPGUSERCONF" && { . "$RPGUSERCONF" || true; }
 
 # Restore previous RPG settings
 eval "${oldrpgenv}"
