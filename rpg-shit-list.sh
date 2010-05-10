@@ -73,6 +73,13 @@ mongrel)
     }
     ;;
 
+RedCloth)
+    fixable "RedCloth.rb clobbers original redcloth.rb"
+    cd "$path"
+    rm -rf "lib/case_sensitive_require"
+    rm -rf "lib/tasks"
+    ;;
+
 SystemTimer)
     fixable "system_timer.rb and system_timer_stub.rb requires rubygems"
     cd "$path"
