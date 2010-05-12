@@ -436,7 +436,7 @@ eval "${oldrpgenv}"
 # designator is considered in days. This value can also be `never`, in
 # which case the database will never be automatically sync'd in the
 # course of running other programs.
-: ${RPGSTALETIME:=1 day}
+: ${RPGSTALETIME:=14 days}
 
 # URL to the specs file used to build the package index.
 : ${RPGSPECSURL:='http://rubygems.org/specs.4.8.gz'}

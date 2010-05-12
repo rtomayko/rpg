@@ -38,12 +38,12 @@
 # is wildly unpredictable performance in most commands.
 #
 # rpg attempts to strike a balance between these two extremes in its default
-# configuration and can be customize to get any behavior along the spectrum.
+# configuration and can be customized to get any behavior along the spectrum.
 # By default, the package index is automatically synchronized when it's more
-# than one day old:
+# than two weeks old:
 #
-#     # auto sync the package index when it's more than 1 day old
-#     RPGSTALETIME=1d
+#     # auto sync the package index when it's more than 14 days old
+#     RPGSTALETIME=14d
 #
 # Setting the stale time to `0`, causes the index to be synchronized before
 # performing any operation that involves remote packages. This is closest to
