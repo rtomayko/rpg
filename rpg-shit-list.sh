@@ -93,6 +93,19 @@ thin)
     sedi 's@require "#{Thin::ROOT}/thin_parser"@require "thin_parser"@' lib/thin.rb
     ;;
 
+taps)
+    cd "$path"
+    test -f VERSION.yml && {
+        fixable "taps VERSION.yml"
+        yaml=$(sed 's|$|\\|' < VERSION.yml)
+        sedi "s/@@version_yml ||= /@@version_yml ||= YAML.load('$yaml') #/" \
+        lib/taps/config.rb
+    }
+
+    fixable "taps relative bin paths"
+    sedi "s|bin_path = |bin_path = '$RPGBIN/schema' #|" lib/taps/utils.rb
+    ;;
+
 esac
 
 # Make sure we exit with success.
