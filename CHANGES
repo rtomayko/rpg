@@ -1,5 +1,24 @@
-RPG Changes and Release Notes
-==============================
+RPG CHANGES
+===========
+
+Version 0.3 (2010 Jun 24)
+-------------------------
+
+This is a smallish bug fix and package compatibility release:
+
+ * Package compatibility: thin, RedCloth, taps, json, url_escape.
+   [Ryan Tomayko, Josh Peek]
+
+ * The default RPGSTALETIME is now 2 weeks instead of 1 day. Use rpg-sync to
+   update the gem index more frequently. [Ryan Tomayko]
+
+ * Fixed a bug where environment variables set in ~/.rpgrc and /etc/rpgrc would
+   override values set in the current environment. [Josh Peek]
+
+ * Improved default mac framework install. /Library/Ruby/RPG/1.8 is used as
+   the root for the RPGDB, RPGINDEX, RPGPACKS, and RPGCACHE paths. Executables
+   go to /usr/bin; library files to /usr/lib/ruby/vendor_ruby/1.8. Unfortunately,
+   this still requires root privileges. [Ryan Tomayko]
 
 Version 0.2 (2010 Apr 27)
 -------------------------
