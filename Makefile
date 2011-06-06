@@ -73,8 +73,8 @@ PROGRAMS     = $(USERPROGRAMS) $(PROGRAMPROGRAMS)
 	$(CC) -c $(CFLAGS) $<
 	printf "       OK\n"
 
-rpg-sh-setup: config.sh munge.rb
-rpg: config.sh munge.rb
+rpg-sh-setup: config.sh munge.rb rpg-sh-setup.sh
+rpg: config.sh munge.rb rpg.sh
 
 rpg-solve: rpg-solve.o strnatcmp.o
 	printf "%13s  %-30s" "[LINK]" "$@"
