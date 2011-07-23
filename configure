@@ -32,9 +32,11 @@ do
     # Options
     --with-ruby)       RUBY="ruby"
                        tiedown=true
+                       specified_ruby=
                        shift;;
     --with-ruby=*)     RUBY=$(longarg "$1" --with-ruby)
                        tiedown=true
+                       specified_ruby="$RUBY"
                        shift;;
     --develop|--development)
                        prefix="$sourcedir/work"
@@ -165,7 +167,12 @@ stdutil bash      BASH       /bin/bash /usr/bin/bash bash
 stdutil dash      DASH       /bin/dash /usr/bin/dash dash
 stdutil sed       SED        /bin/sed /usr/bin/sed sed gsed
 stdutil perl      PERL       perl
-stdutil ruby      RUBY       "$RUBY" ruby ruby18
+if $tiedown && test -n "$specified_ruby"
+then
+    stdutil ruby      RUBY       "$RUBY"
+else
+    stdutil ruby      RUBY       "$RUBY" ruby ruby18
+fi
 stdutil install   INSTALL    "$(rbconfig INSTALL)" /usr/bin/install install ginstall
 stdutil egrep     EGREP      "$(rbconfig EGREP)" egrep
 
@@ -192,8 +199,14 @@ set -e
 eval "$SHCONFIG"
 
 test -z "$RUBY" && {
-    warn "fatal: no ruby found on PATH."
-    warn "try: $0 --with-ruby=/path/to/ruby"
+if $tiedown && test -n "$specified_ruby"
+    then
+        warn "fatal: specified ruby ($specified_ruby) not found."
+        warn "please fix: --with-ruby=/path/to/ruby."
+    else
+        warn "fatal: no ruby found on PATH."
+        warn "try: $0 --with-ruby=/path/to/ruby"
+    fi
     exit 3
 }
 
