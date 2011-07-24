@@ -30,23 +30,56 @@ directory, and then switch into it:
 INSTALLING
 ----------
 
+rpg works with two trees: one for rpg binaries and supporting code, and one
+for installed packages and the package database. It is possible to have either
+of these trees be standalone, or located under an existing ruby installation.
+
 To install rpg under the default location (`/usr/local`):
 
     ./configure
     make
     sudo make install
 
+Ruby packages will be installed under your ruby installation
+(e.g. /usr/local/lib/ruby or /usr/lib/ruby). Assuming that /usr/local/bin
+is in your PATH environment variable no further configuration is necessary.
+
 To install rpg into a self-contained directory off your home:
 
-    ./configure --prefix=~/.rpg
+    ./configure --prefix=~/.rpg --rpgdir ~/.packages
     make
     make install
 
-You may need to add <prefix>/bin to your PATH environment variable if it isn't
-there already. Add the following to your ~/.bashrc or ~/.profile to ensure rpg
-is available to all new shell sessions:
+Ruby packages will be installed in ~/.packages/lib, and binaries
+for ruby packages in ~/.packages/bin, requiring these directories be added
+to RUBYOPT and PATH as follows:
+
+    RUBYOPT="$RUBYOPT -I~/.packages/lib"
+    PATH="$PATH:~/.packages/bin"
+
+You might need to use $HOME instead of ~ depending on your shell/environment.
+
+rpg itself requires that its `bin` directory (`<prefix>/bin`) be on your PATH
+as well (this is needed for rpg operations on packages, not for using packages
+installed by rpg). If it is not there already add the following to your
+~/.bashrc or ~/.profile to ensure rpg is available to all new shell sessions:
 
     PATH="$PATH:<prefix>/bin"
+
+To install rpg into an existing system-wide ruby installation:
+
+    ./configure --with-ruby
+    make
+    sudo make install
+
+To install rpg into a specific ruby installation:
+
+    ./configure --with-ruby=~/.rvm/rubies/ruby187
+    make
+    make install
+
+In both of these cases packages will be installed under the ruby installation
+tree so that no further configuration of environment variables is needed.
 
 The installation puts files under the bin, libexec, and share/man directories of
 the configured <prefix>. See `configure --help' for information on tuning
