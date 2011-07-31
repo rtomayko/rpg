@@ -213,7 +213,7 @@ fi
 # `diff(1)` not being available.
 notice "building release diff: $release-diff"
 
-(diff -u "$release" "$release+" 2>&1 && true) > "$release-diff+"
+diff -u "$release" "$release+" > "$release-diff+" 2>&1 && true
 
 # Write a list of new packages to stdout if the verbose flag was given.
 if $verbose
