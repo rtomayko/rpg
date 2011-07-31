@@ -84,3 +84,9 @@ tree so that no further configuration of environment variables is needed.
 The installation puts files under the bin, libexec, and share/man directories of
 the configured <prefix>. See `configure --help' for information on tuning
 these default locations.
+
+On FreeBSD, if installing as an unprivileged user, you might receive an error
+during `make install` complaining about insufficient permissions for `chown`.
+To fix it, configure with `RB_USER_INSTALL=yes` as follows:
+
+    RB_USER_INSTALL=yes ./configure --prefix=... [other options...]
