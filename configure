@@ -15,6 +15,7 @@
 #/   --datarootdir=DIR        data file root [PREFIX/share]
 #/   --datadir=DIR            data files [DATAROOTDIR]
 #/   --mandir=DIR             man documentation [DATAROOTDIR/man]
+#/   --rpgdir=DIR             rpg package and db root [RUBYLIBDIR/rpg]
 
 warn () { echo "$(basename $0):" "$@" 1>&2; }
 longarg () { echo "$1" | sed "s/^$2=//"; }
@@ -66,6 +67,8 @@ do
     --datadir=*)       datadir="$(longarg "$1" --datadir)";shift;;
     --mandir)          mandir="$2";shift 2;;
     --mandir=*)        mandir="$(longarg "$1" --mandir)";shift;;
+    --rpgdir)          rpgdir="$2";shift 2;;
+    --rpgdir=*)        rpgdir="$(longarg "$1" --rpgdir)";shift;;
 
     # Environment variables passed on command line:
     [A-Z]*=*)       name="${1%%=*}"
@@ -239,6 +242,7 @@ then
     : ${datadir:=$(rbconfig datadir "$datarootdir")}
     : ${mandir:=$(rbconfig mandir "$datadir/man")}
     : ${docdir:=$(rbconfig docdir "$datadir/doc")}
+    : ${rpgdir:=$(rbconfig rubylibdir "/var/lib")/rpg}
 else
     : ${prefix:="/usr/local"}
     : ${exec_prefix:="$prefix"}
@@ -261,6 +265,7 @@ recordconfig sysconfdir    "$sysconfdir"
 recordconfig datarootdir   "$datarootdir"
 recordconfig datadir       "$datadir"
 recordconfig mandir        "$mandir"
+recordconfig rpgdir        "$rpgdir"
 recordconfig develmode     "$develmode"
 
 echo writing config.mk...
@@ -289,4 +294,5 @@ printf "  libexecdir:    %-20s (%s)\n" "$libexecdir" "rpg program executables"
 printf "  sysconfdir:    %-20s (%s)\n" "$sysconfdir" "rpgrc config file"
 printf "  localstatedir: %-20s (%s)\n" "$localstatedir" "package db, index, and gem cache"
 printf "  mandir:        %-20s (%s)\n" "$mandir" "unix manpages"
+printf "  rpgdir:        %-20s (%s)\n" "$rpgdir" "rpg files"
 echo "run \`make' to build and then \`make install' to install."
