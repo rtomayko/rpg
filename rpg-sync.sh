@@ -55,7 +55,7 @@
 # Finally, automatic sync can be disabled completely with:
 #
 #     # never auto sync the package index
-#     PGSTALETIME=never
+#     RPGSTALETIME=never
 #
 # See the stale time code below for more information on acceptable values.
 

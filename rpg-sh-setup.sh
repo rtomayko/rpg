@@ -114,7 +114,7 @@ heed () {
     sed 's/^\([^ ]\)/                   \1/'  1>&2
 }
 
-# We rewite the `notice` function to `head` if `RPGVERBOSE` is enabled
+# We rewite the `notice` function to `heed` if `RPGVERBOSE` is enabled
 # after sourcing config files.
 notice () { true; }
 
