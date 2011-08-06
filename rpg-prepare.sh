@@ -194,9 +194,18 @@ heed "$freshpacks of $totalpacks packages already installed and up to date"
 # Check for unsolved packages in our solved list. Unsolved packages have
 # a dash "-" in their version field.
 if badpacks=$(grep ' -$' "$delta")
-then heed "$(echo "$badpacks" |grep -c .) packages failed to resolve:
-$(echo "$badpacks" | cut -d ' ' -f 1)"
-     exit 1
+then
+    heed "$(echo "$badpacks" |grep -c .) packages failed to resolve:"
+    for pack in $(echo "$badpacks" | cut -d ' ' -f 1)
+    do
+        heed "$pack ($(cut -d ' ' -f 3- "$packlist"))"
+    done
+    versions=$(grep "^$pack " "$release" | cut -d ' ' -f 2)
+    if test -n "$versions"
+    then
+        heed "available versions: $(echo $versions)"
+    fi
+    exit 1
 fi
 
 # Note the number of packages that are now queued up for installation.
