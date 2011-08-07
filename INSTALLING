@@ -54,8 +54,15 @@ Ruby packages will be installed in ~/.packages/lib, and binaries
 for ruby packages in ~/.packages/bin, requiring these directories be added
 to RUBYOPT and PATH as follows:
 
-    RUBYOPT="$RUBYOPT -I~/.packages/lib"
+    RUBYOPT="$RUBYOPT -I~/.packages/lib -I~/.packages/lib/i386-freebsd8"
     PATH="$PATH:~/.packages/bin"
+
+The architecture-dependent directory (~/.packages/lib/i386-freebsd8) is
+probably different for your system, adjust the command accordingly.
+
+You can find out your architecture by running:
+
+    echo 'puts RbConfig::CONFIG["arch"]' | ruby -rrbconfig
 
 You might need to use $HOME instead of ~ depending on your shell/environment.
 
