@@ -69,6 +69,14 @@ ARGV.each do |file|
     case spec['date']
     when Time; spec['date'].utc.strftime('%Y-%m-%d')
     when Date; spec['date'].to_s
+    when String
+      # Some date formats are not parsed by YAML despite being legitimate;
+      # e.g. 2011-08-25 00:00:00.000000000Z.
+      # Use Time.parse to parse such dates.
+      # Sadly, it looks like Time.parse will silently accept any garbage
+      # fed to it, meaning truly invalid input is unlikely to be caught.
+      require 'time'
+      Time.parse(spec['date']).utc.strftime('%Y-%m-%d')
     else fail "unexpected date value: #{spec['date'].inspect}"
     end
   spec.reject! { |k,v| v.respond_to?(:ivars) }
