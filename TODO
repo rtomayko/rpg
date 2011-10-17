@@ -82,3 +82,4 @@ LATER
 [ ] rpg-check verifies an installed package
 [ ] search from current directory up for .rpgrc
 [ ] ruby-specific config file based on md5 of ruby interpreter path
+[ ] detect file conflicts (same file installed) between packages

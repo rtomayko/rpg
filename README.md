@@ -199,6 +199,11 @@ Differences from the `gem` command:
     into a single rpg environment -- the package's files would overwrite each
     other. All version conflicts must be resolved at install time.
 
+  * `rpg` is similarly unable to install more than one package owning the
+    same file under Ruby libdir. (Currently `rpg` will install such packages
+    anyway, with later installed packages overwriting files installed by
+    earlier installed packages.)
+
   * `rpg` has no runtime component (e.g., `require 'rubygems'`). Because all
     library files are placed under a common `lib` directory, and because package
     versions are sussed at install time, there's no need for a component to
