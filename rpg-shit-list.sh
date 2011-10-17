@@ -80,6 +80,18 @@ RedCloth)
     rm -rf "lib/tasks"
     ;;
 
+sass)
+    fixable "sass reads VERSION, VERSION_NAME, REVISION files from package root"
+    cd "$path"
+    revision=$(cat REVISION 2>/dev/null || true)
+    vername=$(cat VERSION_NAME 2>/dev/null || true)
+    sedi "
+        s/File.read(scope('VERSION'))/'$version'/g
+        s/File.read(scope('REVISION'))/'$revision'/g
+        s/File.read(scope('VERSION_NAME'))/'$vername'/g
+    " lib/sass/version.rb
+    ;;
+
 SystemTimer)
     fixable "system_timer.rb and system_timer_stub.rb requires rubygems"
     cd "$path"
