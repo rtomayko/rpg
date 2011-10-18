@@ -39,6 +39,7 @@ rpg-resolve.html
 rpg-status.html
 rpg-package-install
 rpg-package-register
+rpg-parse-gemfile
 rpg-parse-package-list
 rpg-solve
 rpg-unpack
