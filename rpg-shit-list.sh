@@ -37,6 +37,14 @@ haml)
         s/File.read(scope('REVISION'))/'$revision'/g
         s/File.read(scope('VERSION_NAME'))/'$vername'/g
     " lib/haml/version.rb
+
+    case "$version" in
+    3.1.*)
+        fixable "haml 3.1.x bundles sass"
+        cd "$path"
+        rm -r lib/sass lib/sass.rb
+        ;;
+    esac
     ;;
 
 json|json_pure)
