@@ -27,6 +27,8 @@ do
         $RPGSHOWBUILD && cat build.log 1>&2
         find "$(dirname "$file")" -name "*.$(ruby_dlext)"
     else
+        status=$?
         cat build.log 1>&2
+        exit $status
     fi
 done
