@@ -185,10 +185,13 @@ manifest="$packagedir/$version/manifest"
     # Ruby Executables
     # ----------------
 
+    bindir=$(cat "$packagedir/$version/bindir" 2>&1)
+    : ${bindir:=bin}
+
     # Write executable scripts into `RPGBIN` and rewrite shebang lines.
-    test -d "$pack/bin" && {
+    test -d "$pack/$bindir" && {
         mkdir -p "$RPGBIN"
-        for file in "$pack/bin"/*
+        for file in "$pack/$bindir"/*
         do  dest="$RPGBIN/$(basename $file)"
             notice "$dest [!]"
             sed "s@^#!.*ruby.*@#!$(ruby_command)@" <"$file" >"$dest"
