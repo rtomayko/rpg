@@ -166,7 +166,7 @@ manifest="$packagedir/$version/manifest"
     # sub-directories, ignoring certain incorrect values (`test`, `ext`, `spec`,
     # etc.).
 
-    libdirs=$(cat "$packagedir/$version/require_paths" 2>&1)
+    libdirs=$(cat "$packagedir/$version/require_paths" 2>/dev/null)
     : ${libdirs:=lib}
 
     for libdir in $libdirs
@@ -185,7 +185,7 @@ manifest="$packagedir/$version/manifest"
     # Ruby Executables
     # ----------------
 
-    bindir=$(cat "$packagedir/$version/bindir" 2>&1)
+    bindir=$(cat "$packagedir/$version/bindir" 2>/dev/null)
     : ${bindir:=bin}
 
     # Write executable scripts into `RPGBIN` and rewrite shebang lines.
