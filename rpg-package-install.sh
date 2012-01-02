@@ -51,7 +51,12 @@ installdir () {
     mkdir -p "$2"
     for file in "$1"/*
     do
-        if test -f "$file"
+        if ! test -e "$file"
+        then
+            # no files in directory - * was not expanded
+            :
+
+        elif test -f "$file"
         then # link dest to source
              installfile "$file" "$2/$(basename $file)"
              echo "$2/$(basename $file)"
