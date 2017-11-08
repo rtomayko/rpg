@@ -23,6 +23,8 @@ Please direct rpg related discussion to the rpg mailing list:
 Status
 ------
 
+*Update: This repository is no longer actively maintained by @rtomayko. Issues and PRs documenting current issues have been intentionally left open for informational purposes.*
+
 Experimental. Using rpg with system rubys is not yet recommended. Suggested use
 is with rvm or custom, non-system ruby builds. See the `KNOWN-ISSUES` file for a
 list of potential gotchas and general annoyances.
