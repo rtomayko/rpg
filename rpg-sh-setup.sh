@@ -261,23 +261,68 @@ eval "${oldrpgenv}"
 # Install Paths
 # -------------
 
-# This is the psuedo root directory where `rpg` keeps all its stuff. The
+# rpg, when installed, has/manages three components:
+#
+#  1. rpg's own binaries;
+#  2. library and binary files belonging to packages installed by rpg;
+#  3. rpg's package database.
+#
+# rpg offers the following common possibilities for installing its own
+# binaries:
+#
+#  1. By default, they are installed under /usr/local.
+#  2. The default location may be overridden by passing --prefix option
+#     to configure.
+#  3. If --with-ruby is given to configure, rpg installs its binaries into
+#     the specified ruby installation's bindir. If --with-ruby is specified,
+#     --prefix is meaningless and is ignored.
+#
+# rpg offers the following common options for where to place the packages
+# it installs and its package database:
+#
+#  1. rpg writes packages into the systemwide ruby installation, and its
+#     package database to a systemwide location under the selected prefix.
+#     This is the default if neither --with-ruby nor --rpgdir are given
+#     to configure.
+#     Since the default prefix is /usr/local, if no options are passed to
+#     configure rpg will install package database in /usr/local/var.
+#  2. rpg writes both packages and package database into the chosen
+#     (or systemwide) ruby installation. This is accomplished by specifying
+#     --with-ruby but not --rpgdir options when running configure.
+#     If --with-ruby is given an argument, like --with-ruby=/path/to/ruby,
+#     then that ruby installation will be used, otherwise the systemwide
+#     ruby installation will be used.
+#  3. rpg writes both packages and its package database into the prescribed
+#     tree. This is accomplished by using --rpgdir option to configure.
+#
+# At runtime RPGDIR can be overridden to make rpg install packages and
+# write its package database to the specified tree.
+# This is the runtime equivalent of --rpgdir configure option.
+# RPGDIR is meant to be given by user and should not be set by rpg itself.
+#
+# Besides using these common patterns it is also possible to override
+# various paths individually if further flexibility is desired.
+
+# This is the pseudo root directory where `rpg` keeps all its stuff. The
 # default locations of other rpg paths use this as a base.  *HOWEVER*,
 # no rpg utility targets this directory -- every significant location must
 # have a separate path variable so that things stay flexible in
 # configuration.
-: ${RPGPATH:=${rpgdir:-$(
+: ${RPGPATH:=${RPGDIR:-${rpgdir:-$(
     if $RUBYMACFRAMEWORK
     then echo "/Library/Ruby/RPG/$RUBYVERSION"
     else echo "${RUBYLIBDIR:-/var/lib}/rpg"
     fi
-)}}
+)}}}
 
 # `RPGLIB` is the shared Ruby `lib` directory where library files are
 # installed. It defaults to the currently active ruby's `vendor_ruby`
 # directory (or `site_ruby` when Ruby < 1.8.7). If neither of those
 # locations be determined for some reason, `RPGPATH/lib` is assumed.
-if test -n "$rpgdir"
+if test -n "$RPGDIR"
+then
+    : ${RPGLIB:=$RPGDIR/lib}
+elif test -n "$rpgdir"
 then
     : ${RPGLIB:=$rpgdir/lib}
 else
@@ -287,7 +332,10 @@ fi
 # `RPGBIN` is where executable scripts included in packages are installed.
 # It defaults to the currently active ruby's `bindir` and falls back to
 # `RPGPATH/bin` if no ruby `bindir` can be determined.
-if test -n "$rpgdir"
+if test -n "$RPGDIR"
+then
+    : ${RPGBIN:=$RPGDIR/bin}
+elif test -n "$rpgdir"
 then
     : ${RPGBIN:=$rpgdir/bin}
 else
@@ -296,7 +344,10 @@ fi
 
 # `RPGMAN` is where manpages included with packages are installed. This
 # is basically the whole reason `rpg` was written in the first place.
-if test -n "$rpgdir"
+if test -n "$RPGDIR"
+then
+    : ${RPGMAN:=$RPGDIR/man}
+elif test -n "$rpgdir"
 then
     : ${RPGMAN:=$RPGPATH/man}
 else
